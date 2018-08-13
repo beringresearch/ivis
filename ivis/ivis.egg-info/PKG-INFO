@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: ivis
+Version: 1.0
+Summary: Artificial neural network-driven visualization of high-dimensional data using triplets.
+Home-page: http://github.com/beringresearch/dimensionality_reduction
+Author: Benjamin Szubert, Ignat Drozdov
+Author-email: bszubert@beringresearch.com, idrozdov@beringresearch.com
+License: MIT
+Description-Content-Type: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
