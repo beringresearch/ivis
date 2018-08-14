@@ -34,7 +34,7 @@ def knn_triplet_from_neighbour_list(X, index, neighbour_list):
     neighbour_ind = np.random.choice(neighbour_list)
     
     # Take a random non-neighbour as negative
-    negative_ind = np.random.randint(0, len(X))
+    negative_ind = np.random.randint(0, len(X))     # Pick a random index until one fits constraint. An optimization.
     while negative_ind in neighbour_list:
         negative_ind = np.random.randint(0, len(X))
     
@@ -73,7 +73,7 @@ def knn_triplet_from_annoy_index(X, annoy_index, row_index, k):
     neighbour_ind = np.random.choice(neighbour_list)
     
     # Take a random non-neighbour as negative
-    negative_ind = np.random.randint(0, len(X))
+    negative_ind = np.random.randint(0, len(X))     # Pick a random index until one fits constraint. An optimization.
     while negative_ind in neighbour_list:
         negative_ind = np.random.randint(0, len(X))
 
