@@ -1,6 +1,5 @@
 tensorflow
 keras
 numpy
-pandas
 scikit-learn
 annoy

@@ -1,5 +1,5 @@
-""" Trains a DNN using Triplet Loss.
-"""
+""" Creates a Siamese Dense Neural Network with three subnetworks """
+
 from .losses import triplet_loss
 
 from keras.models import Model

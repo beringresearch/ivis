@@ -1,6 +1,5 @@
 ivis/__init__.py
 ivis/ivis.py
-ivis/knn.py
 ivis.egg-info/PKG-INFO
 ivis.egg-info/SOURCES.txt
 ivis.egg-info/dependency_links.txt

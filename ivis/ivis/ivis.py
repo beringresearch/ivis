@@ -1,5 +1,6 @@
-from .knn import extract_knn
-from .data.triplet_generators import generate_knn_triplets
+""" scikit-learn wrapper class for the Ivis algorithm. """
+
+from .data.triplet_generators import create_triplet_generator
 from .nn.network import build_network, selu_base_network
 from .nn.losses import triplet_loss
 
@@ -72,8 +73,7 @@ class Ivis(BaseEstimator):
 
     def _fit(self, X):
         input_size = (X.shape[-1],)
-        neighbour_list = extract_knn(X, ntrees=self.ntrees, k=self.k)
-        datagen = generate_knn_triplets(X, neighbour_list, batch_size=self.batch_size)
+        datagen = create_triplet_generator(X, k=self.k, ntrees=self.ntrees, batch_size=self.batch_size, precompute=self.precompute)
 
         try:
             model = build_network(selu_base_network(input_size))
