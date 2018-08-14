@@ -1,9 +1,0 @@
-ivis/__init__.py
-ivis/ivis.py
-ivis/knn.py
-ivis.egg-info/PKG-INFO
-ivis.egg-info/SOURCES.txt
-ivis.egg-info/dependency_links.txt
-ivis.egg-info/not-zip-safe
-ivis.egg-info/requires.txt
-ivis.egg-info/top_level.txt
