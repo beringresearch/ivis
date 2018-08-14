@@ -1,8 +1,7 @@
 from .knn import extract_knn
 from .data.triplet_generators import generate_knn_triplets
 from .nn.network import build_network, selu_base_network
-from .nn.distance_metrics import triplet_pn_distance, triplet_euclidean_distance, triplet_squared_euclidean_distance
-from .nn.losses import triplet_loss, mae, mse
+from .nn.losses import triplet_loss
 
 from keras.callbacks import EarlyStopping
 from sklearn.base import BaseEstimator
@@ -23,7 +22,7 @@ class Ivis(BaseEstimator):
         The number of neighbours to retrieve for each point
 
     distance : string, optional (default: "pn")
-        The loss function used to train the neural network. One of "pn", "euclidean", "squared euclidean".
+        The loss function used to train the neural network. One of "pn", "euclidean", "softmax_ratio_pn", "softmax_ratio".
     
     batch_size : int, optional (default: 128)
         The size of mini-batches used during gradient descent while training the neural network.
@@ -76,11 +75,11 @@ class Ivis(BaseEstimator):
         neighbour_list = extract_knn(X, ntrees=self.ntrees, k=self.k)
         datagen = generate_knn_triplets(X, neighbour_list, batch_size=self.batch_size)
 
-        if self.distance == "pn":
-            model = build_network(selu_base_network(input_size), triplet_pn_distance)
-            model.compile(optimizer='adam', loss=triplet_loss(margin=self.margin))
-        else:
-            raise Exception('Not yet implemented.')
+        try:
+            model = build_network(selu_base_network(input_size))
+            model.compile(optimizer='adam', loss=triplet_loss(distance=self.distance, margin=self.margin))
+        except KeyError:
+            raise Exception('Loss function not implemented.')
         
         hist = model.fit_generator(datagen, steps_per_epoch=int(X.shape[0] / self.batch_size), epochs=self.epochs, callbacks=[EarlyStopping(monitor='loss', patience=50)] )
         self.loss_history_ = hist.history['loss']
