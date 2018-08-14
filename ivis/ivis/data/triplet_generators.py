@@ -26,7 +26,7 @@ def create_triplet_generator(X, k, ntrees, batch_size, precompute=True):
         return generate_knn_triplets_from_annoy_index(X, index, k=k, batch_size=batch_size)
 
 
-def knn_triplet_from_neighbour_list(X, index, neighbour_list, row_indexes):
+def knn_triplet_from_neighbour_list(X, index, neighbour_list):
     """ A random (unweighted) positive example chosen. """
     triplets = []
     
@@ -44,19 +44,20 @@ def knn_triplet_from_neighbour_list(X, index, neighbour_list, row_indexes):
 
 def generate_knn_triplets_from_neighbour_list(X, neighbour_list, batch_size=32):
     iterations = 0
-    row_indexes = list(range(len(X)))
+    row_indexes = np.array(list(range(len(X))), dtype=np.uint32)
     np.random.shuffle(row_indexes)
-    
+
+    placeholder_labels = np.array([0 for i in range(batch_size)])
+
     while True:
         triplet_batch = []
-        placeholder_labels = np.array([0 for i in range(batch_size)])
         
         for i in range(batch_size):
             if iterations >= len(X):
                 np.random.shuffle(row_indexes)
                 iterations = 0
            
-            triplet = knn_triplet_from_neighbour_list(X, row_indexes[iterations], neighbour_list[row_indexes[iterations]], row_indexes)
+            triplet = knn_triplet_from_neighbour_list(X, row_indexes[iterations], neighbour_list[row_indexes[iterations]])
             triplet_batch += triplet
             iterations += 1
         
@@ -81,12 +82,13 @@ def knn_triplet_from_annoy_index(X, annoy_index, row_index, k):
 
 def generate_knn_triplets_from_annoy_index(X, annoy_index, k=150, batch_size=32):
     iterations = 0
-    row_indexes = list(range(len(X)))
+    row_indexes = np.array(list(range(len(X))), dtype=np.uint32)
     np.random.shuffle(row_indexes)
+
+    placeholder_labels = np.array([0 for i in range(batch_size)])
     
     while True:
         triplet_batch = []
-        placeholder_labels = np.array([0 for i in range(batch_size)])
         
         for i in range(batch_size):
             if iterations >= len(X):
