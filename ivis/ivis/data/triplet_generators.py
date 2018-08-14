@@ -15,29 +15,30 @@ can be useful.
 from .knn import build_annoy_index, extract_knn
 
 import numpy as np
-import random
+
 
 def create_triplet_generator(X, k, ntrees, batch_size, precompute=True):
     if precompute == True:
-        neighbour_list = extract_knn(X, k=k, ntrees=ntrees)
+        neighbour_list = np.array(extract_knn(X, k=k, ntrees=ntrees), dtype=np.uint32)
         return generate_knn_triplets_from_neighbour_list(X, neighbour_list, batch_size=batch_size)
     else:
         index = build_annoy_index(X, k=k, ntrees=ntrees)
         return generate_knn_triplets_from_annoy_index(X, index, k=k, batch_size=batch_size)
 
 
-def knn_triplet_from_neighbour_list(X, index, neighbour_list):
+def knn_triplet_from_neighbour_list(X, index, neighbour_list, row_indexes):
     """ A random (unweighted) positive example chosen. """
     triplets = []
     
     # Take a random neighbour as positive
-    neighbour = neighbour_list[np.random.choice(range(len(neighbour_list)))]
+    neighbour_ind = np.random.choice(neighbour_list)
     
     # Take a random non-neighbour as negative
-    negative_ind = random.randrange(0, len(X))
-    while negative_ind == index or negative_ind in neighbour_list:
-        negative_ind = random.randrange(0, len(X))
-    triplets += [[X[index], X[neighbour], X[negative_ind]]]
+    negative_ind = np.random.randint(0, len(X))
+    while negative_ind in neighbour_list:
+        negative_ind = np.random.randint(0, len(X))
+    
+    triplets += [[X[index], X[neighbour_ind], X[negative_ind]]]
     return triplets
 
 
@@ -55,7 +56,7 @@ def generate_knn_triplets_from_neighbour_list(X, neighbour_list, batch_size=32):
                 np.random.shuffle(row_indexes)
                 iterations = 0
            
-            triplet = knn_triplet_from_neighbour_list(X, row_indexes[iterations], neighbour_list[row_indexes[iterations]])
+            triplet = knn_triplet_from_neighbour_list(X, row_indexes[iterations], neighbour_list[row_indexes[iterations]], row_indexes)
             triplet_batch += triplet
             iterations += 1
         
@@ -68,13 +69,14 @@ def knn_triplet_from_annoy_index(X, annoy_index, row_index, k):
     neighbour_list = np.array(annoy_index.get_nns_by_item(row_index, k+1, search_k=-1, include_distances=False), dtype=np.uint32)
     
     # Take a random neighbour as positive
-    neighbour = neighbour_list[np.random.choice(range(len(neighbour_list)))]
+    neighbour_ind = np.random.choice(neighbour_list)
     
     # Take a random non-neighbour as negative
-    negative_ind = random.randrange(0, len(X))
-    while negative_ind == row_index or negative_ind in neighbour_list:
-        negative_ind = random.randrange(0, len(X))
-    triplets += [[X[row_index], X[neighbour], X[negative_ind]]]
+    negative_ind = np.random.randint(0, len(X))
+    while negative_ind in neighbour_list:
+        negative_ind = np.random.randint(0, len(X))
+
+    triplets += [[X[row_index], X[neighbour_ind], X[negative_ind]]]
     return triplets
 
 def generate_knn_triplets_from_annoy_index(X, annoy_index, k=150, batch_size=32):
