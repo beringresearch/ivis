@@ -1,6 +1,5 @@
 """ KNN retrieval using an Annoy index. """
 
-import louvain
 import numpy as np
 
 from annoy import AnnoyIndex
