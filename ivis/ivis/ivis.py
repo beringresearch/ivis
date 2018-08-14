@@ -5,6 +5,7 @@ from .nn.network import build_network, selu_base_network
 from .nn.losses import triplet_loss
 
 from keras.callbacks import EarlyStopping
+from keras.models import load_model
 from sklearn.base import BaseEstimator
 
 
@@ -96,3 +97,11 @@ class Ivis(BaseEstimator):
     def transform(self, X):
         embedding = self.model_.predict(X)
         return embedding
+
+    def save(self, filepath):
+        self.model_.save(filepath)
+    
+    def load(self, filepath):
+        model = load_model(filepath)
+        self.model_ = model
+        return self
