@@ -1,3 +1,7 @@
+""" Triplet loss functions for training a siamese network with three subnetworks.
+    All loss function variants are accessible through the `triplet_loss` function by specifying the distance as a string.
+"""
+
 from keras import backend as K
 import tensorflow as tf
 
