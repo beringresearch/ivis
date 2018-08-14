@@ -1,8 +1,8 @@
 """ scikit-learn wrapper class for the Ivis algorithm. """
 
-from .data.triplet_generators import create_triplet_generator
-from .nn.network import build_network, selu_base_network
-from .nn.losses import triplet_loss
+from  data.triplet_generators import create_triplet_generator
+from nn.network import build_network, selu_base_network
+from nn.losses import triplet_loss
 
 from keras.callbacks import EarlyStopping
 from keras.models import load_model

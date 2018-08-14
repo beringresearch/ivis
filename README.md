@@ -6,16 +6,16 @@ This algorithm uses a siamese neural network trained on triplets to reduce the d
 
 ## Installation
 
-After cloning this repo, navigate to the 'ivis' folder and run: `pip install -e .`
+After cloning this repo run: `pip install -e .` from the root of the project.
 
 ## Examples
 
 ```
-from ivis.ivis import Ivis
+from ivis import Ivis
 from sklearn import datasets
 
 iris = datasets.load_iris()
-X = iris.data[:,:2]
+X = iris.data
 y = iris.target
 
 model = Ivis(embedding_dims=2, k=15)
