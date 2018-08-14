@@ -43,7 +43,7 @@ class Ivis(BaseEstimator):
 
     search_k: int, optional (default: -1)
         The maximum number of nodes inspected during a nearest neighbour query by Annoy. The higher, the more computation time required, but the higher the accuracy. The default 
-        is n_trees * k, where k is the number of neighbours to retrieve.
+        is n_trees * k, where k is the number of neighbours to retrieve. If this is set too low, a variable number of neighbours may be retrieved per data-point.
 
     precompute : boolean, optional (default: True)
         Whether to pre-compute the nearest neighbours. Pre-computing is significantly faster, but requires more memory. If memory is limited, try setting this to False.
@@ -74,7 +74,7 @@ class Ivis(BaseEstimator):
 
     def _fit(self, X):
         input_size = (X.shape[-1],)
-        datagen = create_triplet_generator(X, k=self.k, ntrees=self.ntrees, batch_size=self.batch_size, precompute=self.precompute)
+        datagen = create_triplet_generator(X, k=self.k, ntrees=self.ntrees, batch_size=self.batch_size, search_k=self.search_k, precompute=self.precompute)
 
         try:
             model = build_network(selu_base_network(input_size))

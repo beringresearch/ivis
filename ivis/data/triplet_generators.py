@@ -17,13 +17,13 @@ from .knn import build_annoy_index, extract_knn
 import numpy as np
 
 
-def create_triplet_generator(X, k, ntrees, batch_size, precompute=True):
+def create_triplet_generator(X, k, ntrees, batch_size, search_k=-1, precompute=True):
     if precompute == True:
-        neighbour_list = np.array(extract_knn(X, k=k, ntrees=ntrees), dtype=np.uint32)
+        neighbour_list = extract_knn(X, k=k, ntrees=ntrees, search_k=search_k)
         return generate_knn_triplets_from_neighbour_list(X, neighbour_list, batch_size=batch_size)
     else:
         index = build_annoy_index(X, k=k, ntrees=ntrees)
-        return generate_knn_triplets_from_annoy_index(X, index, k=k, batch_size=batch_size)
+        return generate_knn_triplets_from_annoy_index(X, index, k=k, batch_size=batch_size, search_k=search_k)
 
 
 def knn_triplet_from_neighbour_list(X, index, neighbour_list):
@@ -64,7 +64,7 @@ def generate_knn_triplets_from_neighbour_list(X, neighbour_list, batch_size=32):
         triplet_batch = np.array(triplet_batch)
         yield ([triplet_batch[:,0], triplet_batch[:,1], triplet_batch[:,2]], placeholder_labels)
 
-def knn_triplet_from_annoy_index(X, annoy_index, row_index, k):
+def knn_triplet_from_annoy_index(X, annoy_index, row_index, k, search_k=-1):
     """ A random (unweighted) positive example chosen. """
     triplets = []
     neighbour_list = np.array(annoy_index.get_nns_by_item(row_index, k+1, search_k=-1, include_distances=False), dtype=np.uint32)
@@ -80,7 +80,7 @@ def knn_triplet_from_annoy_index(X, annoy_index, row_index, k):
     triplets += [[X[row_index], X[neighbour_ind], X[negative_ind]]]
     return triplets
 
-def generate_knn_triplets_from_annoy_index(X, annoy_index, k=150, batch_size=32):
+def generate_knn_triplets_from_annoy_index(X, annoy_index, k=150, batch_size=32, search_k=-1):
     iterations = 0
     row_indexes = np.array(list(range(len(X))), dtype=np.uint32)
     np.random.shuffle(row_indexes)
@@ -95,7 +95,7 @@ def generate_knn_triplets_from_annoy_index(X, annoy_index, k=150, batch_size=32)
                 np.random.shuffle(row_indexes)
                 iterations = 0                    
             
-            triplet = knn_triplet_from_annoy_index(X, annoy_index, row_indexes[iterations], k=k)
+            triplet = knn_triplet_from_annoy_index(X, annoy_index, row_indexes[iterations], k=k, search_k=search_k)
             triplet_batch += triplet
             iterations += 1
         

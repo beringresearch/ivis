@@ -14,15 +14,15 @@ def build_annoy_index(X, k=150, ntrees=50):
     index.build(ntrees)
     return index
 
-def extract_knn(X, k=150, ntrees=50):
+def extract_knn(X, k=150, ntrees=50, search_k=-1):
     index = build_annoy_index(X, k=k, ntrees=ntrees)
 
     def knn(x, k = k):
-        k = index.get_nns_by_item(x, k+1, include_distances=False) 
-        return k
+        k = index.get_nns_by_item(x, k+1, search_k=search_k, include_distances=False) 
+        return np.array(k, dtype=np.uint32)
 
     edge_list = []
     for element in range(X.shape[0]):
         edge_list.append(knn(element, k=k))
     
-    return np.array(edge_list, dtype=np.uint32)
+    return edge_list
