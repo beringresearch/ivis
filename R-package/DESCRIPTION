@@ -1,0 +1,16 @@
+Package: ivis
+Title: Artificial neural network-driven visualization of high-dimensional data using triplets. 
+Version: 1.0 
+Authors@R: c(person("Benjamin", "Szubert", email = "bszubert@beringresearch.com", role = c("aut", "cre")),
+         person("Ignat", "Drozdov", email = "idrozdov@beringresearch.com", role = c("aut")))
+Description: Implementation of the ivis algorithm as described in the paper:
+  'Structure-preserving visualisation of high dimensional single-cell data with deep Siamese Neural Networks'.
+  This algorithm uses a siamese neural network trained on triplets to reduce the dimensionality of data to two dimensions for visualization.
+  Each triplet is sampled from one of the k nearest neighbours as approximated by the Annoy library, with neighbouring points being pulled
+  together and non-neighours being pushed away.
+Depends: R (>= 3.4.3)
+Imports: reticulate
+License: MIT
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
