@@ -1,4 +1,5 @@
 from setuptools import setup
+from setuptools import find_packages
 
 setup(name='ivis',
       version='1.0',
@@ -7,7 +8,7 @@ setup(name='ivis',
       author='Benjamin Szubert, Ignat Drozdov',
       author_email='bszubert@beringresearch.com, idrozdov@beringresearch.com',
       license='MIT',
-      packages=['ivis'],
+      packages=find_packages(),
       install_requires=[
           'tensorflow',
           'keras',
