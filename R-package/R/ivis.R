@@ -7,7 +7,7 @@
 #'        The loss function used to train the neural network. One of "pn", "euclidean", "softmax_ratio_pn", "softmax_ratio". 
 #' @param batch_size int, optional (default: 128)
 #'        The size of mini-batches used during gradient descent while training the neural network.
-#' @param epochs int, optional (default: 10000)
+#' @param epochs int, optional (default: 1000)
 #'        The maximum number of epochs to train the model for. Each epoch the network will see a triplet based on each data-point once.
 #' @param n_epochs_without_progress int, optional (default: 50)
 #'        After n number of epochs without an improvement to the loss, terminate training early.
