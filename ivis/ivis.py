@@ -29,7 +29,7 @@ class Ivis(BaseEstimator):
     batch_size : int, optional (default: 128)
         The size of mini-batches used during gradient descent while training the neural network.
 
-    epochs : int, optional (default: 10000)
+    epochs : int, optional (default: 1000)
         The maximum number of epochs to train the model for. Each epoch the network will see a triplet based on each data-point once.
 
     n_epochs_without_progress: int, optional (default: 50)
