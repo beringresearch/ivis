@@ -77,7 +77,7 @@ class Ivis(BaseEstimator):
         datagen = create_triplet_generator(X, k=self.k, ntrees=self.ntrees, batch_size=self.batch_size, search_k=self.search_k, precompute=self.precompute)
 
         try:
-            model = build_network(selu_base_network(input_size))
+            model = build_network(selu_base_network(input_size, embedding_dims = self.embedding_dims))
             model.compile(optimizer='adam', loss=triplet_loss(distance=self.distance, margin=self.margin))
         except KeyError:
             raise Exception('Loss function not implemented.')
