@@ -26,7 +26,7 @@ def create_triplet_generator(X, k, ntrees, batch_size, search_k=-1, precompute=T
             index = build_annoy_index(X, k=k, ntrees=ntrees)
             return generate_knn_triplets_from_annoy_index(X, index, k=k, batch_size=batch_size, search_k=search_k)
     else:
-        return generate_triplets_from_labels(X, y, batch_size=batch_size)
+        return generate_triplets_from_labels(X, np.array(y), batch_size=batch_size)
 
 
 def knn_triplet_from_neighbour_list(X, index, neighbour_list):
