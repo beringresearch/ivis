@@ -4,11 +4,15 @@
 \alias{ivis}
 \title{IVIS algorithm}
 \usage{
-ivis(X, embedding_dims = 2L, k = 150L, distance = "pn",
+ivis(X, y = NULL, embedding_dims = 2L, k = 150L, distance = "pn",
   batch_size = 128L, epochs = 1000L, n_epochs_without_progress = 50L,
   margin = 1, ntrees = 50L, search_k = -1L, precompute = TRUE)
 }
 \arguments{
+\item{X}{numerical matrix to be reduced. Columns correspond to features.}
+
+\item{y}{int, optional (default: NULL). Optional class vector triggering supervised tripplet selection.}
+
 \item{embedding_dims}{int, optional (default: 2) Number of dimensions in the embedding space}
 
 \item{k}{int, optional (default: 150)
