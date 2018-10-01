@@ -10,6 +10,10 @@ After cloning this repo run: `pip install -e .` from the root of the project.
 
 ## Examples
 
+Ivis can be run in both unsupervised and supervised mode. To run in supservised mode, simply provide an array of labels to the .fit() method.
+
+### Unsupervised embeddings
+
 ```
 from ivis import Ivis
 from sklearn import datasets
@@ -25,8 +29,24 @@ embeddings = model.fit_transform(X)
 
 Plotting the embeddings results in the following visualization:
 
-![](examples/ivis-iris-demo.png)
+![](docs/ivis-iris-demo.png)
 
+### Supervised embeddings
+
+```
+from keras.datasets import mnist
+import numpy as np
+from ivis import Ivis
+
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+x_test = np.reshape(x_test.astype('float32'), (len(x_test), 28 * 28))
+
+
+model = Ivis()
+embeddings = model.fit_transform(x_test, y_test)
+```
+
+![](docs/ivis_mnist_supervised_embeddings.png)
 
 ivis is free for non-commercial use. If you have any questions, please send queries to info "at" beringresearch.com
 
