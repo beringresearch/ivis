@@ -29,7 +29,7 @@ class Ivis(BaseEstimator):
     batch_size : int, optional (default: 128)
         The size of mini-batches used during gradient descent while training the neural network.
 
-    epochs : int, optional (default: 10000)
+    epochs : int, optional (default: 1000)
         The maximum number of epochs to train the model for. Each epoch the network will see a triplet based on each data-point once.
 
     n_epochs_without_progress: int, optional (default: 50)
@@ -77,7 +77,7 @@ class Ivis(BaseEstimator):
         datagen = create_triplet_generator(X, k=self.k, ntrees=self.ntrees, batch_size=self.batch_size, search_k=self.search_k, precompute=self.precompute, y=y)
 
         try:
-            model = build_network(selu_base_network(input_size))
+            model = build_network(selu_base_network(input_size, embedding_dims = self.embedding_dims))
             model.compile(optimizer='adam', loss=triplet_loss(distance=self.distance, margin=self.margin))
         except KeyError:
             raise Exception('Loss function not implemented.')

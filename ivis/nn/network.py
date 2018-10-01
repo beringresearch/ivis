@@ -29,7 +29,7 @@ def build_network(base_network):
 
     return model
 
-def selu_base_network(input_shape, embedding_l2=0.0):
+def selu_base_network(input_shape, embedding_l2=0.0, embedding_dims=2):
     '''Base network to be shared (eq. to feature extraction).
     '''
     inputs = Input(shape=input_shape)
@@ -38,7 +38,7 @@ def selu_base_network(input_shape, embedding_l2=0.0):
     x = Dense(128, activation='selu', kernel_initializer='lecun_normal')(x)
     x = AlphaDropout(0.1)(x)
     x = Dense(128, activation='selu', kernel_initializer='lecun_normal')(x)
-    x = Dense(2, kernel_regularizer=regularizers.l2(embedding_l2))(x)
+    x = Dense(embedding_dims, kernel_regularizer=regularizers.l2(embedding_l2))(x)
     return Model(inputs, x)
 
 if __name__ == "__main__":

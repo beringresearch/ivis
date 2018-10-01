@@ -26,3 +26,8 @@ embeddings = model.fit_transform(X)
 Plotting the embeddings results in the following visualization:
 
 ![](examples/ivis-iris-demo.png)
+
+
+ivis is free for non-commercial use. If you have any questions, please send queries to info "at" beringresearch.com
+
+Copyright 2018 Bering Limited
