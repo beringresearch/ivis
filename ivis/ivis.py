@@ -72,9 +72,9 @@ class Ivis(BaseEstimator):
         self.search_k = search_k
         self.precompute = precompute
 
-    def _fit(self, X):
+    def _fit(self, X, y):
         input_size = (X.shape[-1],)
-        datagen = create_triplet_generator(X, k=self.k, ntrees=self.ntrees, batch_size=self.batch_size, search_k=self.search_k, precompute=self.precompute)
+        datagen = create_triplet_generator(X, k=self.k, ntrees=self.ntrees, batch_size=self.batch_size, search_k=self.search_k, precompute=self.precompute, y=y)
 
         try:
             model = build_network(selu_base_network(input_size))
@@ -87,7 +87,7 @@ class Ivis(BaseEstimator):
         self.model_ = model.layers[3]
 
     def fit(self, X, y=None):
-        self._fit(X)
+        self._fit(X, y)
         return self
 
     def fit_transform(self, X, y=None):
