@@ -31,7 +31,19 @@ ivis <- function(X, y = NULL, embedding_dims = 2L,
     epochs = 1000L,
     n_epochs_without_progress = 50L,
     margin = 1,
-    ntrees = 50L
+    ntrees = 50L,
+    search_k = -1L,
+    precompute = TRUE){
+
+
+    X <- data.matrix(X)
+    if (!is.null(y)) y <- as.integer(y)
+    embedding_dims <- as.integer(embedding_dims)
+    batch_size <- as.integer(batch_size)
+    epochs <- as.integer(epochs)
+    n_epochs_without_progress = as.integer(n_epochs_without_progress)
+    ntrees <- as.integer(ntrees)
+
     search_k <- as.integer(search_k)
 
     model <- ivis_object$Ivis(embedding_dims=embedding_dims,
