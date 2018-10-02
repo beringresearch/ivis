@@ -37,6 +37,7 @@ ivis <- function(X, y = NULL, embedding_dims = 2L,
 
 
     X <- data.matrix(X)
+    k <- as.integer(k)
     if (!is.null(y)) y <- as.integer(y)
     embedding_dims <- as.integer(embedding_dims)
     batch_size <- as.integer(batch_size)
