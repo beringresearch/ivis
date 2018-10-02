@@ -91,7 +91,7 @@ class Ivis(BaseEstimator):
         return self
 
     def fit_transform(self, X, y=None):
-        self.fit(X)
+        self.fit(X, y)
         return self.transform(X)
         
     def transform(self, X):
