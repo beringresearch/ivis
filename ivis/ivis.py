@@ -104,4 +104,5 @@ class Ivis(BaseEstimator):
     def load(self, filepath):
         model = load_model(filepath)
         self.model_ = model
+        self.model_._make_predict_function()
         return self
