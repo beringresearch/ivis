@@ -32,22 +32,25 @@ class Ivis(BaseEstimator):
     epochs : int, optional (default: 1000)
         The maximum number of epochs to train the model for. Each epoch the network will see a triplet based on each data-point once.
 
-    n_epochs_without_progress: int, optional (default: 50)
+    n_epochs_without_progress : int, optional (default: 50)
         After n number of epochs without an improvement to the loss, terminate training early.
 
-    margin: float, optional (default: 1)
+    margin : float, optional (default: 1)
         The distance that is enforced between points by the triplet loss functions
 
-    ntrees: int, optional (default: 50)
+    ntrees : int, optional (default: 50)
         The number of random projections trees built by Annoy to approximate KNN. The more trees the higher the memory usage, but the better the accuracy of results.
 
-    search_k: int, optional (default: -1)
+    search_k : int, optional (default: -1)
         The maximum number of nodes inspected during a nearest neighbour query by Annoy. The higher, the more computation time required, but the higher the accuracy. The default 
         is n_trees * k, where k is the number of neighbours to retrieve. If this is set too low, a variable number of neighbours may be retrieved per data-point.
 
     precompute : boolean, optional (default: True)
         Whether to pre-compute the nearest neighbours. Pre-computing is significantly faster, but requires more memory. If memory is limited, try setting this to False.
     
+    model: keras.models.Model (default: None)
+        The keras model to train using triplet loss. If provided, an embedding layer of size 'embedding_dims' will be appended to the end of the network. If not provided, a default 
+        selu network composed of 3 dense layers of 128 neurons each will be created, followed by an embedding layer of size 'embedding_dims'.
 
     Attributes
     ----------
@@ -58,9 +61,9 @@ class Ivis(BaseEstimator):
         The loss history at the end of each epoch during training of the model.
 
     
-    """
+    """                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 
-    def __init__(self, embedding_dims=2, k=150, distance='pn', batch_size=128, epochs=1000, n_epochs_without_progress=50, margin=1, ntrees=50, search_k=-1, precompute=True):
+    def __init__(self, embedding_dims=2, k=150, distance='pn', batch_size=128, epochs=1000, n_epochs_without_progress=50, margin=1, ntrees=50, search_k=-1, precompute=True, model=None):
         self.embedding_dims = embedding_dims
         self.k = k
         self.distance = distance
@@ -71,13 +74,18 @@ class Ivis(BaseEstimator):
         self.ntrees = ntrees
         self.search_k = search_k
         self.precompute = precompute
+        self.model_ = model
 
     def _fit(self, X, y):
         input_size = (X.shape[-1],)
         datagen = create_triplet_generator(X, k=self.k, ntrees=self.ntrees, batch_size=self.batch_size, search_k=self.search_k, precompute=self.precompute, y=y)
 
+        if self.model_:
+            model = build_network(self.model_, embedding_dims=self.embedding_dims) 
+        else:
+            model = build_network(selu_base_network(input_size), embedding_dims=self.embedding_dims)
+
         try:
-            model = build_network(selu_base_network(input_size, embedding_dims = self.embedding_dims))
             model.compile(optimizer='adam', loss=triplet_loss(distance=self.distance, margin=self.margin))
         except KeyError:
             raise Exception('Loss function not implemented.')
@@ -105,3 +113,4 @@ class Ivis(BaseEstimator):
         model = load_model(filepath)
         self.model_ = model
         return self
+
