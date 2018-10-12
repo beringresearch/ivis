@@ -11,7 +11,7 @@ from keras import regularizers, constraints
 from keras.layers.core import Dense
 
 
-def build_network(base_network):
+def build_network(base_network, embedding_dims=2, embedding_l2=0.0):
     def output_shape(shapes):
         shape1, shape2, shape3 = shapes
         return (3, shape1[0],)
@@ -19,17 +19,20 @@ def build_network(base_network):
     input_a = Input(shape=base_network.input_shape[1:])
     input_p = Input(shape=base_network.input_shape[1:])
     input_n = Input(shape=base_network.input_shape[1:])
+        
+    embeddings = Dense(embedding_dims, kernel_regularizer=regularizers.l2(embedding_l2))(base_network.output)
+    network = Model(base_network.input, embeddings)
 
-    processed_a = base_network(input_a)
-    processed_p = base_network(input_p)
-    processed_n = base_network(input_n)
+    processed_a = network(input_a)
+    processed_p = network(input_p)
+    processed_n = network(input_n)
 
     triplet = Lambda(K.stack, output_shape=output_shape)([processed_a, processed_p, processed_n])
     model = Model([input_a, input_p, input_n], triplet)
 
     return model
 
-def selu_base_network(input_shape, embedding_l2=0.0, embedding_dims=2):
+def selu_base_network(input_shape):
     '''Base network to be shared (eq. to feature extraction).
     '''
     inputs = Input(shape=input_shape)
@@ -38,7 +41,6 @@ def selu_base_network(input_shape, embedding_l2=0.0, embedding_dims=2):
     x = Dense(128, activation='selu', kernel_initializer='lecun_normal')(x)
     x = AlphaDropout(0.1)(x)
     x = Dense(128, activation='selu', kernel_initializer='lecun_normal')(x)
-    x = Dense(embedding_dims, kernel_regularizer=regularizers.l2(embedding_l2))(x)
     return Model(inputs, x)
 
 if __name__ == "__main__":
