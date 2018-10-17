@@ -76,10 +76,17 @@ class Ivis(BaseEstimator):
         self.precompute = precompute
         self.model_ = model
 
-    def _fit(self, X, y):
+    def _fit(self, X, y, val_x, val_y):
         input_size = (X.shape[-1],)
         datagen = create_triplet_generator(X, k=self.k, ntrees=self.ntrees, batch_size=self.batch_size, search_k=self.search_k, precompute=self.precompute, y=y)
-
+        val_datagen = None
+        validation_steps = None
+        loss_monitor = 'loss'
+        
+        if val_x is not None:
+            val_datagen = create_triplet_generator(val_x, k=self.k, ntrees=self.ntrees, batch_size=self.batch_size, search_k=self.search_k, precompute=self.precompute, y=val_y)
+            validation_steps = int(val_x.shape[0] / self.batch_size)
+            loss_monitor = 'val_loss'
         if self.model_:
             model = build_network(self.model_, embedding_dims=self.embedding_dims) 
         else:
@@ -90,16 +97,21 @@ class Ivis(BaseEstimator):
         except KeyError:
             raise Exception('Loss function not implemented.')
         
-        hist = model.fit_generator(datagen, steps_per_epoch=int(X.shape[0] / self.batch_size), epochs=self.epochs, callbacks=[EarlyStopping(monitor='loss', patience=50)] )
+        hist = model.fit_generator(datagen, 
+            steps_per_epoch=int(X.shape[0] / self.batch_size), 
+            epochs=self.epochs, 
+            callbacks=[EarlyStopping(monitor=loss_monitor, patience=50)],
+            validation_data=val_datagen,
+            validation_steps=validation_steps )
         self.loss_history_ = hist.history['loss']
         self.model_ = model.layers[3]
 
-    def fit(self, X, y=None):
-        self._fit(X, y)
+    def fit(self, X, y=None, val_x=None, val_y=None):
+        self._fit(X, y, val_x, val_y)
         return self
 
-    def fit_transform(self, X, y=None):
-        self.fit(X, y)
+    def fit_transform(self, X, y=None, val_x=None, val_y=None):
+        self.fit(X, y, val_x, val_y)
         return self.transform(X)
         
     def transform(self, X):
