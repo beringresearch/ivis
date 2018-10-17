@@ -3,10 +3,12 @@
 from .data.triplet_generators import create_triplet_generator
 from .nn.network import build_network, selu_base_network
 from .nn.losses import triplet_loss
+from .knn import build_annoy_index
 
 from keras.callbacks import EarlyStopping
 from keras.models import load_model
 from sklearn.base import BaseEstimator
+from annoy import AnnoyIndex
 
 
 class Ivis(BaseEstimator):
@@ -77,12 +79,13 @@ class Ivis(BaseEstimator):
         self.model_ = model
 
     def _fit(self, X, y):
-        input_size = (X.shape[-1],)
-        datagen = create_triplet_generator(X, k=self.k, ntrees=self.ntrees, batch_size=self.batch_size, search_k=self.search_k, precompute=self.precompute, y=y)
+        self.index = build_annoy_index(X, ntrees=self.ntrees)
+        datagen = create_triplet_generator(X, index=self.index, k=self.k, ntrees=self.ntrees, batch_size=self.batch_size, search_k=self.search_k, precompute=self.precompute, y=y)
 
         if self.model_:
             model = build_network(self.model_, embedding_dims=self.embedding_dims) 
         else:
+            input_size = (X.shape[-1],)
             model = build_network(selu_base_network(input_size), embedding_dims=self.embedding_dims)
 
         try:
@@ -115,3 +118,11 @@ class Ivis(BaseEstimator):
         self.model_._make_predict_function()
         return self
 
+    def load_index(self, filepath):
+        index = AnnoyIndex()
+        index.load(filepath)
+        self.index = index
+    
+    def save_index(self, filepath):
+        if self.index is not None:
+            self.index.save(filepath)

@@ -12,12 +12,12 @@ can be useful.
 
 """
 
-from .knn import build_annoy_index, extract_knn
+from .knn import extract_knn
 
 import numpy as np
 
 
-def create_triplet_generator(X, k, ntrees, batch_size, search_k=-1, precompute=True, y=None):
+def create_triplet_generator(X, index, k, batch_size, search_k=-1, precompute=True, y=None):
     if y is None:
         if k >= len(X) - 1:
             raise Exception('k value greater than or equal to (num_rows - 1) (k={}, rows={}). Lower k to a smaller value.'.format(k, len(X)))
@@ -25,10 +25,9 @@ def create_triplet_generator(X, k, ntrees, batch_size, search_k=-1, precompute=T
             raise Exception('batch_size value larger than num_rows in dataset (batch_size={}, rows={}). Lower batch_size to a smaller value.'.format(batch_size, len(X)))
         
         if precompute == True:
-            neighbour_list = extract_knn(X, k=k, ntrees=ntrees, search_k=search_k)
+            neighbour_list = extract_knn(index, k=k, search_k=search_k)
             return generate_knn_triplets_from_neighbour_list(X, neighbour_list, batch_size=batch_size)
         else:
-            index = build_annoy_index(X, k=k, ntrees=ntrees)
             return generate_knn_triplets_from_annoy_index(X, index, k=k, batch_size=batch_size, search_k=search_k)
     else:
         return generate_triplets_from_labels(X, np.array(y), batch_size=batch_size)
