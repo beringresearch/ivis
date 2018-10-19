@@ -17,20 +17,21 @@ from .knn import extract_knn
 import numpy as np
 
 
-def create_triplet_generator(X, index, k, batch_size, search_k=-1, precompute=True, y=None):
-    if y is None:
-        if k >= len(X) - 1:
-            raise Exception('k value greater than or equal to (num_rows - 1) (k={}, rows={}). Lower k to a smaller value.'.format(k, len(X)))
-        if batch_size > len(X):
-            raise Exception('batch_size value larger than num_rows in dataset (batch_size={}, rows={}). Lower batch_size to a smaller value.'.format(batch_size, len(X)))
-        
-        if precompute == True:
-            neighbour_list = extract_knn(X, index, k=k, search_k=search_k)
-            return generate_knn_triplets_from_neighbour_list(X, neighbour_list, batch_size=batch_size)
-        else:
-            return generate_knn_triplets_from_annoy_index(X, index, k=k, batch_size=batch_size, search_k=search_k)
+def create_triplet_generator_from_annoy_index(X, index, k, batch_size, search_k=-1, precompute=True):
+    if k >= len(X) - 1:
+        raise Exception('k value greater than or equal to (num_rows - 1) (k={}, rows={}). Lower k to a smaller value.'.format(k, len(X)))
+    if batch_size > len(X):
+        raise Exception('batch_size value larger than num_rows in dataset (batch_size={}, rows={}). Lower batch_size to a smaller value.'.format(batch_size, len(X)))
+    
+    if precompute == True:
+        neighbour_list = extract_knn(X, index, k=k, search_k=search_k)
+        return generate_knn_triplets_from_neighbour_list(X, neighbour_list, batch_size=batch_size)
     else:
-        return generate_triplets_from_labels(X, np.array(y), batch_size=batch_size)
+        return generate_knn_triplets_from_annoy_index(X, index, k=k, batch_size=batch_size, search_k=search_k)
+
+
+def create_triplet_generator_from_labels(X, y, batch_size):
+    return generate_triplets_from_labels(X, np.array(y), batch_size=batch_size)
 
 
 def knn_triplet_from_neighbour_list(X, index, neighbour_list):
