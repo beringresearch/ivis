@@ -7,7 +7,7 @@ from annoy import AnnoyIndex
 def build_annoy_index(X, ntrees=50):
     index = AnnoyIndex(X.shape[1])
     for i in range(X.shape[0]):
-        v = X[i,:] 
+        v = X[i] 
         index.add_item(i, v)
 
     # Build n trees

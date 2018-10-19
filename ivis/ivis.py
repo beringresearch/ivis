@@ -79,7 +79,7 @@ class Ivis(BaseEstimator):
         self.model_ = model
         self.annoy_index = annoy_index
 
-    def _fit(self, X, y, val_x, val_y):
+    def _fit(self, X, y, val_x, val_y, shuffle_mode=True):
         if y is None:
             self.annoy_index = self.annoy_index or build_annoy_index(X, ntrees=self.ntrees)
             datagen = create_triplet_generator_from_annoy_index(X, index=self.annoy_index, k=self.k, batch_size=self.batch_size, search_k=self.search_k, precompute=self.precompute)
@@ -115,16 +115,17 @@ class Ivis(BaseEstimator):
             epochs=self.epochs, 
             callbacks=[EarlyStopping(monitor=loss_monitor, patience=self.n_epochs_without_progress)],
             validation_data=val_datagen,
-            validation_steps=validation_steps )
+            validation_steps=validation_steps,
+            shuffle=shuffle_mode )
         self.loss_history_ = hist.history['loss']
         self.model_ = model.layers[3]
 
-    def fit(self, X, y=None, val_x=None, val_y=None):
-        self._fit(X, y, val_x, val_y)
+    def fit(self, X, y=None, val_x=None, val_y=None, shuffle_mode=True):
+        self._fit(X, y, val_x, val_y, shuffle_mode)
         return self
 
-    def fit_transform(self, X, y=None, val_x=None, val_y=None):
-        self.fit(X, y, val_x, val_y)
+    def fit_transform(self, X, y=None, val_x=None, val_y=None, shuffle_mode=True):
+        self.fit(X, y, val_x, val_y, shuffle_mode)
         return self.transform(X)
         
     def transform(self, X):
