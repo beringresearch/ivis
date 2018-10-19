@@ -3,7 +3,7 @@
 from .data.triplet_generators import create_triplet_generator
 from .nn.network import build_network, selu_base_network
 from .nn.losses import triplet_loss
-from .knn import build_annoy_index
+from .data.knn import build_annoy_index
 
 from keras.callbacks import EarlyStopping
 from keras.models import load_model
@@ -65,7 +65,7 @@ class Ivis(BaseEstimator):
     
     """                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 
-    def __init__(self, embedding_dims=2, k=150, distance='pn', batch_size=128, epochs=1000, n_epochs_without_progress=50, margin=1, ntrees=50, search_k=-1, precompute=True, model=None):
+    def __init__(self, embedding_dims=2, k=150, distance='pn', batch_size=128, epochs=1000, n_epochs_without_progress=50, margin=1, ntrees=50, search_k=-1, precompute=True, model=None, annoy_index=None):
         self.embedding_dims = embedding_dims
         self.k = k
         self.distance = distance
@@ -77,11 +77,20 @@ class Ivis(BaseEstimator):
         self.search_k = search_k
         self.precompute = precompute
         self.model_ = model
+        self.annoy_index = annoy_index
 
-    def _fit(self, X, y):
-        self.index = build_annoy_index(X, ntrees=self.ntrees)
-        datagen = create_triplet_generator(X, index=self.index, k=self.k, ntrees=self.ntrees, batch_size=self.batch_size, search_k=self.search_k, precompute=self.precompute, y=y)
-
+    def _fit(self, X, y, val_x, val_y):
+        self.annoy_index = self.annoy_index or build_annoy_index(X, ntrees=self.ntrees)
+        datagen = create_triplet_generator(X, index=self.annoy_index, k=self.k, batch_size=self.batch_size, search_k=self.search_k, precompute=self.precompute, y=y)
+        val_datagen = None
+        validation_steps = None
+        loss_monitor = 'loss'
+        
+        if val_x is not None:
+            val_index = build_annoy_index(val_x, ntrees=self.ntrees)
+            val_datagen = create_triplet_generator(val_x, index=val_index, k=self.k, batch_size=self.batch_size, search_k=self.search_k, precompute=self.precompute, y=val_y)
+            validation_steps = int(val_x.shape[0] / self.batch_size)
+            loss_monitor = 'val_loss'
         if self.model_:
             model = build_network(self.model_, embedding_dims=self.embedding_dims) 
         else:
@@ -93,16 +102,21 @@ class Ivis(BaseEstimator):
         except KeyError:
             raise Exception('Loss function not implemented.')
         
-        hist = model.fit_generator(datagen, steps_per_epoch=int(X.shape[0] / self.batch_size), epochs=self.epochs, callbacks=[EarlyStopping(monitor='loss', patience=50)] )
+        hist = model.fit_generator(datagen, 
+            steps_per_epoch=int(X.shape[0] / self.batch_size), 
+            epochs=self.epochs, 
+            callbacks=[EarlyStopping(monitor=loss_monitor, patience=self.n_epochs_without_progress)],
+            validation_data=val_datagen,
+            validation_steps=validation_steps )
         self.loss_history_ = hist.history['loss']
         self.model_ = model.layers[3]
 
-    def fit(self, X, y=None):
-        self._fit(X, y)
+    def fit(self, X, y=None, val_x=None, val_y=None):
+        self._fit(X, y, val_x, val_y)
         return self
 
-    def fit_transform(self, X, y=None):
-        self.fit(X, y)
+    def fit_transform(self, X, y=None, val_x=None, val_y=None):
+        self.fit(X, y, val_x, val_y)
         return self.transform(X)
         
     def transform(self, X):
@@ -119,10 +133,10 @@ class Ivis(BaseEstimator):
         return self
 
     def load_index(self, filepath):
-        index = AnnoyIndex()
-        index.load(filepath)
-        self.index = index
+        annoy_index = AnnoyIndex()
+        annoy_index.load(filepath)
+        self.annoy_index = annoy_index
     
     def save_index(self, filepath):
-        if self.index is not None:
-            self.index.save(filepath)
+        if self.annoy_index is not None:
+            self.annoy_index.save(filepath)

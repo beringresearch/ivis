@@ -14,7 +14,7 @@ def build_annoy_index(X, ntrees=50):
     index.build(ntrees)
     return index
 
-def extract_knn(index, k=150, search_k=-1):
+def extract_knn(X, index, k=150, search_k=-1):
 
     def knn(x, k = k):
         k = index.get_nns_by_item(x, k+1, search_k=search_k, include_distances=False) 

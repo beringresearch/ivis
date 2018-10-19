@@ -25,7 +25,7 @@ def create_triplet_generator(X, index, k, batch_size, search_k=-1, precompute=Tr
             raise Exception('batch_size value larger than num_rows in dataset (batch_size={}, rows={}). Lower batch_size to a smaller value.'.format(batch_size, len(X)))
         
         if precompute == True:
-            neighbour_list = extract_knn(index, k=k, search_k=search_k)
+            neighbour_list = extract_knn(X, index, k=k, search_k=search_k)
             return generate_knn_triplets_from_neighbour_list(X, neighbour_list, batch_size=batch_size)
         else:
             return generate_knn_triplets_from_annoy_index(X, index, k=k, batch_size=batch_size, search_k=search_k)
