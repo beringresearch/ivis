@@ -1,6 +1,6 @@
 """ scikit-learn wrapper class for the Ivis algorithm. """
 
-from .data.triplet_generators import create_triplet_generator
+from .data.triplet_generators import create_triplet_generator_from_annoy_index, create_triplet_generator_from_labels
 from .nn.network import build_network, selu_base_network
 from .nn.losses import triplet_loss
 from .data.knn import build_annoy_index
@@ -80,15 +80,23 @@ class Ivis(BaseEstimator):
         self.annoy_index = annoy_index
 
     def _fit(self, X, y, val_x, val_y):
-        self.annoy_index = self.annoy_index or build_annoy_index(X, ntrees=self.ntrees)
-        datagen = create_triplet_generator(X, index=self.annoy_index, k=self.k, batch_size=self.batch_size, search_k=self.search_k, precompute=self.precompute, y=y)
+        if y is None:
+            self.annoy_index = self.annoy_index or build_annoy_index(X, ntrees=self.ntrees)
+            datagen = create_triplet_generator_from_annoy_index(X, index=self.annoy_index, k=self.k, batch_size=self.batch_size, search_k=self.search_k, precompute=self.precompute)
+        else:
+            datagen = create_triplet_generator_from_labels(X, y, batch_size=self.batch_size)
+
         val_datagen = None
         validation_steps = None
         loss_monitor = 'loss'
         
         if val_x is not None:
-            val_index = build_annoy_index(val_x, ntrees=self.ntrees)
-            val_datagen = create_triplet_generator(val_x, index=val_index, k=self.k, batch_size=self.batch_size, search_k=self.search_k, precompute=self.precompute, y=val_y)
+            if val_y is None:
+                val_index = build_annoy_index(val_x, ntrees=self.ntrees)
+                val_datagen = create_triplet_generator_from_annoy_index(val_x, index=val_index, k=self.k, batch_size=self.batch_size, search_k=self.search_k, precompute=self.precompute)
+            else:
+                val_datagen = create_triplet_generator_from_labels(X, y, batch_size=self.batch_size)
+
             validation_steps = int(val_x.shape[0] / self.batch_size)
             loss_monitor = 'val_loss'
         if self.model_:
@@ -140,3 +148,5 @@ class Ivis(BaseEstimator):
     def save_index(self, filepath):
         if self.annoy_index is not None:
             self.annoy_index.save(filepath)
+        else:
+            raise Exception('No annoy index to save.')
