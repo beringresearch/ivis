@@ -100,7 +100,7 @@ class Ivis(BaseEstimator):
         hist = model.fit_generator(datagen, 
             steps_per_epoch=int(X.shape[0] / self.batch_size), 
             epochs=self.epochs, 
-            callbacks=[EarlyStopping(monitor=loss_monitor, patience=50)],
+            callbacks=[EarlyStopping(monitor=loss_monitor, patience=self.n_epochs_without_progress)],
             validation_data=val_datagen,
             validation_steps=validation_steps )
         self.loss_history_ = hist.history['loss']
