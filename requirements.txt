@@ -1,0 +1,5 @@
+tensorflow==1.10.0
+keras==2.2.2
+numpy==1.14.3
+scikit-learn==0.20.0
+git+https://github.com/idroz/annoy.git#egg=annoy
