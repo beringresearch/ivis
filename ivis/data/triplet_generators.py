@@ -15,7 +15,35 @@ can be useful.
 from .knn import extract_knn
 
 import numpy as np
+import threading
 
+
+class threadsafe_iter:
+    """Takes an iterator/generator and makes it thread-safe by
+    serializing call to the `next` method of given iterator/generator.
+    """
+    def __init__(self, it):
+        self.it = it
+        self.lock = threading.Lock()
+
+    def __iter__(self):
+        return 
+
+    def __next__(self): # Py3
+        with self.lock:
+            return next(self.it)
+
+    def next(self): # Py2
+        with self.lock:
+            return self.it.next()
+
+
+def threadsafe_generator(f):
+    """A decorator that takes a generator function and makes it thread-safe.
+    """
+    def g(*a, **kw):
+        return threadsafe_iter(f(*a, **kw))
+    return g
 
 def create_triplet_generator_from_annoy_index(X, index, k, batch_size, search_k=-1, precompute=True):
     if k >= len(X) - 1:
@@ -49,7 +77,7 @@ def knn_triplet_from_neighbour_list(X, index, neighbour_list):
     triplets += [[X[index], X[neighbour_ind], X[negative_ind]]]
     return triplets
 
-
+@threadsafe_generator
 def generate_knn_triplets_from_neighbour_list(X, neighbour_list, batch_size=32):
     iterations = 0
     row_indexes = np.array(list(range(len(X))), dtype=np.uint32)
@@ -88,6 +116,7 @@ def knn_triplet_from_annoy_index(X, annoy_index, row_index, k, search_k=-1):
     triplets += [[X[row_index], X[neighbour_ind], X[negative_ind]]]
     return triplets
 
+@threadsafe_generator
 def generate_knn_triplets_from_annoy_index(X, annoy_index, k=150, batch_size=32, search_k=-1):
     iterations = 0
     row_indexes = np.array(list(range(len(X))), dtype=np.uint32)
@@ -110,6 +139,7 @@ def generate_knn_triplets_from_annoy_index(X, annoy_index, k=150, batch_size=32,
         triplet_batch = np.array(triplet_batch)
         yield ([triplet_batch[:,0], triplet_batch[:,1], triplet_batch[:,2]], placeholder_labels)
 
+@threadsafe_generator
 def generate_triplets_from_labels(X, Y, batch_size=32):
     iterations = 0
     row_indexes = np.array(list(range(len(X))), dtype=np.uint32)

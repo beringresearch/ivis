@@ -9,6 +9,7 @@ from keras.callbacks import EarlyStopping
 from keras.models import load_model
 from sklearn.base import BaseEstimator
 from annoy import AnnoyIndex
+import multiprocessing
 
 
 class Ivis(BaseEstimator):
@@ -116,7 +117,8 @@ class Ivis(BaseEstimator):
             callbacks=[EarlyStopping(monitor=loss_monitor, patience=self.n_epochs_without_progress)],
             validation_data=val_datagen,
             validation_steps=validation_steps,
-            shuffle=shuffle_mode )
+            shuffle=shuffle_mode,
+            workers=multiprocessing.cpu_count() )
         self.loss_history_ = hist.history['loss']
         self.model_ = model.layers[3]
 
