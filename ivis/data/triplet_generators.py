@@ -12,6 +12,7 @@ can be useful.
 
 """
 
+import sys
 from .knn import extract_knn
 from scipy.sparse import issparse
 
@@ -98,12 +99,14 @@ def generate_knn_triplets_from_neighbour_list(X, neighbour_list, batch_size=32):
                 np.random.shuffle(row_indexes)
                 iterations = 0
            
-            triplet = knn_triplet_from_neighbour_list(X, row_indexes[iterations], neighbour_list[row_indexes[iterations]])
+            triplet = knn_triplet_from_neighbour_list(X, row_indexes[iterations], neighbour_list[row_indexes[iterations]])                                               
             triplet_batch += triplet
-            iterations += 1
+            iterations += 1                        
         
-        if (issparse(triplet_batch)): triplet_batch = triplet_batch.todense()
-        triplet_batch = np.array(triplet_batch)        
+        if (issparse(X)):
+            triplet_batch = [[e.toarray()[0] for e in t] for t in triplet_batch]                 
+        triplet_batch = np.array(triplet_batch)
+        
         yield ([triplet_batch[:,0], triplet_batch[:,1], triplet_batch[:,2]], placeholder_labels)
 
 def knn_triplet_from_annoy_index(X, annoy_index, row_index, k, search_k=-1):
@@ -140,11 +143,14 @@ def generate_knn_triplets_from_annoy_index(X, annoy_index, k=150, batch_size=32,
                 np.random.shuffle(row_indexes)
                 iterations = 0                    
             
-            triplet = knn_triplet_from_annoy_index(X, annoy_index, row_indexes[iterations], k=k, search_k=search_k)
+            triplet = knn_triplet_from_annoy_index(X, annoy_index, row_indexes[iterations], k=k, search_k=search_k)            
+
             triplet_batch += triplet
             iterations += 1
         
-        if (issparse(triplet_batch)): triplet_batch = triplet_batch.todense()
+        if (issparse(X)):
+            triplet_batch = [[e.toarray()[0] for e in t] for t in triplet_batch]                 
+
         triplet_batch = np.array(triplet_batch)
         yield ([triplet_batch[:,0], triplet_batch[:,1], triplet_batch[:,2]], placeholder_labels)
 
@@ -165,12 +171,15 @@ def generate_triplets_from_labels(X, Y, batch_size=32):
                 np.random.shuffle(row_indexes)
                 iterations = 0
            
-            triplet = triplet_from_labels(X, Y, row_indexes[iterations])
+            triplet = triplet_from_labels(X, Y, row_indexes[iterations])            
+            
             triplet_batch += triplet
             iterations += 1
         
-        if (issparse(triplet_batch)): triplet_batch = triplet_batch.todense()
-        triplet_batch = np.array(triplet_batch)
+        if (issparse(X)):
+            triplet_batch = [[e.toarray()[0] for e in t] for t in triplet_batch]                 
+            
+        triplet_batch = np.array(triplet_batch)        
         yield ([triplet_batch[:,0], triplet_batch[:,1], triplet_batch[:,2]], placeholder_labels)
 
 def triplet_from_labels(X, Y, index):
