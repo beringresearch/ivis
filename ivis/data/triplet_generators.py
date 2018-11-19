@@ -47,10 +47,11 @@ def threadsafe_generator(f):
     return g
 
 def create_triplet_generator_from_annoy_index(X, index, k, batch_size, search_k=-1, precompute=True):
-    if k >= len(X) - 1:
-        raise Exception('k value greater than or equal to (num_rows - 1) (k={}, rows={}). Lower k to a smaller value.'.format(k, len(X)))
-    if batch_size > len(X):
-        raise Exception('batch_size value larger than num_rows in dataset (batch_size={}, rows={}). Lower batch_size to a smaller value.'.format(batch_size, len(X)))
+    N_ROWS = X.shape[0]
+    if k >= N_ROWS - 1:
+        raise Exception('k value greater than or equal to (num_rows - 1) (k={}, rows={}). Lower k to a smaller value.'.format(k, N_ROWS))
+    if batch_size > N_ROWS:
+        raise Exception('batch_size value larger than num_rows in dataset (batch_size={}, rows={}). Lower batch_size to a smaller value.'.format(batch_size, N_ROWS))
     
     if precompute == True:
         neighbour_list = extract_knn(X, index, k=k, search_k=search_k)
@@ -65,23 +66,26 @@ def create_triplet_generator_from_labels(X, y, batch_size):
 
 def knn_triplet_from_neighbour_list(X, index, neighbour_list):
     """ A random (unweighted) positive example chosen. """
+    N_ROWS = X.shape[0]
     triplets = []
     
     # Take a random neighbour as positive
     neighbour_ind = np.random.choice(neighbour_list)
     
     # Take a random non-neighbour as negative
-    negative_ind = np.random.randint(0, len(X))     # Pick a random index until one fits constraint. An optimization.
+    
+    negative_ind = np.random.randint(0, N_ROWS)     # Pick a random index until one fits constraint. An optimization.
     while negative_ind in neighbour_list:
-        negative_ind = np.random.randint(0, len(X))
+        negative_ind = np.random.randint(0, N_ROWS)
     
     triplets += [[X[index], X[neighbour_ind], X[negative_ind]]]
     return triplets
 
 @threadsafe_generator
 def generate_knn_triplets_from_neighbour_list(X, neighbour_list, batch_size=32):
+    N_ROWS = X.shape[0]
     iterations = 0
-    row_indexes = np.array(list(range(len(X))), dtype=np.uint32)
+    row_indexes = np.array(list(range(N_ROWS)), dtype=np.uint32)
     np.random.shuffle(row_indexes)
 
     placeholder_labels = np.array([0 for i in range(batch_size)])
@@ -90,7 +94,7 @@ def generate_knn_triplets_from_neighbour_list(X, neighbour_list, batch_size=32):
         triplet_batch = []
         
         for i in range(batch_size):
-            if iterations >= len(X):
+            if iterations >= N_ROWS:
                 np.random.shuffle(row_indexes)
                 iterations = 0
            
@@ -104,6 +108,7 @@ def generate_knn_triplets_from_neighbour_list(X, neighbour_list, batch_size=32):
 
 def knn_triplet_from_annoy_index(X, annoy_index, row_index, k, search_k=-1):
     """ A random (unweighted) positive example chosen. """
+    N_ROWS = X.shape[0]
     triplets = []
     neighbour_list = np.array(annoy_index.get_nns_by_item(row_index, k+1, search_k=-1, include_distances=False), dtype=np.uint32)
     
@@ -111,17 +116,18 @@ def knn_triplet_from_annoy_index(X, annoy_index, row_index, k, search_k=-1):
     neighbour_ind = np.random.choice(neighbour_list)
     
     # Take a random non-neighbour as negative
-    negative_ind = np.random.randint(0, len(X))     # Pick a random index until one fits constraint. An optimization.
+    negative_ind = np.random.randint(0, N_ROWS)     # Pick a random index until one fits constraint. An optimization.
     while negative_ind in neighbour_list:
-        negative_ind = np.random.randint(0, len(X))
+        negative_ind = np.random.randint(0, N_ROWS)
 
     triplets += [[X[row_index], X[neighbour_ind], X[negative_ind]]]
     return triplets
 
 @threadsafe_generator
 def generate_knn_triplets_from_annoy_index(X, annoy_index, k=150, batch_size=32, search_k=-1):
+    N_ROWS = X.shape[0]
     iterations = 0
-    row_indexes = np.array(list(range(len(X))), dtype=np.uint32)
+    row_indexes = np.array(list(range(N_ROWS)), dtype=np.uint32)
     np.random.shuffle(row_indexes)
 
     placeholder_labels = np.array([0 for i in range(batch_size)])
@@ -130,7 +136,7 @@ def generate_knn_triplets_from_annoy_index(X, annoy_index, k=150, batch_size=32,
         triplet_batch = []
         
         for i in range(batch_size):
-            if iterations >= len(X):
+            if iterations >= N_ROWS:
                 np.random.shuffle(row_indexes)
                 iterations = 0                    
             
@@ -144,8 +150,9 @@ def generate_knn_triplets_from_annoy_index(X, annoy_index, k=150, batch_size=32,
 
 @threadsafe_generator
 def generate_triplets_from_labels(X, Y, batch_size=32):
+    N_ROWS = X.shape[0]
     iterations = 0
-    row_indexes = np.array(list(range(len(X))), dtype=np.uint32)
+    row_indexes = np.array(list(range(N_ROWS)), dtype=np.uint32)
     np.random.shuffle(row_indexes)
 
     placeholder_labels = np.array([0 for i in range(batch_size)])
@@ -154,7 +161,7 @@ def generate_triplets_from_labels(X, Y, batch_size=32):
         triplet_batch = []
         
         for i in range(batch_size):
-            if iterations >= len(X):
+            if iterations >= N_ROWS:
                 np.random.shuffle(row_indexes)
                 iterations = 0
            
@@ -168,6 +175,7 @@ def generate_triplets_from_labels(X, Y, batch_size=32):
 
 def triplet_from_labels(X, Y, index):
     """ A random (unweighted) positive example chosen. """
+    N_ROWS = X.shape[0]
     triplets = []
 
     row_label = Y[index]
@@ -177,22 +185,23 @@ def triplet_from_labels(X, Y, index):
     neighbour_ind = np.random.choice(neighbour_indexes)
     
     # Take a random non-neighbour as negative
-    negative_ind = np.random.randint(0, len(X))     # Pick a random index until one fits constraint. An optimization.
+    negative_ind = np.random.randint(0, N_ROWS)     # Pick a random index until one fits constraint. An optimization.
     while negative_ind in neighbour_indexes:
-        negative_ind = np.random.randint(0, len(X))
+        negative_ind = np.random.randint(0, N_ROWS)
     
     triplets += [[X[index], X[neighbour_ind], X[negative_ind]]]
     return triplets
 
 def create_triplets_from_positive_index_dict(X, positive_index_dict):
+    N_ROWS = X.shape[0]
     triplets = []
     labels_placeholder = []
-    for i in range(len(X)):
+    for i in range(N_ROWS):
         try:
             for neighbour in positive_index_dict[i]:
                 ind = i
                 while ind == i or ind in positive_index_dict[i]:
-                    ind = random.randrange(0, len(X))
+                    ind = random.randrange(0, N_ROWS)
                 triplets += [[X[i], X[neighbour], X[ind]]]
                 labels_placeholder += [1]
         except:
