@@ -13,6 +13,7 @@ can be useful.
 """
 
 from .knn import extract_knn
+from scipy.sparse import issparse
 
 import numpy as np
 import threading
@@ -97,7 +98,8 @@ def generate_knn_triplets_from_neighbour_list(X, neighbour_list, batch_size=32):
             triplet_batch += triplet
             iterations += 1
         
-        triplet_batch = np.array(triplet_batch)
+        if (issparse(triplet_batch)): triplet_batch = triplet_batch.toarray()
+        triplet_batch = np.array(triplet_batch)        
         yield ([triplet_batch[:,0], triplet_batch[:,1], triplet_batch[:,2]], placeholder_labels)
 
 def knn_triplet_from_annoy_index(X, annoy_index, row_index, k, search_k=-1):
@@ -136,6 +138,7 @@ def generate_knn_triplets_from_annoy_index(X, annoy_index, k=150, batch_size=32,
             triplet_batch += triplet
             iterations += 1
         
+        if (issparse(triplet_batch)): triplet_batch = triplet_batch.toarray()
         triplet_batch = np.array(triplet_batch)
         yield ([triplet_batch[:,0], triplet_batch[:,1], triplet_batch[:,2]], placeholder_labels)
 
@@ -159,6 +162,7 @@ def generate_triplets_from_labels(X, Y, batch_size=32):
             triplet_batch += triplet
             iterations += 1
         
+        if (issparse(triplet_batch)): triplet_batch = triplet_batch.toarray()
         triplet_batch = np.array(triplet_batch)
         yield ([triplet_batch[:,0], triplet_batch[:,1], triplet_batch[:,2]], placeholder_labels)
 
