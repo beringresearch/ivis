@@ -6,7 +6,7 @@ This algorithm uses a siamese neural network trained on triplets to reduce the d
 
 ## Installation
 
-After cloning this repo run: `pip install -e .` from the root of the project.
+After cloning this repo run: `pip install -r requirements.txt --editable .` from the root of the project.
 
 ## Examples
 

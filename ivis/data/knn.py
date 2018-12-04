@@ -1,10 +1,11 @@
 """ KNN retrieval using an Annoy index. """
 
 import numpy as np
-
+from scipy.sparse import issparse
 from annoy import AnnoyIndex
 
 def build_annoy_index(X, ntrees=50):
+    if issparse(X): X = X.toarray()
     index = AnnoyIndex(X.shape[1])
     for i in range(X.shape[0]):
         v = X[i] 
