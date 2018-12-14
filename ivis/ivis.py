@@ -111,6 +111,7 @@ class Ivis(BaseEstimator):
         except KeyError:
             raise Exception('Loss function not implemented.')
         
+        print('Training neural network')
         hist = model.fit_generator(datagen, 
             steps_per_epoch=int(X.shape[0] / self.batch_size), 
             epochs=self.epochs, 
