@@ -2,4 +2,5 @@ tensorflow==1.10.0
 keras==2.2.2
 numpy==1.14.3
 scikit-learn==0.20.0
+tqdm==4.19.4
 git+https://github.com/beringresearch/annoy.git#egg=annoy
