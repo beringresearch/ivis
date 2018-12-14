@@ -15,5 +15,6 @@ setup(name='ivis',
           'numpy',
           'scikit-learn',
           'annoy',
+          'tqdm'
       ],
       zip_safe=False)
