@@ -6,6 +6,8 @@ from annoy import AnnoyIndex
 from tqdm import trange
 
 def build_annoy_index(X, ntrees=50):
+    print('Building KNN index')
+    
     if issparse(X): X = X.toarray()
     index = AnnoyIndex(X.shape[1])
     for i in range(X.shape[0]):
