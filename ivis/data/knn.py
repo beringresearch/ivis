@@ -3,6 +3,7 @@
 import numpy as np
 from scipy.sparse import issparse
 from annoy import AnnoyIndex
+from tqdm import trange
 
 def build_annoy_index(X, ntrees=50):
     if issparse(X): X = X.toarray()
@@ -16,13 +17,14 @@ def build_annoy_index(X, ntrees=50):
     return index
 
 def extract_knn(X, index, k=150, search_k=-1):
+    print('Extracting KNN from index')
 
     def knn(x, k = k):
         k = index.get_nns_by_item(x, k+1, search_k=search_k, include_distances=False) 
         return np.array(k, dtype=np.uint32)
 
     edge_list = []
-    for element in range(X.shape[0]):
+    for element in trange(X.shape[0]):
         edge_list.append(knn(element, k=k))
     
     return edge_list
