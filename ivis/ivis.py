@@ -1,6 +1,6 @@
 """ scikit-learn wrapper class for the Ivis algorithm. """
 
-from .data.triplet_generators import create_triplet_generator_from_annoy_index, create_triplet_generator_from_labels
+from .data.triplet_generators import create_triplet_generator_from_annoy_index
 from .nn.network import build_network, selu_base_network
 from .nn.losses import triplet_loss
 from .data.knn import build_annoy_index
@@ -80,26 +80,18 @@ class Ivis(BaseEstimator):
         self.model_ = model
         self.annoy_index = annoy_index
 
-    def _fit(self, X, y, val_x, val_y, shuffle_mode=True):
-        if y is None:
-            self.annoy_index = self.annoy_index or build_annoy_index(X, ntrees=self.ntrees)
-            datagen = create_triplet_generator_from_annoy_index(X, index=self.annoy_index, k=self.k, batch_size=self.batch_size, search_k=self.search_k, precompute=self.precompute)
-        else:
-            datagen = create_triplet_generator_from_labels(X, y, batch_size=self.batch_size)
-
-        val_datagen = None
-        validation_steps = None
-        loss_monitor = 'loss'
+    def _fit(self, X, shuffle_mode=True):
         
-        if val_x is not None:
-            if val_y is None:
-                val_index = build_annoy_index(val_x, ntrees=self.ntrees)
-                val_datagen = create_triplet_generator_from_annoy_index(val_x, index=val_index, k=self.k, batch_size=self.batch_size, search_k=self.search_k, precompute=self.precompute)
-            else:
-                val_datagen = create_triplet_generator_from_labels(X, y, batch_size=self.batch_size)
+        self.annoy_index = self.annoy_index or build_annoy_index(X, ntrees=self.ntrees)        
+        datagen = create_triplet_generator_from_annoy_index(X,
+                    index=self.annoy_index,
+                    k=self.k,
+                    batch_size=self.batch_size,
+                    search_k=self.search_k,
+                    precompute=self.precompute)
 
-            validation_steps = int(val_x.shape[0] / self.batch_size)
-            loss_monitor = 'val_loss'
+        loss_monitor = 'loss'
+                
         if self.model_:
             model = build_network(self.model_, embedding_dims=self.embedding_dims) 
         else:
@@ -115,42 +107,40 @@ class Ivis(BaseEstimator):
         hist = model.fit_generator(datagen, 
             steps_per_epoch=int(X.shape[0] / self.batch_size), 
             epochs=self.epochs, 
-            callbacks=[EarlyStopping(monitor=loss_monitor, patience=self.n_epochs_without_progress)],
-            validation_data=val_datagen,
-            validation_steps=validation_steps,
+            callbacks=[EarlyStopping(monitor=loss_monitor, patience=self.n_epochs_without_progress)],            
             shuffle=shuffle_mode,
             workers=multiprocessing.cpu_count() )
         self.loss_history_ = hist.history['loss']
         self.model_ = model.layers[3]
 
-    def fit(self, X, y=None, val_x=None, val_y=None, shuffle_mode=True):
-        self._fit(X, y, val_x, val_y, shuffle_mode)
+    def fit(self, X, shuffle_mode=True):
+        self._fit(X, shuffle_mode)
         return self
 
-    def fit_transform(self, X, y=None, val_x=None, val_y=None, shuffle_mode=True):
-        self.fit(X, y, val_x, val_y, shuffle_mode)
+    def fit_transform(self, X, shuffle_mode=True):
+        self.fit(X, shuffle_mode)
         return self.transform(X)
         
     def transform(self, X):
         embedding = self.model_.predict(X)
         return embedding
 
-    def save(self, filepath):
+    def save_model(self, filepath):
         self.model_.save(filepath)
     
-    def load(self, filepath):
+    def load_model(self, filepath):
         model = load_model(filepath)
         self.model_ = model
         self.model_._make_predict_function()
         return self
-
-    def load_index(self, filepath):
-        annoy_index = AnnoyIndex()
-        annoy_index.load(filepath)
-        self.annoy_index = annoy_index
     
     def save_index(self, filepath):
         if self.annoy_index is not None:
             self.annoy_index.save(filepath)
         else:
             raise Exception('No annoy index to save.')
+    
+    def load_index(self, filepath):
+        annoy_index = AnnoyIndex()
+        annoy_index.load(filepath)
+        self.annoy_index = annoy_index

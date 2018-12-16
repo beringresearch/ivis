@@ -1,7 +1,6 @@
 #' IVIS algorithm
 #'
 #' @param X numerical matrix to be reduced. Columns correspond to features.
-#' @param y int, optional (default: NULL). Optional class vector triggering supervised tripplet selection.
 #' @param embedding_dims int, optional (default: 2) Number of dimensions in the embedding space
 #' @param k int, optional (default: 150)
 #'        The number of neighbours to retrieve for each point
@@ -24,7 +23,7 @@
 #'        Whether to pre-compute the nearest neighbours. Pre-computing is significantly faster, but requires more memory. If memory is limited, try setting this to False.
 #' @export
 
-ivis <- function(X, y = NULL, embedding_dims = 2L,
+ivis <- function(X, embedding_dims = 2L,
     k = 150L,
     distance = "pn",
     batch_size = 128L,
@@ -52,7 +51,7 @@ ivis <- function(X, y = NULL, embedding_dims = 2L,
         epochs = epochs, n_epochs_without_progress = n_epochs_without_progress,
         margin = margin, ntrees = ntrees, search_k = search_k, precompute = precompute)
     
-    embeddings = model$fit_transform(X = X, y = y)
+    embeddings = model$fit_transform(X = X)
     return(embeddings)
 
     }
