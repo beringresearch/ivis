@@ -82,13 +82,14 @@ class Ivis(BaseEstimator):
 
     def _fit(self, X, shuffle_mode=True):
         
-        self.annoy_index = self.annoy_index or build_annoy_index(X, ntrees=self.ntrees)
+        self.annoy_index = self.annoy_index or build_annoy_index(X, ntrees=self.ntrees)        
         datagen = create_triplet_generator_from_annoy_index(X,
                     index=self.annoy_index,
                     k=self.k,
                     batch_size=self.batch_size,
                     search_k=self.search_k,
-                    precompute=self.precompute)                
+                    precompute=self.precompute)
+
         loss_monitor = 'loss'
                 
         if self.model_:
@@ -106,9 +107,7 @@ class Ivis(BaseEstimator):
         hist = model.fit_generator(datagen, 
             steps_per_epoch=int(X.shape[0] / self.batch_size), 
             epochs=self.epochs, 
-            callbacks=[EarlyStopping(monitor=loss_monitor, patience=self.n_epochs_without_progress)],
-            validation_data=val_datagen,
-            validation_steps=validation_steps,
+            callbacks=[EarlyStopping(monitor=loss_monitor, patience=self.n_epochs_without_progress)],            
             shuffle=shuffle_mode,
             workers=multiprocessing.cpu_count() )
         self.loss_history_ = hist.history['loss']
