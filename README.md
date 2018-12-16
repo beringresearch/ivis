@@ -10,8 +10,6 @@ After cloning this repo run: `pip install -r requirements.txt --editable .` from
 
 ## Examples
 
-Ivis can be run in both unsupervised and supervised mode. To run in supservised mode, simply provide an array of labels to the .fit() method.
-
 ### Unsupervised embeddings
 
 ```
@@ -20,7 +18,6 @@ from sklearn import datasets
 
 iris = datasets.load_iris()
 X = iris.data
-y = iris.target
 
 model = Ivis(embedding_dims=2, k=15)
 
@@ -30,23 +27,6 @@ embeddings = model.fit_transform(X)
 Plotting the embeddings results in the following visualization:
 
 ![](docs/ivis-iris-demo.png)
-
-### Supervised embeddings
-
-```
-from keras.datasets import mnist
-import numpy as np
-from ivis import Ivis
-
-(x_train, y_train), (x_test, y_test) = mnist.load_data()
-x_test = np.reshape(x_test.astype('float32'), (len(x_test), 28 * 28))
-
-
-model = Ivis()
-embeddings = model.fit_transform(x_test, y_test)
-```
-
-![](docs/ivis_mnist_supervised_embeddings.png)
 
 ### Training an a .h5 dataset
 
