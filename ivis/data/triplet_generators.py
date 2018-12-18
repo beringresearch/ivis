@@ -14,6 +14,7 @@ can be useful.
 
 import sys
 from .knn import extract_knn
+from annoy import AnnoyIndex
 from scipy.sparse import issparse
 
 import numpy as np
@@ -58,6 +59,21 @@ def create_triplet_generator_from_annoy_index(X, index, k, batch_size, search_k=
         neighbour_list = extract_knn(X, index, k=k, search_k=search_k)
         return generate_knn_triplets_from_neighbour_list(X, neighbour_list, batch_size=batch_size)
     else:
+        return generate_knn_triplets_from_annoy_index(X, index, k=k, batch_size=batch_size, search_k=search_k)
+
+def create_triplet_generator_from_index_path(X, index_path, k, batch_size, search_k=-1, precompute=True):
+    N_ROWS = X.shape[0]
+    if k >= N_ROWS - 1:
+        raise Exception('k value greater than or equal to (num_rows - 1) (k={}, rows={}). Lower k to a smaller value.'.format(k, N_ROWS))
+    if batch_size > N_ROWS:
+        raise Exception('batch_size value larger than num_rows in dataset (batch_size={}, rows={}). Lower batch_size to a smaller value.'.format(batch_size, N_ROWS))
+    
+    if precompute == True:
+        neighbour_list = extract_knn(X, index_path, k=k, search_k=search_k)
+        return generate_knn_triplets_from_neighbour_list(X, neighbour_list, batch_size=batch_size)
+    else:
+        index = AnnoyIndex(X.shape[1])
+        index.load(index_path)
         return generate_knn_triplets_from_annoy_index(X, index, k=k, batch_size=batch_size, search_k=search_k)
 
 

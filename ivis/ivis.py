@@ -1,6 +1,6 @@
 """ scikit-learn wrapper class for the Ivis algorithm. """
 
-from .data.triplet_generators import create_triplet_generator_from_annoy_index
+from .data.triplet_generators import create_triplet_generator_from_index_path
 from .nn.network import build_network, selu_base_network
 from .nn.losses import triplet_loss
 from .data.knn import build_annoy_index
@@ -82,9 +82,10 @@ class Ivis(BaseEstimator):
 
     def _fit(self, X, shuffle_mode=True):
         
-        self.annoy_index = self.annoy_index or build_annoy_index(X, ntrees=self.ntrees)        
-        datagen = create_triplet_generator_from_annoy_index(X,
-                    index=self.annoy_index,
+        self.annoy_index = self.annoy_index or build_annoy_index(X, ntrees=self.ntrees)
+        self.save_index('annoy.index')  
+        datagen = create_triplet_generator_from_index_path(X,
+                    index_path='annoy.index',
                     k=self.k,
                     batch_size=self.batch_size,
                     search_k=self.search_k,
