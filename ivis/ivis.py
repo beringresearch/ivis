@@ -82,9 +82,9 @@ class Ivis(BaseEstimator):
 
     def _fit(self, X, shuffle_mode=True):
         
-        if not self.annoy_index_path:
-            build_annoy_index(X, 'annoy.index', ntrees=self.ntrees)
+        if self.annoy_index_path is None:
             self.annoy_index_path = 'annoy.index'
+            build_annoy_index(X, self.annoy_index_path, ntrees=self.ntrees)
         datagen = create_triplet_generator_from_index_path(X,
                     index_path=self.annoy_index_path,
                     k=self.k,
