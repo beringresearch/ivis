@@ -7,11 +7,12 @@ from tqdm import trange
 from multiprocessing import Process, RawArray, Pool, cpu_count, Queue
 from functools import reduce, partial
 
-def build_annoy_index(X, ntrees=50):
+def build_annoy_index(X, path, ntrees=50):
     print('Building KNN index')
     
     if issparse(X): X = X.toarray()
     index = AnnoyIndex(X.shape[1])
+    index.on_disk_build(path)
     for i in range(X.shape[0]):
         v = X[i] 
         index.add_item(i, v)
@@ -22,7 +23,7 @@ def build_annoy_index(X, ntrees=50):
 
 def extract_knn(X, index_filepath, k=150, search_k=-1):
     """ Starts multiple processes to retrieve nearest neighbours using an Annoy Index in parallel """
-    
+
     print('Extracting KNN from index')
 
     n_dims = X.shape[1]
@@ -76,9 +77,7 @@ class KNN_Worker(Process):
     def run(self):
         for i in range(self.data_indices[0], self.data_indices[1]):
             try:
-                print('{} adding to queue'.format(i))
                 neighbour_indexes = self.index.get_nns_by_item(i, self.k+1, search_k=self.search_k, include_distances=False)
-                print(neighbour_indexes)
                 neighbour_indexes = np.array(neighbour_indexes, dtype=np.uint32)
                 self.results_queue.put(neighbour_indexes)
             except Exception as e:
