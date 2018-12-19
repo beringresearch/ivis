@@ -66,7 +66,7 @@ class Ivis(BaseEstimator):
     
     """                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 
-    def __init__(self, embedding_dims=2, k=150, distance='pn', batch_size=128, epochs=1000, n_epochs_without_progress=50, margin=1, ntrees=50, search_k=-1, precompute=True, model=None, annoy_index=None):
+    def __init__(self, embedding_dims=2, k=150, distance='pn', batch_size=128, epochs=1000, n_epochs_without_progress=50, margin=1, ntrees=50, search_k=-1, precompute=True, model=None, annoy_index_path=None):
         self.embedding_dims = embedding_dims
         self.k = k
         self.distance = distance
@@ -78,14 +78,15 @@ class Ivis(BaseEstimator):
         self.search_k = search_k
         self.precompute = precompute
         self.model_ = model
-        self.annoy_index = annoy_index
+        self.annoy_index_path = annoy_index_path
 
     def _fit(self, X, shuffle_mode=True):
         
-        self.annoy_index = self.annoy_index or build_annoy_index(X, ntrees=self.ntrees)
-        self.save_index('annoy.index')  
+        if not self.annoy_index_path:
+            build_annoy_index(X, 'annoy.index', ntrees=self.ntrees)
+            self.annoy_index_path = 'annoy.index'
         datagen = create_triplet_generator_from_index_path(X,
-                    index_path='annoy.index',
+                    index_path=self.annoy_index_path,
                     k=self.k,
                     batch_size=self.batch_size,
                     search_k=self.search_k,
@@ -135,13 +136,3 @@ class Ivis(BaseEstimator):
         self.model_._make_predict_function()
         return self
     
-    def save_index(self, filepath):
-        if self.annoy_index is not None:
-            self.annoy_index.save(filepath)
-        else:
-            raise Exception('No annoy index to save.')
-    
-    def load_index(self, filepath):
-        annoy_index = AnnoyIndex()
-        annoy_index.load(filepath)
-        self.annoy_index = annoy_index
