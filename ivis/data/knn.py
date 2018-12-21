@@ -6,6 +6,7 @@ from annoy import AnnoyIndex
 from multiprocessing import Process, cpu_count, Queue
 from collections import namedtuple
 from operator import attrgetter
+from tqdm import tqdm
 
 def build_annoy_index(X, path, ntrees=50):
     print('Building KNN index')
@@ -45,16 +46,21 @@ def extract_knn(X, index_filepath, k=150, search_k=-1):
         process.start()
 
     # Read from results queue as processes write to it to prevent queue becoming full
-    neighbour_list = []
-    while True:
-        running = any(process.is_alive() for process in process_pool)
-        if not running:
-            break
-        while not results_queue.empty():
-            neighbour_list.append(results_queue.get())
+    with tqdm(total=len(X)) as pbar:
+        neighbour_list = []
+        neighbour_list_length = len(neighbour_list)
+        while True:
+            running = any(process.is_alive() for process in process_pool)
+            if not running:
+                break
+            while not results_queue.empty():
+                neighbour_list.append(results_queue.get())
+            progress = len(neighbour_list) - neighbour_list_length
+            pbar.update(progress)
+            neighbour_list_length = len(neighbour_list)
 
-    for process in process_pool:
-        process.join()
+        for process in process_pool:
+            process.join()
 
     neighbour_list = sorted(neighbour_list, key=attrgetter('row_index'))
     neighbour_list = map(attrgetter('neighbour_list'), neighbour_list)
