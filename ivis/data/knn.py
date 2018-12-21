@@ -3,9 +3,9 @@
 import numpy as np
 from scipy.sparse import issparse
 from annoy import AnnoyIndex
-from tqdm import trange
-from multiprocessing import Process, RawArray, Pool, cpu_count, Queue
-from functools import reduce, partial
+from multiprocessing import Process, cpu_count, Queue
+from collections import namedtuple
+from operator import attrgetter
 
 def build_annoy_index(X, path, ntrees=50):
     print('Building KNN index')
@@ -31,31 +31,37 @@ def extract_knn(X, index_filepath, k=150, search_k=-1):
     chunk_size = len(X) // cpu_count()
     remainder = (len(X) % cpu_count()) > 0
     process_pool = []
-    results_queue_list = []
+    results_queue = Queue()
 
+    # Split up the indices and assign processes for each chunk
     i = 0
     while (i + chunk_size) <= len(X):
-        results_queue = Queue()
         process_pool.append(KNN_Worker(index_filepath, k, search_k, n_dims, (i, i+chunk_size), results_queue))
-        results_queue_list.append(results_queue)
         i += chunk_size
     if remainder:
-        results_queue = Queue()
         process_pool.append(KNN_Worker(index_filepath, k, search_k, n_dims, (i, len(X)), results_queue))
-        results_queue_list.append(results_queue)
 
     for process in process_pool:
         process.start()
-    
+
+    # Read from results queue as processes write to it to prevent queue becoming full
+    neighbour_list = []
+    while True:
+        running = any(process.is_alive() for process in process_pool)
+        if not running:
+            break
+        while not results_queue.empty():
+            neighbour_list.append(results_queue.get())
+
     for process in process_pool:
         process.join()
 
-    neighbour_list = []
-    for queue in results_queue_list:
-        while not queue.empty():
-            neighbour_list.append(queue.get())
+    neighbour_list = sorted(neighbour_list, key=attrgetter('row_index'))
+    neighbour_list = map(attrgetter('neighbour_list'), neighbour_list)
 
     return np.array(neighbour_list)
+
+IndexNeighbours = namedtuple('IndexNeighbours', 'row_index neighbour_list')
 
 class KNN_Worker(Process):
     """
@@ -75,11 +81,12 @@ class KNN_Worker(Process):
         super(KNN_Worker, self).__init__()
 
     def run(self):
-        for i in range(self.data_indices[0], self.data_indices[1]):
-            try:
-                neighbour_indexes = self.index.get_nns_by_item(i, self.k+1, search_k=self.search_k, include_distances=False)
+        try:
+            for i in range(self.data_indices[0], self.data_indices[1]):
+                neighbour_indexes = self.index.get_nns_by_item(i, self.k, search_k=self.search_k, include_distances=False)
                 neighbour_indexes = np.array(neighbour_indexes, dtype=np.uint32)
-                self.results_queue.put(neighbour_indexes)
-            except Exception as e:
-                print(e)
-        self.results_queue.close()
+                self.results_queue.put(IndexNeighbours(row_index=i, neighbour_list=neighbour_indexes))
+        except Exception as e:
+            self.exception = e
+        finally:
+            self.results_queue.close()
