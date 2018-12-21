@@ -3,13 +3,17 @@
 import numpy as np
 from scipy.sparse import issparse
 from annoy import AnnoyIndex
-from tqdm import trange
+from multiprocessing import Process, cpu_count, Queue
+from collections import namedtuple
+from operator import attrgetter
+from tqdm import tqdm
 
-def build_annoy_index(X, ntrees=50):
+def build_annoy_index(X, path, ntrees=50):
     print('Building KNN index')
     
     if issparse(X): X = X.toarray()
     index = AnnoyIndex(X.shape[1])
+    index.on_disk_build(path)
     for i in range(X.shape[0]):
         v = X[i] 
         index.add_item(i, v)
@@ -18,15 +22,77 @@ def build_annoy_index(X, ntrees=50):
     index.build(ntrees)
     return index
 
-def extract_knn(X, index, k=150, search_k=-1):
+def extract_knn(X, index_filepath, k=150, search_k=-1):
+    """ Starts multiple processes to retrieve nearest neighbours using an Annoy Index in parallel """
+
     print('Extracting KNN from index')
 
-    def knn(x, k = k):
-        k = index.get_nns_by_item(x, k+1, search_k=search_k, include_distances=False) 
-        return np.array(k, dtype=np.uint32)
+    n_dims = X.shape[1]
 
-    edge_list = []
-    for element in trange(X.shape[0]):
-        edge_list.append(knn(element, k=k))
-    
-    return edge_list
+    chunk_size = len(X) // cpu_count()
+    remainder = (len(X) % cpu_count()) > 0
+    process_pool = []
+    results_queue = Queue()
+
+    # Split up the indices and assign processes for each chunk
+    i = 0
+    while (i + chunk_size) <= len(X):
+        process_pool.append(KNN_Worker(index_filepath, k, search_k, n_dims, (i, i+chunk_size), results_queue))
+        i += chunk_size
+    if remainder:
+        process_pool.append(KNN_Worker(index_filepath, k, search_k, n_dims, (i, len(X)), results_queue))
+
+    for process in process_pool:
+        process.start()
+
+    # Read from results queue as processes write to it to prevent queue becoming full
+    with tqdm(total=len(X)) as pbar:
+        neighbour_list = []
+        neighbour_list_length = len(neighbour_list)
+        while True:
+            running = any(process.is_alive() for process in process_pool)
+            if not running:
+                break
+            while not results_queue.empty():
+                neighbour_list.append(results_queue.get())
+            progress = len(neighbour_list) - neighbour_list_length
+            pbar.update(progress)
+            neighbour_list_length = len(neighbour_list)
+
+        for process in process_pool:
+            process.join()
+
+    neighbour_list = sorted(neighbour_list, key=attrgetter('row_index'))
+    neighbour_list = map(attrgetter('neighbour_list'), neighbour_list)
+
+    return np.array(neighbour_list)
+
+IndexNeighbours = namedtuple('IndexNeighbours', 'row_index neighbour_list')
+
+class KNN_Worker(Process):
+    """
+    Upon construction, this worker process loads an annoy index from disk. Upon being started, the neighbours of the 
+    data-points specified by 'data_indices' variable will be retrieved from the index according to 
+    the provided parameters and stored in the 'results_queue'.
+
+    data_indices is a tuple of integers denoting the start and end range of indices to retrieve
+    """
+    def __init__(self, index_filepath, k, search_k, n_dims, data_indices, results_queue):
+        self.index = AnnoyIndex(n_dims)
+        self.index.load(index_filepath)
+        self.k = k
+        self.search_k = search_k
+        self.data_indices = data_indices
+        self.results_queue = results_queue
+        super(KNN_Worker, self).__init__()
+
+    def run(self):
+        try:
+            for i in range(self.data_indices[0], self.data_indices[1]):
+                neighbour_indexes = self.index.get_nns_by_item(i, self.k, search_k=self.search_k, include_distances=False)
+                neighbour_indexes = np.array(neighbour_indexes, dtype=np.uint32)
+                self.results_queue.put(IndexNeighbours(row_index=i, neighbour_list=neighbour_indexes))
+        except Exception as e:
+            self.exception = e
+        finally:
+            self.results_queue.close()
