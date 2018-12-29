@@ -11,7 +11,9 @@ library(ivis)
 install_ivis()
 ```
 
-To set environment to tensorflow, add the following to your environment variables:
+After ivis is installed into a conda environment, restart your R session.
+
+Finally, to set environment to tensorflow, add the following line to your environment variables:
 ```
 export KERAS_BACKEND=tensorflow
 ```
