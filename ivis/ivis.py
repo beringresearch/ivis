@@ -111,7 +111,7 @@ class Ivis(BaseEstimator):
             epochs=self.epochs, 
             callbacks=[EarlyStopping(monitor=loss_monitor, patience=self.n_epochs_without_progress)],            
             shuffle=shuffle_mode,
-            workers=multiprocessing.cpu_count() )
+            workers=multiprocessing.cpu_count())
         self.loss_history_ = hist.history['loss']
         self.model_ = model.layers[3]
 
