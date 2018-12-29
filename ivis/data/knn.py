@@ -63,7 +63,7 @@ def extract_knn(X, index_filepath, k=150, search_k=-1):
             process.join()
 
     neighbour_list = sorted(neighbour_list, key=attrgetter('row_index'))
-    neighbour_list = map(attrgetter('neighbour_list'), neighbour_list)
+    neighbour_list = list(map(attrgetter('neighbour_list'), neighbour_list))
 
     return np.array(neighbour_list)
 
