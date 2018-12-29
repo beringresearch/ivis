@@ -12,7 +12,7 @@ install_ivis <- function(){
     envname <- "ivis"
     conda_create(envname)
     condaenv_bin <- function(bin) path.expand(file.path(dirname(conda_binary()), bin))
-    packages = c("pip", "tensorflow", "keras", "numpy", "scikit-learn")
+    packages = c("pip", "tensorflow", "keras", "numpy", "scikit-learn", "tqdm")
     conda_install("ivis", packages, forge = TRUE)
 
     tmp <- tempdir()
