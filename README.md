@@ -54,4 +54,4 @@ Supervised version of ivis is available at https://github.com/beringresearch/ivi
 
 ivis is free for non-commercial use. If you have any questions, please send queries to info "at" beringresearch.com
 
-Copyright 2018 Bering Limited
+Copyright 2019 Bering Limited
