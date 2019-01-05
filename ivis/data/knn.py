@@ -14,7 +14,7 @@ def build_annoy_index(X, path, ntrees=50):
     if issparse(X): X = X.toarray()
     index = AnnoyIndex(X.shape[1])
     index.on_disk_build(path)
-    for i in range(X.shape[0]):
+    for i in tqdm(range(X.shape[0])):
         v = X[i] 
         index.add_item(i, v)
 
