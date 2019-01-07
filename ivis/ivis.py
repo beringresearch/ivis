@@ -27,7 +27,7 @@ class Ivis(BaseEstimator):
         The number of neighbours to retrieve for each point. Must be less than one minus the number of rows in the dataset.
 
     distance : string, optional (default: "pn")
-        The loss function used to train the neural network. One of "pn", "euclidean", "softmax_ratio_pn", "softmax_ratio".
+        The loss function used to train the neural network. One of "pn", "euclidean", "manhatten_pn", "manhatten", "softmax_ratio_pn", "softmax_ratio".
     
     batch_size : int, optional (default: 128)
         The size of mini-batches used during gradient descent while training the neural network. Must be less than the num_rows in the dataset.
@@ -39,7 +39,7 @@ class Ivis(BaseEstimator):
         After n number of epochs without an improvement to the loss, terminate training early.
 
     margin : float, optional (default: 1)
-        The distance that is enforced between points by the triplet loss functions
+        The distance that is enforced between points by the triplet loss functions.
 
     ntrees : int, optional (default: 50)
         The number of random projections trees built by Annoy to approximate KNN. The more trees the higher the memory usage, but the better the accuracy of results.
@@ -55,6 +55,10 @@ class Ivis(BaseEstimator):
         The keras model to train using triplet loss. If provided, an embedding layer of size 'embedding_dims' will be appended to the end of the network. If not provided, a default 
         selu network composed of 3 dense layers of 128 neurons each will be created, followed by an embedding layer of size 'embedding_dims'.
 
+    annoy_index_path: string, optional (default: None)
+        The filepath of a pre-trained annoy index file saved on disk. If provided, the annoy index file will be used. Otherwise, a new index will be generated and saved to disk in the 
+        current directory as 'annoy.index'.
+
     Attributes
     ----------
     model_ : keras Model 
@@ -63,6 +67,8 @@ class Ivis(BaseEstimator):
     loss_history_ : array-like, floats
         The loss history at the end of each epoch during training of the model.
 
+    annoy_index_path : string
+        The filepath of the annoy index currently in use by the model.
     
     """                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 
