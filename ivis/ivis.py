@@ -27,7 +27,7 @@ class Ivis(BaseEstimator):
         The number of neighbours to retrieve for each point. Must be less than one minus the number of rows in the dataset.
 
     distance : string, optional (default: "pn")
-        The loss function used to train the neural network. One of "pn", "euclidean", "manhatten_pn", "manhatten", "softmax_ratio_pn", "softmax_ratio".
+        The loss function used to train the neural network. One of "pn", "euclidean", "manhattan_pn", "manhattan", "softmax_ratio_pn", "softmax_ratio".
     
     batch_size : int, optional (default: 128)
         The size of mini-batches used during gradient descent while training the neural network. Must be less than the num_rows in the dataset.
