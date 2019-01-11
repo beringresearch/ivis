@@ -12,7 +12,9 @@ def triplet_loss(distance='pn', margin=1):
         'softmax_ratio' : softmax_ratio,
         'softmax_ratio_pn' : softmax_ratio_pn,
         'manhattan': manhattan_loss(margin=margin),
-        'manhattan_pn': manhattan_pn_loss(margin=margin)
+        'manhattan_pn': manhattan_pn_loss(margin=margin),
+        'chebyshev': chebyshev_loss(margin=margin),
+        'chebyshev_pn': chebyshev_pn_loss(margin=margin)
     }
     return distances[distance]
 
@@ -20,7 +22,10 @@ def _euclidean_distance(x, y):
     return K.sqrt(K.maximum(K.sum(K.square(x - y), axis=1, keepdims=True), K.epsilon()))
 
 def _manhattan_distance(x, y):
-    return K.maximum(K.sum(K.abs(x - y), axis=1, keepdims=True), K.epsilon())
+    return K.sum(K.abs(x - y), axis=1, keepdims=True)
+
+def _chebyshev_distance(x, y):
+    return K.max(K.abs(x - y), axis=1, keepdims=True)
 
 def pn_loss(margin=1):
     def _pn_loss(y_true, y_pred):    
@@ -60,7 +65,27 @@ def manhattan_pn_loss(margin=1):
 
         return K.mean(K.maximum(anchor_positive_distance - minimum_distance + margin, 0))
     
-    return _pn_loss 
+    return _pn_loss
+
+def chebyshev_loss(margin=1):
+    def _chebyshev_loss(y_true, y_pred):
+        anchor, positive, negative = tf.unstack(y_pred)  
+        return K.mean(K.maximum(_chebyshev_distance(anchor, positive) - _chebyshev_distance(anchor, negative) + margin, 0))
+    return _chebyshev_loss
+
+def chebyshev_pn_loss(margin=1):
+    def _pn_loss(y_true, y_pred):
+        anchor, positive, negative = tf.unstack(y_pred)
+
+        anchor_positive_distance = _chebyshev_distance(anchor, positive)
+        anchor_negative_distance = _chebyshev_distance(anchor, negative)
+        positive_negative_distance = _chebyshev_distance(positive, negative)
+
+        minimum_distance = K.min(K.concatenate([anchor_negative_distance, positive_negative_distance]), axis=1, keepdims=True)
+
+        return K.mean(K.maximum(anchor_positive_distance - minimum_distance + margin, 0))
+    
+    return _pn_loss
 
 def softmax_ratio(y_true, y_pred):
     anchor, positive, negative = tf.unstack(y_pred)
