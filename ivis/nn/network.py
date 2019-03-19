@@ -32,7 +32,17 @@ def build_network(base_network, embedding_dims=2, embedding_l2=0.0):
 
     return model
 
-def selu_base_network(input_shape):
+def base_network(model_name, input_shape):
+    '''Return the defined base_network defined by the model_name string.
+    '''
+    model_dict = {
+        'default': default_base_network(input_shape),
+        'hinton' : hinton_base_network(input_shape),
+        'maaten' : maaten_base_network(input_shape)
+    }
+    return model_dict[model_name]
+
+def default_base_network(input_shape):
     '''Base network to be shared (eq. to feature extraction).
     '''
     inputs = Input(shape=input_shape)
@@ -41,6 +51,28 @@ def selu_base_network(input_shape):
     x = Dense(128, activation='selu', kernel_initializer='lecun_normal')(x)
     x = AlphaDropout(0.1)(x)
     x = Dense(128, activation='selu', kernel_initializer='lecun_normal')(x)
+    return Model(inputs, x)
+
+def hinton_base_network(input_shape):
+    '''Base network to be shared (eq. to feature extraction).
+    '''
+    inputs = Input(shape=input_shape)
+    x = Dense(2000, activation='selu', kernel_initializer='lecun_normal')(inputs)
+    x = AlphaDropout(0.1)(x)
+    x = Dense(1000, activation='selu', kernel_initializer='lecun_normal')(x)
+    x = AlphaDropout(0.1)(x)
+    x = Dense(500, activation='selu', kernel_initializer='lecun_normal')(x)
+    return Model(inputs, x)
+
+def maaten_base_network(input_shape):
+    '''Base network to be shared (eq. to feature extraction).
+    '''
+    inputs = Input(shape=input_shape)
+    x = Dense(500, activation='selu', kernel_initializer='lecun_normal')(inputs)
+    x = AlphaDropout(0.1)(x)
+    x = Dense(500, activation='selu', kernel_initializer='lecun_normal')(x)
+    x = AlphaDropout(0.1)(x)
+    x = Dense(2000, activation='selu', kernel_initializer='lecun_normal')(x)
     return Model(inputs, x)
 
 if __name__ == "__main__":
