@@ -1,12 +1,12 @@
 """ scikit-learn wrapper class for the Ivis algorithm. """
 
 from .data.triplet_generators import create_triplet_generator_from_index_path
-from .nn.network import build_network, selu_base_network
+from .nn.network import build_network, base_network
 from .nn.losses import triplet_loss
 from .data.knn import build_annoy_index
 
 from keras.callbacks import EarlyStopping
-from keras.models import load_model
+from keras.models import load_model, Model
 from sklearn.base import BaseEstimator
 from annoy import AnnoyIndex
 import multiprocessing
@@ -51,9 +51,10 @@ class Ivis(BaseEstimator):
     precompute : boolean, optional (default: True)
         Whether to pre-compute the nearest neighbours. Pre-computing is significantly faster, but requires more memory. If memory is limited, try setting this to False.
     
-    model: keras.models.Model (default: None)
-        The keras model to train using triplet loss. If provided, an embedding layer of size 'embedding_dims' will be appended to the end of the network. If not provided, a default 
-        selu network composed of 3 dense layers of 128 neurons each will be created, followed by an embedding layer of size 'embedding_dims'.
+    model: str or keras.models.Model (default: 'default')
+        The keras model to train using triplet loss. If a model object is provided, an embedding layer of size 'embedding_dims' will be appended to the end of the network. 
+        If a string, a pre-defined network by that name will be used. Possible options are: 'default', 'hinton', 'maaten'. 
+        By default, a selu network composed of 3 dense layers of 128 neurons each will be created, followed by an embedding layer of size 'embedding_dims'.
 
     annoy_index_path: string, optional (default: None)
         The filepath of a pre-trained annoy index file saved on disk. If provided, the annoy index file will be used. Otherwise, a new index will be generated and saved to disk in the 
@@ -72,7 +73,7 @@ class Ivis(BaseEstimator):
     
     """                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 
-    def __init__(self, embedding_dims=2, k=150, distance='pn', batch_size=128, epochs=1000, n_epochs_without_progress=50, margin=1, ntrees=50, search_k=-1, precompute=True, model=None, annoy_index_path=None):
+    def __init__(self, embedding_dims=2, k=150, distance='pn', batch_size=128, epochs=1000, n_epochs_without_progress=50, margin=1, ntrees=50, search_k=-1, precompute=True, model='default', annoy_index_path=None):
         self.embedding_dims = embedding_dims
         self.k = k
         self.distance = distance
@@ -100,12 +101,11 @@ class Ivis(BaseEstimator):
 
         loss_monitor = 'loss'
                 
-        if self.model_:
-            model = build_network(self.model_, embedding_dims=self.embedding_dims) 
-        else:
+        if type(self.model_) is str:
             input_size = (X.shape[-1],)
-            model = build_network(selu_base_network(input_size), embedding_dims=self.embedding_dims)
-
+            model = build_network(base_network(self.model_, input_size), embedding_dims=self.embedding_dims)
+        else:
+            model = build_network(self.model_, embedding_dims=self.embedding_dims)
         try:
             model.compile(optimizer='adam', loss=triplet_loss(distance=self.distance, margin=self.margin))
         except KeyError:
