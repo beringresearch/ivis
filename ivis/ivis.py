@@ -63,8 +63,14 @@ class Ivis(BaseEstimator):
     Attributes
     ----------
     model_ : keras Model 
-        Stores the trained neural network model mapping inputs to embeddings
-    
+        Stores the trained triplet loss neural network model. Can be used to resume training at a later stage.
+
+    encoder : keras Model 
+        Stores the encoder neural network model mapping inputs to embeddings. Used for inference.
+
+    model_def: str or keras.models.Model
+        The model definition provided to the Ivis object for the base network. Can be either a string or an actual model.
+
     loss_history_ : array-like, floats
         The loss history at the end of each epoch during training of the model.
 
@@ -84,7 +90,10 @@ class Ivis(BaseEstimator):
         self.ntrees = ntrees
         self.search_k = search_k
         self.precompute = precompute
-        self.model_ = model
+        self.model_def = model
+        self.model_ = None
+        self.encoder = None
+        self.loss_history_ = []
         self.annoy_index_path = annoy_index_path
 
     def _fit(self, X, shuffle_mode=True):
@@ -100,26 +109,27 @@ class Ivis(BaseEstimator):
                     precompute=self.precompute)
 
         loss_monitor = 'loss'
-                
-        if type(self.model_) is str:
-            input_size = (X.shape[-1],)
-            model = build_network(base_network(self.model_, input_size), embedding_dims=self.embedding_dims)
-        else:
-            model = build_network(self.model_, embedding_dims=self.embedding_dims)
-        try:
-            model.compile(optimizer='adam', loss=triplet_loss(distance=self.distance, margin=self.margin))
-        except KeyError:
-            raise Exception('Loss function not implemented.')
-        
+
+        if self.model_ is None:       
+            if type(self.model_def) is str:
+                input_size = (X.shape[-1],)
+                self.model_ = build_network(base_network(self.model_def, input_size), embedding_dims=self.embedding_dims)
+            else:
+                self.model_ = build_network(self.model_def, embedding_dims=self.embedding_dims)
+            try:
+                self.model_.compile(optimizer='adam', loss=triplet_loss(distance=self.distance, margin=self.margin))
+            except KeyError:
+                raise Exception('Loss function not implemented.')
+        self.encoder = self.model_.layers[3]
+
         print('Training neural network')
-        hist = model.fit_generator(datagen, 
+        hist = self.model_.fit_generator(datagen, 
             steps_per_epoch=int(X.shape[0] / self.batch_size), 
             epochs=self.epochs, 
             callbacks=[EarlyStopping(monitor=loss_monitor, patience=self.n_epochs_without_progress)],            
             shuffle=shuffle_mode,
             workers=multiprocessing.cpu_count())
-        self.loss_history_ = hist.history['loss']
-        self.model_ = model.layers[3]
+        self.loss_history_ += hist.history['loss']
 
     def fit(self, X, shuffle_mode=True):
         self._fit(X, shuffle_mode)
@@ -130,15 +140,17 @@ class Ivis(BaseEstimator):
         return self.transform(X)
         
     def transform(self, X):
-        embedding = self.model_.predict(X)
+        embedding = self.encoder.predict(X)
         return embedding
 
     def save_model(self, filepath):
-        self.model_.save(filepath)
+        self.encoder.save(filepath)
     
     def load_model(self, filepath):
-        model = load_model(filepath)
-        self.model_ = model
-        self.model_._make_predict_function()
+        encoder = load_model(filepath)
+        self.model_ = build_network(encoder, embedding_dims=self.embedding_dims)
+        self.model_.compile(optimizer='adam', loss=triplet_loss(distance=self.distance, margin=self.margin))
+        self.encoder = self.model_.layers[3]
+        self.encoder._make_predict_function()
         return self
     
