@@ -9,6 +9,8 @@ from keras.callbacks import EarlyStopping
 from keras.models import load_model, Model
 from sklearn.base import BaseEstimator
 from annoy import AnnoyIndex
+import json
+import os
 import multiprocessing
 
 
@@ -96,6 +98,12 @@ class Ivis(BaseEstimator):
         self.loss_history_ = []
         self.annoy_index_path = annoy_index_path
 
+    def __getstate__(self):
+        state = dict(self.__dict__)
+        del state['model_']
+        del state['encoder']
+        return state
+
     def _fit(self, X, shuffle_mode=True):
         
         if self.annoy_index_path is None:
@@ -143,11 +151,17 @@ class Ivis(BaseEstimator):
         embedding = self.encoder.predict(X)
         return embedding
 
-    def save_model(self, filepath):
-        self.encoder.save(filepath)
+    def save_model(self, folder_path):
+        os.makedirs(folder_path)
+        
+        self.encoder.save(os.path.join(folder_path, 'ivis_model.h5'))
+        json.dump(self.__getstate__(), open(os.path.join(folder_path, 'ivis.json'), 'w'))
     
-    def load_model(self, filepath):
-        encoder = load_model(filepath)
+    def load_model(self, folder_path):
+        encoder = load_model(os.path.join(folder_path, 'ivis_model.h5'))
+        ivis_config = json.load(open(os.path.join(folder_path,'ivis.json'), 'r'))
+        self.__dict__ = ivis_config
+
         self.model_ = build_network(encoder, embedding_dims=self.embedding_dims)
         self.model_.compile(optimizer='adam', loss=triplet_loss(distance=self.distance, margin=self.margin))
         self.encoder = self.model_.layers[3]
