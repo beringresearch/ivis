@@ -49,10 +49,7 @@ def extract_knn(X, index_filepath, k=150, search_k=-1):
     with tqdm(total=len(X)) as pbar:
         neighbour_list = []
         neighbour_list_length = len(neighbour_list)
-        while True:
-            running = any(process.is_alive() for process in process_pool)
-            if not running:
-                break
+        while any(process.is_alive() for process in process_pool):
             while not results_queue.empty():
                 neighbour_list.append(results_queue.get())
             progress = len(neighbour_list) - neighbour_list_length
