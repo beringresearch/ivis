@@ -35,12 +35,14 @@ def build_network(base_network, embedding_dims=2, embedding_l2=0.0):
 def base_network(model_name, input_shape):
     '''Return the defined base_network defined by the model_name string.
     '''
-    model_dict = {
-        'default': default_base_network(input_shape),
-        'hinton' : hinton_base_network(input_shape),
-        'maaten' : maaten_base_network(input_shape)
-    }
-    return model_dict[model_name]
+    if model_name == 'default':
+        return default_base_network(input_shape)
+    elif model_name == 'hinton':
+        return hinton_base_network(input_shape),
+    elif model_name == 'maaten':
+        return maaten_base_network(input_shape)
+    
+    raise NotImplementedError('Base network {} is not implemented'.format(model_name))
 
 def default_base_network(input_shape):
     '''Base network to be shared (eq. to feature extraction).
