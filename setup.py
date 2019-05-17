@@ -7,7 +7,7 @@ setup(name='ivis',
       url='http://github.com/beringresearch/ivis',
       author='Benjamin Szubert, Ignat Drozdov',
       author_email='bszubert@beringresearch.com, idrozdov@beringresearch.com',
-      license='MIT',
+      license='GNU General Public License v2.0',
       packages=find_packages(),
       install_requires=[
           'tensorflow',
