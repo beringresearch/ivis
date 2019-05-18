@@ -1,14 +1,14 @@
 """ scikit-learn wrapper class for the Ivis algorithm. """
-
 from .data.triplet_generators import create_triplet_generator_from_index_path
 from .nn.network import build_network, base_network
 from .nn.losses import triplet_loss
 from .data.knn import build_annoy_index
 
 from keras.callbacks import EarlyStopping
-from keras.models import load_model, Model
+from keras.models import model_from_json
+
 from sklearn.base import BaseEstimator
-from annoy import AnnoyIndex
+
 import json
 import os
 import multiprocessing
@@ -152,17 +152,24 @@ class Ivis(BaseEstimator):
         return embedding
 
     def save_model(self, folder_path):
-        os.makedirs(folder_path)
-        
-        self.encoder.save(os.path.join(folder_path, 'ivis_model.h5'))
-        json.dump(self.__getstate__(), open(os.path.join(folder_path, 'ivis.json'), 'w'))
+        os.makedirs(folder_path) 
+
+        model_json = self.model_.to_json()
+        with open(os.path.join(folder_path, 'ivis_model.json'), 'w') as json_file:
+            json_file.write(model_json)
+        # serialize weights to HDF5
+        self.model_.save_weights(os.path.join(folder_path, 'ivis_model.h5'))
+
+        json.dump(self.__getstate__(), open(os.path.join(folder_path, 'ivis_params.json'), 'w'))
     
-    def load_model(self, folder_path):
-        encoder = load_model(os.path.join(folder_path, 'ivis_model.h5'))
-        ivis_config = json.load(open(os.path.join(folder_path,'ivis.json'), 'r'))
+    def load_model(self, folder_path):  
+        encoder = model_from_json(open(os.path.join(folder_path, 'ivis_model.json')).read())
+        encoder.load_weights(os.path.join(folder_path, 'ivis_model.h5'))
+
+        ivis_config = json.load(open(os.path.join(folder_path,'ivis_params.json'), 'r'))
         self.__dict__ = ivis_config
 
-        self.model_ = build_network(encoder, embedding_dims=self.embedding_dims)
+        self.model_ = encoder 
         self.model_.compile(optimizer='adam', loss=triplet_loss(distance=self.distance, margin=self.margin))
         self.encoder = self.model_.layers[3]
         self.encoder._make_predict_function()
