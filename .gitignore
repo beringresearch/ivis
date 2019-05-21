@@ -1,3 +1,5 @@
 ivis.egg-info/
 __pycache__/
 *.egg
+.DS_Store
+*.swp
