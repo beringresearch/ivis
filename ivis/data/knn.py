@@ -29,24 +29,24 @@ def extract_knn(X, index_filepath, k=150, search_k=-1):
 
     n_dims = X.shape[1]
 
-    chunk_size = len(X) // cpu_count()
-    remainder = (len(X) % cpu_count()) > 0
+    chunk_size = X.shape[0] // cpu_count()
+    remainder = (X.shape[0] % cpu_count()) > 0
     process_pool = []
     results_queue = Queue()
 
     # Split up the indices and assign processes for each chunk
     i = 0
-    while (i + chunk_size) <= len(X):
+    while (i + chunk_size) <= X.shape[0]:
         process_pool.append(KNN_Worker(index_filepath, k, search_k, n_dims, (i, i+chunk_size), results_queue))
         i += chunk_size
     if remainder:
-        process_pool.append(KNN_Worker(index_filepath, k, search_k, n_dims, (i, len(X)), results_queue))
+        process_pool.append(KNN_Worker(index_filepath, k, search_k, n_dims, (i, X.shape[0]), results_queue))
 
     for process in process_pool:
         process.start()
 
     # Read from results queue as processes write to it to prevent queue becoming full
-    with tqdm(total=len(X)) as pbar:
+    with tqdm(total=X.shape[0]) as pbar:
         neighbour_list = []
         neighbour_list_length = len(neighbour_list)
         while any(process.is_alive() for process in process_pool):
