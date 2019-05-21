@@ -13,6 +13,7 @@ import json
 import os
 import multiprocessing
 import tensorflow as tf
+import numpy as np
 
 
 class Ivis(BaseEstimator):
@@ -106,6 +107,8 @@ class Ivis(BaseEstimator):
         return state
 
     def _fit(self, X, shuffle_mode=True):
+        if np.isnan(X).any():
+            raise ValueError('NaN value encountered in inputs')
         
         if self.annoy_index_path is None:
             self.annoy_index_path = 'annoy.index'
