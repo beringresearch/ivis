@@ -27,11 +27,7 @@ def build_network(base_network, embedding_dims=2, embedding_l2=0.0):
     processed_p = network(input_p)
     processed_n = network(input_n)
 
-    def lamb(l):
-        import tensorflow as tf
-        return K.stack(l)
-
-    triplet = Lambda(lamb, output_shape=output_shape)([processed_a, processed_p, processed_n])
+    triplet = Lambda(K.stack, output_shape=output_shape)([processed_a, processed_p, processed_n])
     model = Model([input_a, input_p, input_n], triplet)
 
     return model

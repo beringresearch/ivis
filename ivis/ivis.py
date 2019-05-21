@@ -12,6 +12,7 @@ from sklearn.base import BaseEstimator
 import json
 import os
 import multiprocessing
+import tensorflow as tf
 
 
 class Ivis(BaseEstimator):
@@ -163,7 +164,7 @@ class Ivis(BaseEstimator):
         json.dump(self.__getstate__(), open(os.path.join(folder_path, 'ivis_params.json'), 'w'))
     
     def load_model(self, folder_path):  
-        encoder = model_from_json(open(os.path.join(folder_path, 'ivis_model.json')).read())
+        encoder = model_from_json(open(os.path.join(folder_path, 'ivis_model.json')).read(), custom_objects={'tf': tf })
         encoder.load_weights(os.path.join(folder_path, 'ivis_model.h5'))
 
         ivis_config = json.load(open(os.path.join(folder_path,'ivis_params.json'), 'r'))
