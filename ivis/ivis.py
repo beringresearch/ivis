@@ -107,9 +107,10 @@ class Ivis(BaseEstimator):
         return state
 
     def _fit(self, X, shuffle_mode=True):
-        if np.isnan(X).any():
-            raise ValueError('NaN value encountered in inputs')
-        
+        #if np.isnan(X).any():
+        #    raise ValueError('NaN value encountered in inputs')
+        #
+
         if self.annoy_index_path is None:
             self.annoy_index_path = 'annoy.index'
             build_annoy_index(X, self.annoy_index_path, ntrees=self.ntrees)
