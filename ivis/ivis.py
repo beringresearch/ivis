@@ -1,19 +1,19 @@
 """ scikit-learn wrapper class for the Ivis algorithm. """
 from .data.triplet_generators import create_triplet_generator_from_index_path
 from .nn.network import build_network, base_network
-from .nn.losses import triplet_loss, get_loss_functions
-from .data.knn import build_annoy_index
+from .nn.losses import triplet_loss
+from .data.knn import build_annoy_index, build_sparse_annoy_index
 
 from keras.callbacks import EarlyStopping
 from keras.models import model_from_json, load_model
 
+from scipy.sparse import issparse
 from sklearn.base import BaseEstimator
 
 import json
 import os
 import multiprocessing
 import tensorflow as tf
-import numpy as np
 
 
 class Ivis(BaseEstimator):
@@ -107,12 +107,14 @@ class Ivis(BaseEstimator):
         return state
 
     def _fit(self, X, shuffle_mode=True):
-        if np.isnan(X).any():
-            raise ValueError('NaN value encountered in inputs')
         
         if self.annoy_index_path is None:
             self.annoy_index_path = 'annoy.index'
-            build_annoy_index(X, self.annoy_index_path, ntrees=self.ntrees)
+            if issparse(X):
+                build_sparse_annoy_index(X, self.annoy_index_path, ntrees=self.ntrees)
+            else:
+                build_annoy_index(X, self.annoy_index_path, ntrees=self.ntrees)
+        
         datagen = create_triplet_generator_from_index_path(X,
                     index_path=self.annoy_index_path,
                     k=self.k,

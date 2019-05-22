@@ -8,10 +8,23 @@ from collections import namedtuple
 from operator import attrgetter
 from tqdm import tqdm
 
+def build_sparse_annoy_index(X, path, ntrees=50):
+    print('Building KNN index')
+
+    index = AnnoyIndex(X.shape[1])
+    index.on_disk_build(path)
+
+    for i in tqdm(range(X.shape[0])):
+        v = X[i].toarray()[0] 
+        index.add_item(i, v)
+
+    # Build n trees
+    index.build(ntrees)
+    return index
+
 def build_annoy_index(X, path, ntrees=50):
     print('Building KNN index')
-    
-    if issparse(X): X = X.toarray()
+       
     index = AnnoyIndex(X.shape[1])
     index.on_disk_build(path)
     for i in tqdm(range(X.shape[0])):
