@@ -1,5 +1,7 @@
 [![DOI](https://zenodo.org/badge/144551119.svg)](https://zenodo.org/badge/latestdoi/144551119)
 
+[![Documentation Status](https://readthedocs.org/projects/bering-ivis/badge/?version=latest)](https://bering-ivis.readthedocs.io/en/latest/?badge=latest)
+
 # ivis
 
 Implementation of the ivis algorithm as described in the paper 'Structure-preserving visualisation of high dimensional single-cell data with deep Siamese Neural Networks'.  
