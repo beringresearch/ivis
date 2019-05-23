@@ -167,7 +167,6 @@ class Ivis(BaseEstimator):
 
         json.dump(self.__getstate__(), open(os.path.join(folder_path, 'ivis_params.json'), 'w'))
     
-<<<<<<< HEAD
     def load_model(self, folder_path):
         """Load ivis model
 
@@ -179,19 +178,15 @@ class Ivis(BaseEstimator):
         Returns
         -------
         returns an ivis instance
-        """
-        
-        encoder = model_from_json(open(os.path.join(folder_path, 'ivis_model.json')).read(), custom_objects={'tf': tf })
-        encoder.load_weights(os.path.join(folder_path, 'ivis_model.h5'))
+        """ 
 
-=======
-    def load_model(self, folder_path):  
->>>>>>> 535c157fe5af1d81ddbc18d573dad07fce4ee14b
-        ivis_config = json.load(open(os.path.join(folder_path,'ivis_params.json'), 'r'))
+        ivis_config = json.load(open(os.path.join(folder_path,
+            'ivis_params.json'), 'r'))
         self.__dict__ = ivis_config
         
         loss_function = triplet_loss(self.distance, self.margin)
-        self.model_ = load_model(os.path.join(folder_path, 'ivis_model.h5'), custom_objects={'tf': tf , loss_function.__name__ : loss_function })
+        self.model_ = load_model(os.path.join(folder_path, 'ivis_model.h5'),
+                custom_objects={'tf':tf, loss_function.__name__ : loss_function })
         self.encoder = self.model_.layers[3]
         self.encoder._make_predict_function()
         return self
