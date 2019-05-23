@@ -6,7 +6,16 @@ from keras import backend as K
 import tensorflow as tf
 
 def triplet_loss(distance='pn', margin=1):
-    distances = {
+
+    losses = get_loss_functions()
+
+    loss_function = losses[distance]
+    loss_function.__name__ = distance
+
+    return loss_function
+
+def get_loss_functions(distance='pn', margin=1):
+    losses = {
         'pn' : pn_loss(margin=margin),
         'euclidean' : euclidean_loss(margin=margin),
         'softmax_ratio' : softmax_ratio,
@@ -16,7 +25,7 @@ def triplet_loss(distance='pn', margin=1):
         'chebyshev': chebyshev_loss(margin=margin),
         'chebyshev_pn': chebyshev_pn_loss(margin=margin)
     }
-    return distances[distance]
+    return losses
 
 def _euclidean_distance(x, y):
     return K.sqrt(K.maximum(K.sum(K.square(x - y), axis=1, keepdims=True), K.epsilon()))
