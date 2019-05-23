@@ -1,0 +1,319 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ivis.Ivis &mdash; ivis  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Getting Started" href="quickstart.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ivis
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ivis</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>ivis.Ivis</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="ivis-ivis">
+<span id="api"></span><h1>ivis.Ivis<a class="headerlink" href="#ivis-ivis" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="ivis.Ivis">
+<em class="property">class </em><code class="descclassname">ivis.</code><code class="descname">Ivis</code><span class="sig-paren">(</span><em>embedding_dims=2</em>, <em>k=150</em>, <em>distance='pn'</em>, <em>batch_size=128</em>, <em>epochs=1000</em>, <em>n_epochs_without_progress=50</em>, <em>margin=1</em>, <em>ntrees=50</em>, <em>search_k=-1</em>, <em>precompute=True</em>, <em>model='default'</em>, <em>annoy_index_path=None</em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.Ivis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code></p>
+<p>Ivis is a technique that uses an artificial neural network for dimensionality reduction, often useful for the purposes of visualization.  
+The network trains on triplets of data-points at a time and pulls positive points together, while pushing more distant points away from each other.  
+Triplets are sampled from the original data using KNN aproximation using the Annoy library.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>embedding_dims</strong> (<em>int</em>) – Number of dimensions in the embedding space</li>
+<li><strong>k</strong> (<em>int</em>) – The number of neighbours to retrieve for each point. Must be less than one minus the number of rows in the dataset.</li>
+<li><strong>distance</strong> (<em>str</em>) – The loss function used to train the neural network. One of “pn”, “euclidean”, “manhattan_pn”, “manhattan”, “chebyshev”, “chebyshev_pn”, “softmax_ratio_pn”, “softmax_ratio”.</li>
+<li><strong>batch_size</strong> (<em>int</em>) – The size of mini-batches used during gradient descent while training the neural network. Must be less than the num_rows in the dataset.</li>
+<li><strong>epochs</strong> (<em>int</em>) – The maximum number of epochs to train the model for. Each epoch the network will see a triplet based on each data-point once.</li>
+<li><strong>n_epochs_without_progress</strong> (<em>int</em>) – After n number of epochs without an improvement to the loss, terminate training early.</li>
+<li><strong>margin</strong> (<em>float</em>) – The distance that is enforced between points by the triplet loss functions.</li>
+<li><strong>ntrees</strong> (<em>int</em>) – The number of random projections trees built by Annoy to approximate KNN. The more trees the higher the memory usage, but the better the accuracy of results.</li>
+<li><strong>search_k</strong> (<em>int</em>) – The maximum number of nodes inspected during a nearest neighbour query by Annoy. The higher, the more computation time required, but the higher the accuracy. The default is n_trees * k, where k is the number of neighbours to retrieve. If this is set too low, a variable number of neighbours may be retrieved per data-point.</li>
+<li><strong>precompute</strong> (<em>bool</em>) – Whether to pre-compute the nearest neighbours. Pre-computing is significantly faster, but requires more memory. If memory is limited, try setting this to False.</li>
+<li><strong>model</strong> (<em>str</em>) – str or keras.models.Model. The keras model to train using triplet loss. If a model object is provided, an embedding layer of size ‘embedding_dims’ will be appended to the end of the network. If a string, a pre-defined network by that name will be used. Possible options are: ‘default’, ‘hinton’, ‘maaten’. By default, a selu network composed of 3 dense layers of 128 neurons each will be created, followed by an embedding layer of size ‘embedding_dims’.</li>
+<li><strong>annoy_index_path</strong> (<em>str</em>) – The filepath of a pre-trained annoy index file saved on disk. If provided, the annoy index file will be used. Otherwise, a new index will be generated and saved to disk in the current directory as ‘annoy.index’.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="ivis.Ivis.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>X</em>, <em>shuffle_mode=True</em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.Ivis.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit an ivis model.</p>
+<dl class="docutils">
+<dt>X <span class="classifier-delimiter">:</span> <span class="classifier">array, shape (n_samples, n_features)</span></dt>
+<dd>Data to be embedded.</dd>
+</dl>
+<p>returns an instance of self</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ivis.Ivis.fit_transform">
+<code class="descname">fit_transform</code><span class="sig-paren">(</span><em>X</em>, <em>shuffle_mode=True</em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.Ivis.fit_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit to data then transform</p>
+<dl class="docutils">
+<dt>X <span class="classifier-delimiter">:</span> <span class="classifier">array, shape (n_samples, n_features)</span></dt>
+<dd>Data to be embedded.</dd>
+</dl>
+<dl class="docutils">
+<dt>X_new <span class="classifier-delimiter">:</span> <span class="classifier">transformed array, shape (n_samples, embedding_dims)</span></dt>
+<dd>Embedding of the new data in low-dimensional space.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="ivis.Ivis.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.Ivis.get_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get parameters for this estimator.</p>
+<dl class="docutils">
+<dt>deep <span class="classifier-delimiter">:</span> <span class="classifier">boolean, optional</span></dt>
+<dd>If True, will return the parameters for this estimator and
+contained subobjects that are estimators.</dd>
+</dl>
+<dl class="docutils">
+<dt>params <span class="classifier-delimiter">:</span> <span class="classifier">mapping of string to any</span></dt>
+<dd>Parameter names mapped to their values.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="ivis.Ivis.load_model">
+<code class="descname">load_model</code><span class="sig-paren">(</span><em>folder_path</em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.Ivis.load_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load ivis model</p>
+<dl class="docutils">
+<dt>folder_path <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>Path to serialised model files and metadata</dd>
+</dl>
+<p>returns an ivis instance</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ivis.Ivis.save_model">
+<code class="descname">save_model</code><span class="sig-paren">(</span><em>folder_path</em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.Ivis.save_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save an ivis model</p>
+<dl class="docutils">
+<dt>folder_path <span class="classifier-delimiter">:</span> <span class="classifier">string</span></dt>
+<dd>Path to serialised model files and metadata</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="ivis.Ivis.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.Ivis.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the parameters of this estimator.</p>
+<p>The method works on simple estimators as well as on nested objects
+(such as pipelines). The latter have parameters of the form
+<code class="docutils literal notranslate"><span class="pre">&lt;component&gt;__&lt;parameter&gt;</span></code> so that it’s possible to update each
+component of a nested object.</p>
+<p>self</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ivis.Ivis.transform">
+<code class="descname">transform</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.Ivis.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform X into the existing embedded space and return that
+transformed output.</p>
+<dl class="docutils">
+<dt>X <span class="classifier-delimiter">:</span> <span class="classifier">array, shape (n_samples, n_features)</span></dt>
+<dd>New data to be transformed.</dd>
+</dl>
+<dl class="docutils">
+<dt>X_new <span class="classifier-delimiter">:</span> <span class="classifier">array, shape (n_samples, embedding_dims)</span></dt>
+<dd>Embedding of the new data in low-dimensional space.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="quickstart.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Bering Limited
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

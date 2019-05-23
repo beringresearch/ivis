@@ -17,73 +17,30 @@ import tensorflow as tf
 
 
 class Ivis(BaseEstimator):
-    """
-    Ivis is a technique that uses an artificial neural network for dimensionality reduction, often useful for the purposes of visualization.  
+    """Ivis is a technique that uses an artificial neural network for dimensionality reduction, often useful for the purposes of visualization.  
     The network trains on triplets of data-points at a time and pulls positive points together, while pushing more distant points away from each other.  
     Triplets are sampled from the original data using KNN aproximation using the Annoy library.
-
-    Parameters
-    ----------
-    embedding_dims : int, optional (default: 2)
-        Number of dimensions in the embedding space
     
-    k : int, optional (default: 150)
-        The number of neighbours to retrieve for each point. Must be less than one minus the number of rows in the dataset.
-
-    distance : string, optional (default: "pn")
-        The loss function used to train the neural network. One of "pn", "euclidean", "manhattan_pn", "manhattan", "chebyshev", "chebyshev_pn", "softmax_ratio_pn", "softmax_ratio".
+    :param int embedding_dims: Number of dimensions in the embedding space
+    :param int k: The number of neighbours to retrieve for each point. Must be less than one minus the number of rows in the dataset.
+    :param str distance: The loss function used to train the neural network. One of "pn", "euclidean", "manhattan_pn", "manhattan", "chebyshev", "chebyshev_pn", "softmax_ratio_pn", "softmax_ratio".
+    :param int batch_size: The size of mini-batches used during gradient descent while training the neural network. Must be less than the num_rows in the dataset.
+    :param int epochs: The maximum number of epochs to train the model for. Each epoch the network will see a triplet based on each data-point once.
+    :param int n_epochs_without_progress: After n number of epochs without an improvement to the loss, terminate training early.
+    :param float margin: The distance that is enforced between points by the triplet loss functions.
+    :param int ntrees: The number of random projections trees built by Annoy to approximate KNN. The more trees the higher the memory usage, but the better the accuracy of results.
+    :param int search_k: The maximum number of nodes inspected during a nearest neighbour query by Annoy. The higher, the more computation time required, but the higher the accuracy. The default is n_trees * k, where k is the number of neighbours to retrieve. If this is set too low, a variable number of neighbours may be retrieved per data-point.
+    :param bool precompute: Whether to pre-compute the nearest neighbours. Pre-computing is significantly faster, but requires more memory. If memory is limited, try setting this to False.
+    :param str model: str or keras.models.Model. The keras model to train using triplet loss. If a model object is provided, an embedding layer of size 'embedding_dims' will be appended to the end of the network. If a string, a pre-defined network by that name will be used. Possible options are: 'default', 'hinton', 'maaten'. By default, a selu network composed of 3 dense layers of 128 neurons each will be created, followed by an embedding layer of size 'embedding_dims'.
+    :param str annoy_index_path: The filepath of a pre-trained annoy index file saved on disk. If provided, the annoy index file will be used. Otherwise, a new index will be generated and saved to disk in the current directory as 'annoy.index'.
+  
+    """
     
-    batch_size : int, optional (default: 128)
-        The size of mini-batches used during gradient descent while training the neural network. Must be less than the num_rows in the dataset.
+    def __init__(self, embedding_dims=2, k=150, distance='pn', batch_size=128,
+                        epochs=1000, n_epochs_without_progress=50,
+                        margin=1, ntrees=50, search_k=-1,
+                        precompute=True, model='default', annoy_index_path=None):
 
-    epochs : int, optional (default: 1000)
-        The maximum number of epochs to train the model for. Each epoch the network will see a triplet based on each data-point once.
-
-    n_epochs_without_progress : int, optional (default: 50)
-        After n number of epochs without an improvement to the loss, terminate training early.
-
-    margin : float, optional (default: 1)
-        The distance that is enforced between points by the triplet loss functions.
-
-    ntrees : int, optional (default: 50)
-        The number of random projections trees built by Annoy to approximate KNN. The more trees the higher the memory usage, but the better the accuracy of results.
-
-    search_k : int, optional (default: -1)
-        The maximum number of nodes inspected during a nearest neighbour query by Annoy. The higher, the more computation time required, but the higher the accuracy. The default 
-        is n_trees * k, where k is the number of neighbours to retrieve. If this is set too low, a variable number of neighbours may be retrieved per data-point.
-
-    precompute : boolean, optional (default: True)
-        Whether to pre-compute the nearest neighbours. Pre-computing is significantly faster, but requires more memory. If memory is limited, try setting this to False.
-    
-    model: str or keras.models.Model (default: 'default')
-        The keras model to train using triplet loss. If a model object is provided, an embedding layer of size 'embedding_dims' will be appended to the end of the network. 
-        If a string, a pre-defined network by that name will be used. Possible options are: 'default', 'hinton', 'maaten'. 
-        By default, a selu network composed of 3 dense layers of 128 neurons each will be created, followed by an embedding layer of size 'embedding_dims'.
-
-    annoy_index_path: string, optional (default: None)
-        The filepath of a pre-trained annoy index file saved on disk. If provided, the annoy index file will be used. Otherwise, a new index will be generated and saved to disk in the 
-        current directory as 'annoy.index'.
-
-    Attributes
-    ----------
-    model_ : keras Model 
-        Stores the trained triplet loss neural network model. Can be used to resume training at a later stage.
-
-    encoder : keras Model 
-        Stores the encoder neural network model mapping inputs to embeddings. Used for inference.
-
-    model_def: str or keras.models.Model
-        The model definition provided to the Ivis object for the base network. Can be either a string or an actual model.
-
-    loss_history_ : array-like, floats
-        The loss history at the end of each epoch during training of the model.
-
-    annoy_index_path : string
-        The filepath of the annoy index currently in use by the model.
-    
-    """                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
-
-    def __init__(self, embedding_dims=2, k=150, distance='pn', batch_size=128, epochs=1000, n_epochs_without_progress=50, margin=1, ntrees=50, search_k=-1, precompute=True, model='default', annoy_index_path=None):
         self.embedding_dims = embedding_dims
         self.k = k
         self.distance = distance
@@ -146,18 +103,64 @@ class Ivis(BaseEstimator):
         self.loss_history_ += hist.history['loss']
 
     def fit(self, X, shuffle_mode=True):
+        """Fit an ivis model.
+        
+        Parameters
+        ----------
+        X : array, shape (n_samples, n_features)
+            Data to be embedded.
+        
+        Returns
+        -------
+        returns an instance of self
+        """
+
         self._fit(X, shuffle_mode)
         return self
 
     def fit_transform(self, X, shuffle_mode=True):
+        """Fit to data then transform
+
+        Parameters
+        ----------
+        X : array, shape (n_samples, n_features)
+            Data to be embedded.
+        
+        Returns
+        -------
+        X_new : transformed array, shape (n_samples, embedding_dims)
+            Embedding of the new data in low-dimensional space.
+        """
+
         self.fit(X, shuffle_mode)
         return self.transform(X)
         
     def transform(self, X):
+        """Transform X into the existing embedded space and return that
+        transformed output.
+        
+        Parameters
+        ----------
+        X : array, shape (n_samples, n_features)
+            New data to be transformed.
+                                                    
+        Returns
+        -------
+        X_new : array, shape (n_samples, embedding_dims)
+            Embedding of the new data in low-dimensional space.
+        """
+
         embedding = self.encoder.predict(X)
         return embedding
 
     def save_model(self, folder_path):
+        """Save an ivis model
+
+        Parameters
+        ----------
+        folder_path : string
+            Path to serialised model files and metadata
+        """
         os.makedirs(folder_path) 
 
         model_json = self.model_.to_json()
@@ -168,7 +171,19 @@ class Ivis(BaseEstimator):
 
         json.dump(self.__getstate__(), open(os.path.join(folder_path, 'ivis_params.json'), 'w'))
     
-    def load_model(self, folder_path):  
+    def load_model(self, folder_path):
+        """Load ivis model
+
+        Parameters
+        ----------
+        folder_path : string
+            Path to serialised model files and metadata
+
+        Returns
+        -------
+        returns an ivis instance
+        """
+        
         encoder = model_from_json(open(os.path.join(folder_path, 'ivis_model.json')).read(), custom_objects={'tf': tf })
         encoder.load_weights(os.path.join(folder_path, 'ivis_model.h5'))
 
