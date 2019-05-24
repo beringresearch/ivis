@@ -40,8 +40,7 @@ release = ''
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
-    'nbsphinx',
+    'sphinx.ext.autosummary', 
     'sphinx_gallery.gen_gallery'
 ]
 
