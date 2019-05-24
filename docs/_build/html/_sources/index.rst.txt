@@ -23,5 +23,5 @@ ivis is a machine learning algorithm for reducing dimensionality of very large d
 
    Installation <installation>
    Quickstart <quickstart>
+   Example Gallery <auto_examples/index>
    API <api>
-

@@ -40,8 +40,16 @@ release = ''
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary'
+    'sphinx.ext.autosummary',
+    'nbsphinx',
+    'sphinx_gallery.gen_gallery'
 ]
+
+sphinx_gallery_conf = {
+        'examples_dirs': '../examples',  
+        'gallery_dirs': 'auto_examples',
+        'plot_gallery': True
+        }
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
