@@ -30,6 +30,26 @@ Several examples of how ivis can be used in common machine learning tasks.
    :hidden:
 
    /auto_examples/iris
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="`Ivis` class extends sklearn&#x27;s `BaseEstimator`, making it easy to incorporate ivis into a stand...">
+
+.. only:: html
+
+    .. figure:: /auto_examples/images/thumb/sphx_glr_sklearn_pipeline_thumb.png
+
+        :ref:`sphx_glr_auto_examples_sklearn_pipeline.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/sklearn_pipeline
 .. raw:: html
 
     <div style='clear:both'></div>

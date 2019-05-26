@@ -23,9 +23,9 @@ ivis.fit(X)
 embeddings = ivis.transform(X)
 
 fig, ax = plt.subplots(figsize=(12, 10))
-plt.scatter(
-        embeddings[:, 0], embeddings[:, 1], c=load_iris().target, cmap='Spectral', s=1
-            )
+plt.scatter(embeddings[:, 0],
+            embeddings[:, 1],
+            c=load_iris().target, cmap='Spectral', s=1)
 plt.setp(ax, xticks=[], yticks=[])
 plt.title('ivis embeddings of the iris dataset', fontsize=18)
 

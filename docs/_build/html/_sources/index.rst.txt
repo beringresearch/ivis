@@ -18,10 +18,16 @@ ivis is a machine learning algorithm for reducing dimensionality of very large d
 
 
 .. toctree::
-   :maxdepth: 3
-   :caption: Contents:
+   :maxdepth: 2
+   :caption: User Guide:
 
    Installation <installation>
    Quickstart <quickstart>
-   Example Gallery <auto_examples/index>
-   API <api>
+   Hyperparameter Selection <hyperparameters>
+   Examples <auto_examples/index>
+
+.. toctree::
+  :maxdepth: 2
+  :caption: API Reference:
+
+   API Guide <api>
