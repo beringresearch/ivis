@@ -1,7 +1,7 @@
 .. _hyperparameters:
 
-Hyperparameters
-===============
+Hyperparameter Selection
+========================
 
 ``ivis`` uses several hyperparameters that can have a significant impact
 on the desired embeddings:
