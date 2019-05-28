@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Comparison with other dimensionality reduction algorithms &mdash; ivis  documentation</title>
+  <title>Comparing ivis with other dimensionality reduction algorithms &mdash; ivis  documentation</title>
   
 
   
@@ -34,7 +34,9 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ivis.Ivis" href="api.html" />
+    <link rel="prev" title="Integrating ivis with standard sklearn pipelines" href="auto_examples/sklearn_pipeline.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -85,6 +87,14 @@
 <li class="toctree-l1"><a class="reference internal" href="hyperparameters.html">Hyperparameter Selection</a></li>
 <li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Examples</a></li>
 </ul>
+<p class="caption"><span class="caption-text">Applications:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Dimensionality Reduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#moon-dataset">Moon Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#swiss-roll-dataset">Swiss Roll Dataset</a></li>
+</ul>
+</li>
+</ul>
 <p class="caption"><span class="caption-text">API Reference:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="api.html"> API Guide</a></li>
@@ -133,7 +143,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Comparison with other dimensionality reduction algorithms</li>
+      <li>Comparing ivis with other dimensionality reduction algorithms</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -152,8 +162,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="comparison-with-other-dimensionality-reduction-algorithms">
-<span id="comparisons"></span><h1>Comparison with other dimensionality reduction algorithms<a class="headerlink" href="#comparison-with-other-dimensionality-reduction-algorithms" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="comparing-ivis-with-other-dimensionality-reduction-algorithms">
+<span id="comparisons"></span><h1>Comparing ivis with other dimensionality reduction algorithms<a class="headerlink" href="#comparing-ivis-with-other-dimensionality-reduction-algorithms" title="Permalink to this headline">¶</a></h1>
 <p>Ivis aims to reduce data dimensionality whilst preserving both global
 and local structures. There are a number of real-world applications
 where this feature could be useful. For example:</p>
@@ -179,7 +189,7 @@ distances between points in the embedding space. As such, ivis does not
 create spurious clusters nor does it artificially pack clusters closer
 together. Embeddings aim to be true to the original structure of the
 data, which can be noisy in a real-world setting.</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">umap</span>
+<div class="code python3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">umap</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">PolynomialFeatures</span><span class="p">,</span> <span class="n">MinMaxScaler</span>
@@ -197,12 +207,12 @@ with 1000 observations in each. Since we are concerned with a
 dimensionality reduction problem, we will artificially add reduntant
 features to the original datasets using polynomial combinations (degree
 ≤ 10) of the original features.</p>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">X_moons</span><span class="p">,</span> <span class="n">y_moons</span> <span class="o">=</span> <span class="n">make_moons</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">noise</span><span class="o">=.</span><span class="mi">05</span><span class="p">)</span>
+<div class="code python3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">X_moons</span><span class="p">,</span> <span class="n">y_moons</span> <span class="o">=</span> <span class="n">make_moons</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">noise</span><span class="o">=.</span><span class="mi">05</span><span class="p">)</span>
 <span class="n">X_moons_poly</span> <span class="o">=</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_moons</span><span class="p">)</span>
 <span class="n">X_moons_poly</span> <span class="o">=</span> <span class="n">MinMaxScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_moons_poly</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<div class="code python3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
 <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X_moons</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">X_moons</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span> <span class="o">=</span> <span class="n">y_moons</span><span class="p">)</span>
 <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Moons&#39;</span><span class="p">)</span>
 <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X_roll</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">X_roll</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">c</span> <span class="o">=</span> <span class="n">y_roll</span><span class="p">)</span>
@@ -210,19 +220,19 @@ features to the original datasets using polynomial combinations (degree
 </pre></div>
 </div>
 <img alt="_images/comparisons_original.png" src="_images/comparisons_original.png" />
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">estimator_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;UMAP&#39;</span><span class="p">,</span> <span class="s1">&#39;t-SNE&#39;</span><span class="p">,</span> <span class="s1">&#39;Isomap&#39;</span><span class="p">,</span> <span class="s1">&#39;MDS&#39;</span><span class="p">,</span> <span class="s1">&#39;PCA&#39;</span><span class="p">,</span> <span class="s1">&#39;Ivis&#39;</span><span class="p">]</span>
+<div class="code python3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">estimator_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;UMAP&#39;</span><span class="p">,</span> <span class="s1">&#39;t-SNE&#39;</span><span class="p">,</span> <span class="s1">&#39;Isomap&#39;</span><span class="p">,</span> <span class="s1">&#39;MDS&#39;</span><span class="p">,</span> <span class="s1">&#39;PCA&#39;</span><span class="p">,</span> <span class="s1">&#39;Ivis&#39;</span><span class="p">]</span>
 <span class="n">embeddings_moons</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">embeddings_roll</span> <span class="o">=</span> <span class="p">{}</span>
 </pre></div>
 </div>
 <div class="section" id="moon-dataset">
 <h2>Moon Dataset<a class="headerlink" href="#moon-dataset" title="Permalink to this headline">¶</a></h2>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">estimators</span> <span class="o">=</span> <span class="p">[</span><span class="n">umap</span><span class="o">.</span><span class="n">UMAP</span><span class="p">(),</span> <span class="n">TSNE</span><span class="p">(),</span> <span class="n">Isomap</span><span class="p">(),</span> <span class="n">MDS</span><span class="p">(),</span> <span class="n">PCA</span><span class="p">(),</span> <span class="n">Ivis</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">annoy_index_path</span><span class="o">=</span><span class="kc">None</span><span class="p">)]</span>
+<div class="code python3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">estimators</span> <span class="o">=</span> <span class="p">[</span><span class="n">umap</span><span class="o">.</span><span class="n">UMAP</span><span class="p">(),</span> <span class="n">TSNE</span><span class="p">(),</span> <span class="n">Isomap</span><span class="p">(),</span> <span class="n">MDS</span><span class="p">(),</span> <span class="n">PCA</span><span class="p">(),</span> <span class="n">Ivis</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">annoy_index_path</span><span class="o">=</span><span class="kc">None</span><span class="p">)]</span>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">estimators</span><span class="p">):</span>
     <span class="n">embeddings_moons</span><span class="p">[</span><span class="n">estimator_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_moons_poly</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<div class="code python3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">hspace</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span> <span class="n">wspace</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">)</span>
 
 <span class="n">axs</span> <span class="o">=</span> <span class="n">axs</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
@@ -233,7 +243,7 @@ features to the original datasets using polynomial combinations (degree
 </pre></div>
 </div>
 <img alt="_images/comparisons_moons.png" src="_images/comparisons_moons.png" />
-<p>Using defualt parameters, we can see that ivis succesfully captures both
+<p>Using default parameters, we can see that ivis succesfully captures both
 the general structure of each half-moon, as well as their relative
 positions to one another. Both UMAP and t-SNE appear to introduce
 spurious clusters and global relationships between the half-moons appear
@@ -241,12 +251,12 @@ to be disrupted.</p>
 </div>
 <div class="section" id="swiss-roll-dataset">
 <h2>Swiss Roll Dataset<a class="headerlink" href="#swiss-roll-dataset" title="Permalink to this headline">¶</a></h2>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">estimators</span> <span class="o">=</span> <span class="p">[</span><span class="n">umap</span><span class="o">.</span><span class="n">UMAP</span><span class="p">(),</span> <span class="n">TSNE</span><span class="p">(),</span> <span class="n">Isomap</span><span class="p">(),</span> <span class="n">MDS</span><span class="p">(),</span> <span class="n">PCA</span><span class="p">(),</span> <span class="n">Ivis</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">annoy_index_path</span><span class="o">=</span><span class="kc">None</span><span class="p">)]</span>
+<div class="code python3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">estimators</span> <span class="o">=</span> <span class="p">[</span><span class="n">umap</span><span class="o">.</span><span class="n">UMAP</span><span class="p">(),</span> <span class="n">TSNE</span><span class="p">(),</span> <span class="n">Isomap</span><span class="p">(),</span> <span class="n">MDS</span><span class="p">(),</span> <span class="n">PCA</span><span class="p">(),</span> <span class="n">Ivis</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">annoy_index_path</span><span class="o">=</span><span class="kc">None</span><span class="p">)]</span>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">estimators</span><span class="p">):</span>
     <span class="n">embeddings_roll</span><span class="p">[</span><span class="n">estimator_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_roll_poly</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<div class="code python3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
 <span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">hspace</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span> <span class="n">wspace</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">)</span>
 
 <span class="n">axs</span> <span class="o">=</span> <span class="n">axs</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
@@ -269,6 +279,15 @@ local structures of the dataset.</p>
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="api.html" class="btn btn-neutral float-right" title="ivis.Ivis" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="auto_examples/sklearn_pipeline.html" class="btn btn-neutral float-left" title="Integrating ivis with standard sklearn pipelines" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
