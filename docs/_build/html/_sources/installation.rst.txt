@@ -22,10 +22,10 @@ Another option would be to clone the github repository and install from your loc
 Dependencies
 ------------
 
-- Python 3.6+
+- Python 3.5+
 - tensorflow
 - keras
-- numpy
+- numpy>1.14.2
 - scikit-learn>0.20.0
 - tqdm
 - annoy
