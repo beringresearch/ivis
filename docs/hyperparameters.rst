@@ -1,7 +1,7 @@
 .. _hyperparameters:
 
-Hyperparameters
-===============
+Hyperparameter Selection
+========================
 
 ``ivis`` uses several hyperparameters that can have a significant impact
 on the desired embeddings:
@@ -141,6 +141,8 @@ naturally rank similarity between inputs. The ivis SNN consists of three
 identical base networks; each base network is followed by a final
 embedding layer. The size of the embedding layer reflects the desired
 dimensionality of outputs.
+
+.. image:: _static/FigureS1.png
 
 ``model`` parameter is defined using a `keras
 model <https://keras.io>`__. This flexibility allows ivis to be trained
