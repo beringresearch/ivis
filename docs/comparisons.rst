@@ -31,7 +31,8 @@ create spurious clusters nor does it artificially pack clusters closer
 together. Embeddings aim to be true to the original structure of the
 data, which can be noisy in a real-world setting.
 
-.. code:: ipython3
+
+.. code:: python3
 
     import umap
     import matplotlib.pyplot as plt
@@ -51,13 +52,15 @@ dimensionality reduction problem, we will artificially add reduntant
 features to the original datasets using polynomial combinations (degree
 ≤ 10) of the original features.
 
-.. code:: ipython3
+
+.. code:: python3
 
     X_moons, y_moons = make_moons(n_samples=1000, noise=.05)
     X_moons_poly = PolynomialFeatures(10).fit_transform(X_moons)
     X_moons_poly = MinMaxScaler().fit_transform(X_moons_poly)
 
-.. code:: ipython3
+
+.. code:: python3
 
     fig, axs = plt.subplots(1, 2, figsize=(16, 6), facecolor='w', edgecolor='k')
     axs[0].scatter(X_moons[:, 0], X_moons[:, 1], c = y_moons)
@@ -69,22 +72,23 @@ features to the original datasets using polynomial combinations (degree
 .. image:: _static/comparisons_original.png
 
 
-.. code:: ipython3
+.. code:: python3
 
     estimator_labels = ['UMAP', 't-SNE', 'Isomap', 'MDS', 'PCA', 'Ivis']
     embeddings_moons = {}
     embeddings_roll = {}
 
+
 Moon Dataset
 ------------
 
-.. code:: ipython3
+.. code:: python3
 
     estimators = [umap.UMAP(), TSNE(), Isomap(), MDS(), PCA(), Ivis(k=15, annoy_index_path=None)]
     for i, e in enumerate(estimators):
         embeddings_moons[estimator_labels[i]] = e.fit_transform(X_moons_poly)
 
-.. code:: ipython3
+.. code:: python3
 
     fig, axs = plt.subplots(2, 3, figsize=(15, 8), facecolor='w', edgecolor='k')
     fig.subplots_adjust(hspace = 0.3, wspace = 0.2)
@@ -101,7 +105,7 @@ Moon Dataset
 .. image:: _static/comparisons_moons.png
 
 
-Using defualt parameters, we can see that ivis succesfully captures both
+Using default parameters, we can see that ivis succesfully captures both
 the general structure of each half-moon, as well as their relative
 positions to one another. Both UMAP and t-SNE appear to introduce
 spurious clusters and global relationships between the half-moons appear
@@ -110,13 +114,13 @@ to be disrupted.
 Swiss Roll Dataset
 ------------------
 
-.. code:: ipython3
+.. code:: python3
 
     estimators = [umap.UMAP(), TSNE(), Isomap(), MDS(), PCA(), Ivis(k=15, annoy_index_path=None)]
     for i, e in enumerate(estimators):
         embeddings_roll[estimator_labels[i]] = e.fit_transform(X_roll_poly)
 
-.. code:: ipython3
+.. code:: python3
 
     fig, axs = plt.subplots(2, 3, figsize=(15, 8), facecolor='w', edgecolor='k')
     fig.subplots_adjust(hspace = 0.3, wspace = 0.2)
