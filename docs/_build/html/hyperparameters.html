@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Hyperparameter Selection &mdash; ivis  documentation</title>
+  <title>Hyperparameters &mdash; ivis  documentation</title>
   
 
   
@@ -84,8 +84,22 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Hyperparameter Selection</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Hyperparameter Selection</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#k"><code class="docutils literal notranslate"><span class="pre">k</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#model"><code class="docutils literal notranslate"><span class="pre">model</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#default">‘default’</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hinton">‘hinton’</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#maaten">‘maaten’</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#tuning-model">Tuning <code class="docutils literal notranslate"><span class="pre">model</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Examples</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html"> API Guide</a></li>
 </ul>
 
             
@@ -131,7 +145,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Hyperparameter Selection</li>
+      <li>Hyperparameters</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -150,8 +164,189 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="hyperparameter-selection">
-<span id="hyperparameters"></span><h1>Hyperparameter Selection<a class="headerlink" href="#hyperparameter-selection" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="hyperparameters">
+<span id="id1"></span><h1>Hyperparameters<a class="headerlink" href="#hyperparameters" title="Permalink to this headline">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">ivis</span></code> uses several hyperparameters that can have a significant impact
+on the desired embeddings:</p>
+<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">embedding_dims</span></code>: Number of dimensions in the embedding space.</li>
+<li><code class="docutils literal notranslate"><span class="pre">k</span></code>: The number of nearest neighbours to retrieve for each point.</li>
+<li><code class="docutils literal notranslate"><span class="pre">model</span></code>: the keras model that is trained using triplet loss. If a
+model object is provided, an embedding layer of size
+<code class="docutils literal notranslate"><span class="pre">embedding_dims</span></code> will be appended to the end of the network. If a
+string is provided, a pre-defined network by that name will be used.
+Possible options are: ‘default’, ‘hinton’, ‘maaten’. By default, a
+selu network composed of 3 dense layers of 128 neurons each will be
+created, followed by an embedding layer of size ‘embedding_dims’.</li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">k</span></code> and <code class="docutils literal notranslate"><span class="pre">model</span></code> are tunable parameters that should be selected on
+the basis of dataset size and complexity. We will look at each of these
+parameters in turn.</p>
+<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">mpl_toolkits.mplot3d.axes3d</span> <span class="k">as</span> <span class="nn">p3</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.datasets.samples_generator</span> <span class="k">import</span> <span class="n">make_swiss_roll</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">PolynomialFeatures</span><span class="p">,</span> <span class="n">MinMaxScaler</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="k">import</span> <span class="n">TSNE</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="k">import</span> <span class="n">PCA</span>
+
+<span class="kn">import</span> <span class="nn">keras</span>
+<span class="kn">import</span> <span class="nn">pydot</span> <span class="k">as</span> <span class="nn">pyd</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="k">import</span> <span class="n">SVG</span>
+<span class="kn">from</span> <span class="nn">keras.utils.vis_utils</span> <span class="k">import</span> <span class="n">model_to_dot</span>
+
+<span class="n">keras</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">vis_utils</span><span class="o">.</span><span class="n">pydot</span> <span class="o">=</span> <span class="n">pyd</span>
+
+<span class="kn">from</span> <span class="nn">ivis</span> <span class="k">import</span> <span class="n">Ivis</span>
+<span class="kn">from</span> <span class="nn">ivis.nn.network</span> <span class="k">import</span> <span class="n">base_network</span>
+</pre></div>
+</div>
+<p>The Swiss Roll dataset with 10,000 points will be used to demonstrate
+the effects of <code class="docutils literal notranslate"><span class="pre">k</span></code> and <code class="docutils literal notranslate"><span class="pre">model</span></code> on embeddings.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Our aim is not to unfold the data in the Swiss Roll, but rather recover original structure from high-dimensional feature set.</p>
+</div>
+<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">make_swiss_roll</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+<span class="n">X_poly</span> <span class="o">=</span> <span class="n">PolynomialFeatures</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">X_poly</span> <span class="o">=</span> <span class="n">MinMaxScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_poly</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Since <code class="docutils literal notranslate"><span class="pre">ivis</span></code> is a dimensionality reduction algorithm, we will
+artificially add reduntant features to the original three-dimensional
+Swiss Roll dataset using polynomial combinations (degree ≤ 10) of the
+original features.</p>
+<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">view_init</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="o">-</span><span class="mi">65</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">X</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span>
+               <span class="n">c</span> <span class="o">=</span> <span class="n">y</span><span class="p">,</span>
+               <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Original&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/swiss_roll_original.png" src="_images/swiss_roll_original.png" />
+<div class="section" id="k">
+<h2><code class="docutils literal notranslate"><span class="pre">k</span></code><a class="headerlink" href="#k" title="Permalink to this headline">¶</a></h2>
+<p>This parameter controls the balance between local and global features of
+the dataset. Low <code class="docutils literal notranslate"><span class="pre">k</span></code> values will result in prioritisation of local
+dataset features and the overall global structure may be missed.
+Conversely, high <code class="docutils literal notranslate"><span class="pre">k</span></code> values will force <code class="docutils literal notranslate"><span class="pre">ivis</span></code> to look at broader
+aspects of the data, losing desired granularity. We can visualise
+effects of low and large values on <code class="docutils literal notranslate"><span class="pre">k</span></code> on the Swiss Roll dataset.</p>
+<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">k</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">750</span><span class="p">]</span>
+<span class="n">embeddings</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">nn</span> <span class="ow">in</span> <span class="n">k</span><span class="p">:</span>
+    <span class="n">ivis</span> <span class="o">=</span> <span class="n">Ivis</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">nn</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span> <span class="s1">&#39;maaten&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_poly</span><span class="p">)</span>
+    <span class="n">embeddings</span><span class="p">[</span><span class="n">nn</span><span class="p">]</span> <span class="o">=</span> <span class="n">ivis</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_poly</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">hspace</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span> <span class="n">wspace</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">)</span>
+
+<span class="n">axs</span> <span class="o">=</span> <span class="n">axs</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">nn</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+    <span class="n">xy</span><span class="o">=</span><span class="n">embeddings</span><span class="p">[</span><span class="n">nn</span><span class="p">]</span>
+    <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xy</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">xy</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">s</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;k=&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">nn</span><span class="p">))</span>
+</pre></div>
+</div>
+<img alt="_images/swiss_roll_knn.png" src="_images/swiss_roll_knn.png" />
+<p>We can see that with small values of <code class="docutils literal notranslate"><span class="pre">k</span></code> (&lt;100), the spiraling
+structure of the Swiss Roll Dataset is not recovered. Emphasis is placed
+on grouping similar points together rather than extracting original
+dataset structure.</p>
+<p>For larger values of <code class="docutils literal notranslate"><span class="pre">k</span></code> (≥500), the overall shape of the dataset is
+preserved, but individual points that make up the Swiss Roll tend to be
+localised to the peripheries.</p>
+<p>In our experiments, we observed that setting <code class="docutils literal notranslate"><span class="pre">k</span></code> values to 0.5%-1.5%
+of the number of observations consistently results in greater embedding
+accuracies. Therefore, for a dataset with 10,000 observations <code class="docutils literal notranslate"><span class="pre">k=150</span></code>
+is a sensible default.</p>
+</div>
+<div class="section" id="model">
+<h2><code class="docutils literal notranslate"><span class="pre">model</span></code><a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">model</span></code> hyperparameter is a powerful way for <code class="docutils literal notranslate"><span class="pre">ivis</span></code> to handle
+complex non-linear feature-spaces. It refers to a trainable neural
+network that learns to minimise a triplet loss loss function.
+Structure-preserving dimensionality reduction is achieved by creating
+three replicates of the baseline architecture and assembling these
+replicates using a <a class="reference external" href="https://en.wikipedia.org/wiki/Siamese_network">siamese neural
+network</a> (SNNs). SNNs
+are a class of neural network that employ a unique architecture to
+naturally rank similarity between inputs. The ivis SNN consists of three
+identical base networks; each base network is followed by a final
+embedding layer. The size of the embedding layer reflects the desired
+dimensionality of outputs.</p>
+<img alt="_images/FigureS1.png" src="_images/FigureS1.png" />
+<p><code class="docutils literal notranslate"><span class="pre">model</span></code> parameter is defined using a <a class="reference external" href="https://keras.io">keras
+model</a>. This flexibility allows ivis to be trained
+using complex architectures and patterns, including convolutions. Out of
+the box, ivis supports three styles of baseline architectures -
+<strong>default</strong>, <strong>hinton</strong>, and <strong>maaten</strong>. This can be passed as string
+values to the <code class="docutils literal notranslate"><span class="pre">model</span></code> parameter.</p>
+<div class="section" id="default">
+<h3>‘default’<a class="headerlink" href="#default" title="Permalink to this headline">¶</a></h3>
+<p>The <strong>base</strong> network has three dense layers of 128 neurons followed by a
+final embedding layer. The size of the embedding layer reflects the
+desired dimensionality of outputs. The layers preceding the embedding
+layer use the SELU activation function, which gives the network a
+self-normalizing property. The weights for these layers are randomly
+initialized with the LeCun normal distribution. The embedding layers use
+a linear activation and have their weights initialized using Glorot’s
+uniform distribution.</p>
+</div>
+<div class="section" id="hinton">
+<h3>‘hinton’<a class="headerlink" href="#hinton" title="Permalink to this headline">¶</a></h3>
+<p>The <strong>hinton</strong> network has three dense layers (2000-1000-500) followed
+by a final embedding layer. The size of the embedding layer reflects the
+desired dimensionality of outputs. The layers preceding the embedding
+layer use the SELU activation function. The weights for these layers are
+randomly initialized with the LeCun normal distribution. The embedding
+layers use a linear activation and have their weights initialized using
+Glorot’s uniform distribution.</p>
+</div>
+<div class="section" id="maaten">
+<h3>‘maaten’<a class="headerlink" href="#maaten" title="Permalink to this headline">¶</a></h3>
+<p>The <strong>maaten</strong> network has three dense layers (500-500-2000) followed by
+a final embedding layer. The size of the embedding layer reflects the
+desired dimensionality of outputs. The layers preceding the embedding
+layer use the SELU activation function. The weights for these layers are
+randomly initialized with the LeCun normal distribution. The embedding
+layers use a linear activation and have their weights initialized using
+Glorot’s uniform distribution.</p>
+</div>
+</div>
+<div class="section" id="tuning-model">
+<h2>Tuning <code class="docutils literal notranslate"><span class="pre">model</span></code><a class="headerlink" href="#tuning-model" title="Permalink to this headline">¶</a></h2>
+<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">architecture</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;hinton&#39;</span><span class="p">,</span> <span class="s1">&#39;maaten&#39;</span><span class="p">]</span>
+<span class="n">embeddings</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">architecture</span><span class="p">:</span>
+    <span class="n">ivis</span> <span class="o">=</span> <span class="n">Ivis</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_poly</span><span class="p">)</span>
+    <span class="n">embeddings</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">ivis</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_poly</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">hspace</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span> <span class="n">wspace</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">)</span>
+
+<span class="n">axs</span> <span class="o">=</span> <span class="n">axs</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">nn</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">architecture</span><span class="p">):</span>
+    <span class="n">xy</span><span class="o">=</span><span class="n">embeddings</span><span class="p">[</span><span class="n">nn</span><span class="p">]</span>
+    <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xy</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">xy</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">s</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">nn</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/swiss_roll_model.png" src="_images/swiss_roll_model.png" />
+<p>Selecting an appropriate baseline architecture is a data-driven task.
+Three unique architectures that are shipped with ivis perform
+consistently well across a wide array of tasks. A general rule of thumb
+in our own experiments is to use the <strong>default</strong> network for
+computationally-intensive processing on large datasets (&gt;1 million
+observations) and select <strong>maaten</strong> architecture for smaller real-world
+datasets.</p>
+</div>
 </div>
 
 

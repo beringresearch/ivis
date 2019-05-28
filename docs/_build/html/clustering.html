@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installing and getting started &mdash; ivis  documentation</title>
+  <title>Using ivis for Clustering &mdash; ivis  documentation</title>
   
 
   
@@ -34,9 +34,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Getting Started" href="quickstart.html" />
-    <link rel="prev" title="ivis: structure preserving dimensionality reduction" href="index.html" /> 
+    <link rel="search" title="Search" href="search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -81,12 +79,8 @@
             
             
               <p class="caption"><span class="caption-text">User Guide:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#bugs">Bugs</a></li>
-</ul>
-</li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hyperparameters.html">ivis Hyperparameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hyperparameters.html#tuning-hyperparameters">Tuning hyperparameters</a></li>
@@ -140,13 +134,13 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Installing and getting started</li>
+      <li>Using ivis for Clustering</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/clustering.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -159,35 +153,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="installing-and-getting-started">
-<span id="installation"></span><h1>Installing and getting started<a class="headerlink" href="#installing-and-getting-started" title="Permalink to this headline">¶</a></h1>
-<p>The latest stable release can be downloaded from <a class="reference external" href="https://github.com/beringresearch/ivis/releases">https://github.com/beringresearch/ivis/releases</a></p>
-<p>Alternatively, you can use <code class="docutils literal notranslate"><span class="pre">pip</span></code> to install the development version directly from github:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install git+https://github.com/beringresearch/ivis.git
+  <div class="section" id="using-ivis-for-clustering">
+<span id="clustering"></span><h1>Using ivis for Clustering<a class="headerlink" href="#using-ivis-for-clustering" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">fetch_mldata</span>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">OPTICS</span>
+<span class="kn">from</span> <span class="nn">ivis</span> <span class="kn">import</span> <span class="n">Ivis</span>
 </pre></div>
-</div>
-<p>Another option would be to clone the github repository and install from your local copy:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/beringresearch/ivis
-<span class="nb">cd</span> ivis
-pip install -r requirements.txt -e .
-</pre></div>
-</div>
-<div class="section" id="dependencies">
-<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>Python 3.5+</li>
-<li>tensorflow</li>
-<li>keras</li>
-<li>numpy&gt;1.14.2</li>
-<li>scikit-learn&gt;0.20.0</li>
-<li>tqdm</li>
-<li>annoy</li>
-</ul>
-</div>
-<div class="section" id="bugs">
-<h2>Bugs<a class="headerlink" href="#bugs" title="Permalink to this headline">¶</a></h2>
-<p>Please report any bugs you encounter through the github <a class="reference external" href="https://github.com/beringresearch/ivis/issues/new">issue tracker</a>. It will be most helpful to
-include a reproducible example.</p>
 </div>
 </div>
 
@@ -196,15 +167,6 @@ include a reproducible example.</p>
            
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="quickstart.html" class="btn btn-neutral float-right" title="Getting Started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="index.html" class="btn btn-neutral float-left" title="ivis: structure preserving dimensionality reduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>
