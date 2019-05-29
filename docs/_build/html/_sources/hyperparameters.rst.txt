@@ -154,9 +154,9 @@ values to the ``model`` parameter.
 'default'
 ~~~~~~~~~
 
-The **base** network has three dense layers of 128 neurons followed by a
-final embedding layer. The size of the embedding layer reflects the
-desired dimensionality of outputs. The layers preceding the embedding
+The **default** network has three dense layers of 128 neurons followed by a
+final embedding layer (128-128-128). The size of the embedding layer reflects 
+the desired dimensionality of outputs. The layers preceding the embedding
 layer use the SELU activation function, which gives the network a
 self-normalizing property. The weights for these layers are randomly
 initialized with the LeCun normal distribution. The embedding layers use
@@ -185,8 +185,8 @@ randomly initialized with the LeCun normal distribution. The embedding
 layers use a linear activation and have their weights initialized using
 Glorot’s uniform distribution.
 
-Tuning ``model``
-----------------
+Let's examine each architectural option in greater detail:
+
 
 .. code:: ipython3
 
