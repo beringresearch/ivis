@@ -92,10 +92,13 @@
 <li class="toctree-l3"><a class="reference internal" href="#maaten">‘maaten’</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#tuning-model">Tuning <code class="docutils literal notranslate"><span class="pre">model</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Examples</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Applications:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="comparisons.html">Dimensionality Reduction</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API Reference:</span></p>
 <ul>
@@ -289,9 +292,9 @@ the box, ivis supports three styles of baseline architectures -
 values to the <code class="docutils literal notranslate"><span class="pre">model</span></code> parameter.</p>
 <div class="section" id="default">
 <h3>‘default’<a class="headerlink" href="#default" title="Permalink to this headline">¶</a></h3>
-<p>The <strong>base</strong> network has three dense layers of 128 neurons followed by a
-final embedding layer. The size of the embedding layer reflects the
-desired dimensionality of outputs. The layers preceding the embedding
+<p>The <strong>default</strong> network has three dense layers of 128 neurons followed by a
+final embedding layer (128-128-128). The size of the embedding layer reflects
+the desired dimensionality of outputs. The layers preceding the embedding
 layer use the SELU activation function, which gives the network a
 self-normalizing property. The weights for these layers are randomly
 initialized with the LeCun normal distribution. The embedding layers use
@@ -317,10 +320,7 @@ layer use the SELU activation function. The weights for these layers are
 randomly initialized with the LeCun normal distribution. The embedding
 layers use a linear activation and have their weights initialized using
 Glorot’s uniform distribution.</p>
-</div>
-</div>
-<div class="section" id="tuning-model">
-<h2>Tuning <code class="docutils literal notranslate"><span class="pre">model</span></code><a class="headerlink" href="#tuning-model" title="Permalink to this headline">¶</a></h2>
+<p>Let’s examine each architectural option in greater detail:</p>
 <div class="code ipython3 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">architecture</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;hinton&#39;</span><span class="p">,</span> <span class="s1">&#39;maaten&#39;</span><span class="p">]</span>
 <span class="n">embeddings</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">architecture</span><span class="p">:</span>
@@ -346,6 +346,7 @@ in our own experiments is to use the <strong>default</strong> network for
 computationally-intensive processing on large datasets (&gt;1 million
 observations) and select <strong>maaten</strong> architecture for smaller real-world
 datasets.</p>
+</div>
 </div>
 </div>
 

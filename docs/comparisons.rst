@@ -59,6 +59,10 @@ features to the original datasets using polynomial combinations (degree
     X_moons_poly = PolynomialFeatures(10).fit_transform(X_moons)
     X_moons_poly = MinMaxScaler().fit_transform(X_moons_poly)
 
+    X_roll, y_roll = make_swiss_roll(n_samples=1000, noise=.05)
+    X_roll_poly = PolynomialFeatures(10).fit_transform(X_roll)
+    X_roll_poly = MinMaxScaler().fit_transform(X_moons_poly)
+
 
 .. code:: python3
 
@@ -66,7 +70,7 @@ features to the original datasets using polynomial combinations (degree
     axs[0].scatter(X_moons[:, 0], X_moons[:, 1], c = y_moons)
     axs[0].set_title('Moons')
     axs[1].scatter(X_roll[:, 0], X_roll[:, 2], c = y_roll)
-    axs[0].set_title('Swiss Roll')
+    axs[1].set_title('Swiss Roll')
 
 
 .. image:: _static/comparisons_original.png
