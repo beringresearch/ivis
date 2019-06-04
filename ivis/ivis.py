@@ -15,7 +15,6 @@ import os
 import multiprocessing
 import tensorflow as tf
 
-
 class Ivis(BaseEstimator):
     """Ivis is a technique that uses an artificial neural network for dimensionality reduction, often useful for the purposes of visualization.  
     The network trains on triplets of data-points at a time and pulls positive points together, while pushing more distant points away from each other.  
@@ -33,13 +32,14 @@ class Ivis(BaseEstimator):
     :param bool precompute: Whether to pre-compute the nearest neighbours. Pre-computing is significantly faster, but requires more memory. If memory is limited, try setting this to False.
     :param str model: str or keras.models.Model. The keras model to train using triplet loss. If a model object is provided, an embedding layer of size 'embedding_dims' will be appended to the end of the network. If a string, a pre-defined network by that name will be used. Possible options are: 'default', 'hinton', 'maaten'. By default, a selu network composed of 3 dense layers of 128 neurons each will be created, followed by an embedding layer of size 'embedding_dims'.
     :param str annoy_index_path: The filepath of a pre-trained annoy index file saved on disk. If provided, the annoy index file will be used. Otherwise, a new index will be generated and saved to disk in the current directory as 'annoy.index'.
-  
+    :param int verbose: Controls the volume of logging output the model produces when training. When set to 0, silences outputs, when above 0 will print outputs.
+
     """
     
     def __init__(self, embedding_dims=2, k=150, distance='pn', batch_size=128,
                         epochs=1000, n_epochs_without_progress=50,
                         margin=1, ntrees=50, search_k=-1,
-                        precompute=True, model='default', annoy_index_path=None):
+                        precompute=True, model='default', annoy_index_path=None, verbose=1):
 
         self.embedding_dims = embedding_dims
         self.k = k
@@ -56,8 +56,11 @@ class Ivis(BaseEstimator):
         self.encoder = None
         self.loss_history_ = []
         self.annoy_index_path = annoy_index_path
+        self.verbose = verbose
 
     def __getstate__(self):
+        """ Return object serializable variable dict """
+
         state = dict(self.__dict__)
         del state['model_']
         del state['encoder']
@@ -65,19 +68,23 @@ class Ivis(BaseEstimator):
 
     def _fit(self, X, shuffle_mode=True):
         
+        if self.verbose > 0:
+            print('Building KNN index')
+
         if self.annoy_index_path is None:
             self.annoy_index_path = 'annoy.index'
             if issparse(X):
-                build_sparse_annoy_index(X, self.annoy_index_path, ntrees=self.ntrees)
+                build_sparse_annoy_index(X, self.annoy_index_path, ntrees=self.ntrees, verbose=self.verbose)
             else:
-                build_annoy_index(X, self.annoy_index_path, ntrees=self.ntrees)
+                build_annoy_index(X, self.annoy_index_path, ntrees=self.ntrees, verbose=self.verbose)
         
         datagen = create_triplet_generator_from_index_path(X,
                     index_path=self.annoy_index_path,
                     k=self.k,
                     batch_size=self.batch_size,
                     search_k=self.search_k,
-                    precompute=self.precompute)
+                    precompute=self.precompute,
+                    verbose=self.verbose)
 
         loss_monitor = 'loss'
 
@@ -93,13 +100,16 @@ class Ivis(BaseEstimator):
                 raise Exception('Loss function not implemented.')
         self.encoder = self.model_.layers[3]
 
-        print('Training neural network')
+        if self.verbose > 0:
+            print('Training neural network')
+
         hist = self.model_.fit_generator(datagen, 
             steps_per_epoch=int(X.shape[0] / self.batch_size), 
             epochs=self.epochs, 
             callbacks=[EarlyStopping(monitor=loss_monitor, patience=self.n_epochs_without_progress)],            
             shuffle=shuffle_mode,
-            workers=multiprocessing.cpu_count())
+            workers=multiprocessing.cpu_count(),
+            verbose=self.verbose)
         self.loss_history_ += hist.history['loss']
 
     def fit(self, X, shuffle_mode=True):

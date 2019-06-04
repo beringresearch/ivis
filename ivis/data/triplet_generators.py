@@ -48,7 +48,7 @@ def threadsafe_generator(f):
         return threadsafe_iter(f(*a, **kw))
     return g
 
-def create_triplet_generator_from_index_path(X, index_path, k, batch_size, search_k=-1, precompute=True):
+def create_triplet_generator_from_index_path(X, index_path, k, batch_size, search_k=-1, precompute=True, verbose=1):
     N_ROWS = X.shape[0]
     if k >= N_ROWS - 1:
         raise Exception('k value greater than or equal to (num_rows - 1) (k={}, rows={}). Lower k to a smaller value.'.format(k, N_ROWS))
@@ -56,7 +56,10 @@ def create_triplet_generator_from_index_path(X, index_path, k, batch_size, searc
         raise Exception('batch_size value larger than num_rows in dataset (batch_size={}, rows={}). Lower batch_size to a smaller value.'.format(batch_size, N_ROWS))
     
     if precompute == True:
-        neighbour_list = extract_knn(X, index_path, k=k, search_k=search_k)
+        if verbose > 0:
+            print('Extracting KNN from index')
+
+        neighbour_list = extract_knn(X, index_path, k=k, search_k=search_k, verbose=verbose)
         return generate_knn_triplets_from_neighbour_list(X, neighbour_list, batch_size=batch_size)
     else:
         index = AnnoyIndex(X.shape[1])
