@@ -8,13 +8,12 @@ from collections import namedtuple
 from operator import attrgetter
 from tqdm import tqdm
 
-def build_sparse_annoy_index(X, path, ntrees=50):
-    print('Building KNN index')
+def build_sparse_annoy_index(X, path, ntrees=50, verbose=1):
 
     index = AnnoyIndex(X.shape[1])
     index.on_disk_build(path)
 
-    for i in tqdm(range(X.shape[0])):
+    for i in tqdm(range(X.shape[0]), disable=verbose < 1):
         v = X[i].toarray()[0] 
         index.add_item(i, v)
 
@@ -22,12 +21,11 @@ def build_sparse_annoy_index(X, path, ntrees=50):
     index.build(ntrees)
     return index
 
-def build_annoy_index(X, path, ntrees=50):
-    print('Building KNN index')
+def build_annoy_index(X, path, ntrees=50, verbose=1):
        
     index = AnnoyIndex(X.shape[1])
     index.on_disk_build(path)
-    for i in tqdm(range(X.shape[0])):
+    for i in tqdm(range(X.shape[0]), disable=verbose < 1):
         v = X[i] 
         index.add_item(i, v)
 
@@ -35,10 +33,8 @@ def build_annoy_index(X, path, ntrees=50):
     index.build(ntrees)
     return index
 
-def extract_knn(X, index_filepath, k=150, search_k=-1):
+def extract_knn(X, index_filepath, k=150, search_k=-1, verbose=1):
     """ Starts multiple processes to retrieve nearest neighbours using an Annoy Index in parallel """
-
-    print('Extracting KNN from index')
 
     n_dims = X.shape[1]
 
@@ -59,7 +55,7 @@ def extract_knn(X, index_filepath, k=150, search_k=-1):
         process.start()
 
     # Read from results queue as processes write to it to prevent queue becoming full
-    with tqdm(total=X.shape[0]) as pbar:
+    with tqdm(total=X.shape[0], disable=verbose < 1) as pbar:
         neighbour_list = []
         neighbour_list_length = len(neighbour_list)
         while any(process.is_alive() for process in process_pool):
