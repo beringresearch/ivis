@@ -46,6 +46,8 @@ def base_network(model_name, input_shape):
     raise NotImplementedError(
         'Base network {} is not implemented'.format(model_name))
 
+def get_base_networks():
+    return ['default', 'hinton', 'maaten']
 
 def default_base_network(input_shape):
     '''Base network to be shared (eq. to feature extraction).
