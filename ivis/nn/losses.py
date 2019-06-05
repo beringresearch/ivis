@@ -7,14 +7,14 @@ import tensorflow as tf
 
 def triplet_loss(distance='pn', margin=1):
 
-    losses = get_loss_functions()
+    losses = get_loss_functions(margin=margin)
 
     loss_function = losses[distance]
     loss_function.__name__ = distance
 
     return loss_function
 
-def get_loss_functions(distance='pn', margin=1):
+def get_loss_functions(margin=1):
     losses = {
         'pn' : pn_loss(margin=margin),
         'euclidean' : euclidean_loss(margin=margin),
