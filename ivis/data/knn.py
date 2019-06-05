@@ -7,6 +7,7 @@ from multiprocessing import Process, cpu_count, Queue
 from collections import namedtuple
 from operator import attrgetter
 from tqdm import tqdm
+import time 
 
 def build_sparse_annoy_index(X, path, ntrees=50, verbose=1):
 
@@ -64,9 +65,10 @@ def extract_knn(X, index_filepath, k=150, search_k=-1, verbose=1):
             progress = len(neighbour_list) - neighbour_list_length
             pbar.update(progress)
             neighbour_list_length = len(neighbour_list)
+            time.sleep(0.1)
 
-        for process in process_pool:
-            process.join()
+        while not results_queue.empty():
+            neighbour_list.append(results_queue.get())
 
     neighbour_list = sorted(neighbour_list, key=attrgetter('row_index'))
     neighbour_list = list(map(attrgetter('neighbour_list'), neighbour_list))
