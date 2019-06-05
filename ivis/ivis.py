@@ -2,12 +2,11 @@
 from .data.triplet_generators import create_triplet_generator_from_index_path
 from .nn.network import build_network, base_network
 from .nn.losses import triplet_loss
-from .data.knn import build_annoy_index, build_sparse_annoy_index
+from .data.knn import build_annoy_index
 
 from keras.callbacks import EarlyStopping
 from keras.models import model_from_json, load_model
 
-from scipy.sparse import issparse
 from sklearn.base import BaseEstimator
 
 import json
@@ -73,11 +72,9 @@ class Ivis(BaseEstimator):
 
         if self.annoy_index_path is None:
             self.annoy_index_path = 'annoy.index'
-            if issparse(X):
-                build_sparse_annoy_index(X, self.annoy_index_path, ntrees=self.ntrees, verbose=self.verbose)
-            else:
-                build_annoy_index(X, self.annoy_index_path, ntrees=self.ntrees, verbose=self.verbose)
-        
+
+        build_annoy_index(X, self.annoy_index_path, ntrees=self.ntrees, verbose=self.verbose)
+
         datagen = create_triplet_generator_from_index_path(X,
                     index_path=self.annoy_index_path,
                     k=self.k,

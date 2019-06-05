@@ -8,6 +8,7 @@ from collections import namedtuple
 from operator import attrgetter
 from tqdm import tqdm
 import time 
+from scipy.sparse import issparse
 
 def build_sparse_annoy_index(X, path, ntrees=50, verbose=1):
 
@@ -26,9 +27,15 @@ def build_annoy_index(X, path, ntrees=50, verbose=1):
        
     index = AnnoyIndex(X.shape[1])
     index.on_disk_build(path)
-    for i in tqdm(range(X.shape[0]), disable=verbose < 1):
-        v = X[i] 
-        index.add_item(i, v)
+
+    if issparse(X):
+        for i in tqdm(range(X.shape[0]), disable=verbose < 1):
+            v = X[i].toarray()[0] 
+            index.add_item(i, v)
+    else:
+        for i in tqdm(range(X.shape[0]), disable=verbose < 1):
+            v = X[i] 
+            index.add_item(i, v)
 
     # Build n trees
     index.build(ntrees)
