@@ -118,6 +118,3 @@ def softmax_ratio_pn(y_true, y_pred):
     softmax = K.softmax(K.concatenate([anchor_positive_distance, minimum_distance]))
     ideal_distance = K.variable([0, 1])
     return K.mean(K.maximum( softmax - ideal_distance, 0))
-
-if __name__ == '__main__':
-    fun = triplet_loss(margin=0.1)
