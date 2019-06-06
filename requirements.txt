@@ -4,3 +4,4 @@ numpy
 scikit-learn>0.20.0
 tqdm
 git+https://github.com/beringresearch/annoy.git#egg=annoy
+pytest

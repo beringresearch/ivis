@@ -17,4 +17,7 @@ setup(name='ivis',
           'annoy',
           'tqdm'
       ],
+      extras_require={
+          'tests': ['pytest']
+      },
       zip_safe=False)
