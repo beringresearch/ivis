@@ -50,7 +50,7 @@
 #'                    outputs, when above 0 will print outputs.
 #' @export
 
-ivis <- function(X, embedding_dims = 2L,
+ivis <- function(embedding_dims = 2L,
     k = 150L,
     distance = "pn",
     batch_size = 128L,
@@ -64,7 +64,7 @@ ivis <- function(X, embedding_dims = 2L,
     annoy_index_path=NULL, verbose=1L){
 
 
-    X <- data.matrix(X)
+    #X <- data.matrix(X)
     k <- as.integer(k)
     
     embedding_dims <- as.integer(embedding_dims)
@@ -83,8 +83,7 @@ ivis <- function(X, embedding_dims = 2L,
                               precompute=precompute, model=model,
                               annoy_index_path=annoy_index_path,
                               verbose=verbose)
-    
-    model = model$fit(X=X)
+  
     return(model)
 
     }
