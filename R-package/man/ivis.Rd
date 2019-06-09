@@ -6,40 +6,70 @@
 \usage{
 ivis(X, embedding_dims = 2L, k = 150L, distance = "pn",
   batch_size = 128L, epochs = 1000L, n_epochs_without_progress = 50L,
-  margin = 1, ntrees = 50L, search_k = -1L, precompute = TRUE)
+  margin = 1, ntrees = 50L, search_k = -1L, precompute = TRUE,
+  model = "default", annoy_index_path = NULL, verbose = 1L)
 }
 \arguments{
-\item{X}{numerical matrix to be reduced. Columns correspond to features.}
+\item{embedding_dims:}{Number of dimensions in the embedding space}
 
-\item{embedding_dims}{int, optional (default: 2) Number of dimensions in the embedding space}
+\item{k:}{The number of neighbours to retrieve for each point.
+Must be less than one minus the number of rows in the
+dataset.}
 
-\item{k}{int, optional (default: 150)
-The number of neighbours to retrieve for each point}
+\item{distance:}{The loss function used to train the neural network.
+One of "pn", "euclidean", "manhattan_pn", "manhattan",
+"chebyshev", "chebyshev_pn", "softmax_ratio_pn",
+"softmax_ratio".}
 
-\item{distance}{string, optional (default: "pn")
-The loss function used to train the neural network. One of "pn", "euclidean", "softmax_ratio_pn", "softmax_ratio".}
+\item{batch_size:}{The size of mini-batches used during gradient descent
+while training the neural network. Must be less than
+the num_rows in the dataset.}
 
-\item{batch_size}{int, optional (default: 128)
-The size of mini-batches used during gradient descent while training the neural network.}
+\item{epochs:}{The maximum number of epochs to train the model for.
+Each epoch the network will see a triplet based on each
+data-point once.}
 
-\item{epochs}{int, optional (default: 1000)
-The maximum number of epochs to train the model for. Each epoch the network will see a triplet based on each data-point once.}
+\item{n_epochs_without_progress:}{After n number of epochs without an
+improvement to the loss, terminate training early.}
 
-\item{n_epochs_without_progress}{int, optional (default: 50)
-After n number of epochs without an improvement to the loss, terminate training early.}
+\item{margin:}{The distance that is enforced between points by the
+triplet loss functions.}
 
-\item{margin}{float, optional (default: 1)
-The distance that is enforced between points by the triplet loss functions}
+\item{ntrees:}{The number of random projections trees built by Annoy to
+approximate KNN. The more trees the higher the memory
+usage, but the better the accuracy of results.}
 
-\item{ntrees}{int, optional (default: 50)
-The number of random projections trees built by Annoy to approximate KNN. The more trees the higher the memory usage, but the better the accuracy of results.}
+\item{search_k:}{The maximum number of nodes inspected during a nearest
+neighbour query by Annoy. The higher, the more
+computation time required, but the higher the accuracy.
+The default is n_trees * k, where k is the number of
+neighbours to retrieve. If this is set too low, a
+variable number of neighbours may be retrieved per
+data-point.}
 
-\item{search_k}{int, optional (default: -1)
-The maximum number of nodes inspected during a nearest neighbour query by Annoy. The higher, the more computation time required, but the higher the accuracy. The default 
-is n_trees * k, where k is the number of neighbours to retrieve. If this is set too low, a variable number of neighbours may be retrieved per data-point.}
+\item{precompute:}{Whether to pre-compute the nearest neighbours.
+Pre-computing is significantly faster, but requires
+more memory. If memory is limited, try setting this to
+False.}
 
-\item{precompute}{boolean, optional (default: True)
-Whether to pre-compute the nearest neighbours. Pre-computing is significantly faster, but requires more memory. If memory is limited, try setting this to False.}
+\item{model:}{str or keras.models.Model. The keras model to train
+using triplet loss. If a model object is provided, an
+embedding layer of size 'embedding_dims' will be
+appended to the end of the network. If a string, a
+pre-defined network by that name will be used.
+Possible options are: 'default', 'hinton', 'maaten'.
+By default, a selu network composed of 3 dense layers
+of 128 neurons each will be created, followed by an
+embedding layer of size 'embedding_dims'.}
+
+\item{annoy_index_path:}{The filepath of a pre-trained annoy index file
+saved on disk. If provided, the annoy index file will
+be used. Otherwise, a new index will be generated and
+saved to disk in the current directory as 'annoy.index'.}
+
+\item{verbose:}{Controls the volume of logging output the model
+produces when training. When set to 0, silences
+outputs, when above 0 will print outputs.}
 }
 \description{
 IVIS algorithm
