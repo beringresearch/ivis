@@ -157,7 +157,7 @@ class Ivis(BaseEstimator):
             Embedding of the new data in low-dimensional space.
         """
 
-        embedding = self.encoder.predict(X)
+        embedding = self.encoder.predict(X, verbose=self.verbose)
         return embedding
 
     def save_model(self, folder_path):
