@@ -38,4 +38,11 @@ model = Ivis(embedding_dims=2, k=15)
 embeddings = model.fit_transform(X)
 ```
 
+## Ivis Universe
+
+Ivis can be used in a wide variety of real-world applications. The Ivis Universe consists of packages that extend the core Ivis functionality.
+
+* *[ivis-animate]**(https://github.com/beringresearch/ivis-animate) - visualise the Ivis learning process.
+* [ivis-explain](https://github.com/beringresearch/ivis-explain) - explain which features contribute the most to ivis embeddings.
+
 Copyright 2019 Bering Limited
