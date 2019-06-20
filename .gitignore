@@ -1,5 +1,6 @@
+build
 dist
-ivis.egg-info/
+*.egg-info/
 __pycache__/
 *.egg
 .DS_Store
