@@ -1,0 +1,9 @@
+tensorflow
+keras
+numpy
+scikit-learn
+annoy>=1.15.2
+tqdm
+
+[tests]
+pytest

@@ -8,7 +8,13 @@ This algorithm uses a siamese neural network trained on triplets to reduce the d
 
 ## Installation
 
-To install development version
+Install the latest ivis releast from PyPi:
+
+```
+pip install ivis
+```
+
+Alternatively, you can install the development version from github:
 
 ```
 git clone https://github.com/beringresearch/ivis
