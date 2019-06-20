@@ -1,0 +1,13 @@
+Metadata-Version: 2.1
+Name: ivis-beringresearch
+Version: 1.1.4
+Summary: Artificial neural network-driven visualization of high-dimensional data using triplets.
+Home-page: http://github.com/beringresearch/ivis
+Author: Benjamin Szubert, Ignat Drozdov
+Author-email: bszubert@beringresearch.com, idrozdov@beringresearch.com
+License: GNU General Public License v2.0
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Provides-Extra: tests
