@@ -3,7 +3,12 @@
 Installing and getting started
 ==============================
 
-The latest stable release can be downloaded from https://github.com/beringresearch/ivis/releases
+The latest stable release can be installed from PyPi:
+
+.. code:: bash
+
+  pip install ivis
+
 
 Alternatively, you can use ``pip`` to install the development version directly from github:
 
