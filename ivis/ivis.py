@@ -67,13 +67,11 @@ class Ivis(BaseEstimator):
 
     def _fit(self, X, shuffle_mode=True):
         
-        if self.verbose > 0:
-            print('Building KNN index')
-
         if self.annoy_index_path is None:
             self.annoy_index_path = 'annoy.index'
-
-        build_annoy_index(X, self.annoy_index_path, ntrees=self.ntrees, verbose=self.verbose)
+            if self.verbose > 0:
+                print('Building KNN index')
+            build_annoy_index(X, self.annoy_index_path, ntrees=self.ntrees, verbose=self.verbose)
 
         datagen = create_triplet_generator_from_index_path(X,
                     index_path=self.annoy_index_path,
