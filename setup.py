@@ -2,7 +2,7 @@ from setuptools import setup
 from setuptools import find_packages
 
 setup(name='ivis',
-      version='1.1.3',
+      version='1.1.4',
       description='Artificial neural network-driven visualization of high-dimensional data using triplets.',
       url='http://github.com/beringresearch/ivis',
       author='Benjamin Szubert, Ignat Drozdov',
@@ -14,10 +14,14 @@ setup(name='ivis',
           'keras',
           'numpy',
           'scikit-learn',
-          'annoy',
+          'annoy>=1.15.2',
           'tqdm'
       ],
       extras_require={
           'tests': ['pytest']
       },
+      classifiers=[
+          "Programming Language :: Python :: 3",
+          "Operating System :: OS Independent",
+      ],
       zip_safe=False)

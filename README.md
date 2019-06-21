@@ -2,13 +2,19 @@
 
 # ivis
 
-Implementation of the ivis algorithm as described in the paper 'Structure-preserving visualisation of high dimensional single-cell datasets'.  
+Implementation of the ivis algorithm as described in the paper [Structure-preserving visualisation of high dimensional single-cell datasets](https://www.nature.com/articles/s41598-019-45301-0).
 
 This algorithm uses a siamese neural network trained on triplets to reduce the dimensionality of data to two dimensions for visualization. Each triplet is sampled from one of the <i>k</i> nearest neighbours as approximated by the Annoy library, with neighbouring points being pulled together and non-neighours being pushed away.
 
 ## Installation
 
-To install development version
+Install the latest ivis releast from PyPi:
+
+```
+pip install ivis
+```
+
+Alternatively, you can install the development version from github:
 
 ```
 git clone https://github.com/beringresearch/ivis
@@ -37,5 +43,12 @@ model = Ivis(embedding_dims=2, k=15)
 
 embeddings = model.fit_transform(X)
 ```
+
+## Ivis Universe
+
+Ivis can be used in a wide variety of real-world applications. The Ivis Universe consists of packages that extend the core Ivis functionality.
+
+* [ivis-animate](https://github.com/beringresearch/ivis-animate) - visualise the Ivis learning process.
+* [ivis-explain](https://github.com/beringresearch/ivis-explain) - explain which features contribute the most to ivis embeddings.
 
 Copyright 2019 Bering Limited
