@@ -1,5 +1,5 @@
 """ scikit-learn wrapper class for the Ivis algorithm. """
-from .data.triplet_generators import create_triplet_generator_from_index_path
+from .data.triplet_generators import generator_from_index
 from .nn.network import build_network, base_network
 from .nn.losses import triplet_loss
 from .data.knn import build_annoy_index
@@ -73,7 +73,7 @@ class Ivis(BaseEstimator):
                 print('Building KNN index')
             build_annoy_index(X, self.annoy_index_path, ntrees=self.ntrees, verbose=self.verbose)
 
-        datagen = create_triplet_generator_from_index_path(X,
+        datagen = generator_from_index(X,
                     index_path=self.annoy_index_path,
                     k=self.k,
                     batch_size=self.batch_size,
