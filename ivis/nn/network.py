@@ -25,9 +25,10 @@ def triplet_network(base_network, embedding_dims=2, embedding_l2=0.0):
     processed_n = network(input_n)
 
     triplet = Lambda(K.stack,
-                     output_shape=output_shape)([processed_a,
+                     output_shape=output_shape,
+                     name='lambda_1')([processed_a,
                                                  processed_p,
-                                                 processed_n])
+                                                 processed_n],)
     model = Model([input_a, input_p, input_n], triplet)
 
     return model, processed_a, processed_p, processed_n
