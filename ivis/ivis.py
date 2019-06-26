@@ -5,7 +5,7 @@ from .nn.losses import triplet_loss
 from .data.knn import build_annoy_index
 
 from keras.callbacks import EarlyStopping
-from keras.models import model_from_json, load_model, Model
+from keras.models import load_model, Model
 from keras.layers import Dense
 import numpy as np
 
@@ -16,24 +16,56 @@ import os
 import multiprocessing
 import tensorflow as tf
 
+
 class Ivis(BaseEstimator):
-    """Ivis is a technique that uses an artificial neural network for dimensionality reduction, often useful for the purposes of visualization.
-    The network trains on triplets of data-points at a time and pulls positive points together, while pushing more distant points away from each other.
-    Triplets are sampled from the original data using KNN aproximation using the Annoy library.
+    """Ivis is a technique that uses an artificial neural network for
+    dimensionality reduction, often useful for the purposes of visualization.
+    The network trains on triplets of data-points at a time and pulls positive
+    points together, while pushing more distant points away from each other.
+    Triplets are sampled from the original data using KNN aproximation using
+    the Annoy library.
 
     :param int embedding_dims: Number of dimensions in the embedding space
-    :param int k: The number of neighbours to retrieve for each point. Must be less than one minus the number of rows in the dataset.
-    :param str distance: The loss function used to train the neural network. One of "pn", "euclidean", "manhattan_pn", "manhattan", "chebyshev", "chebyshev_pn", "softmax_ratio_pn", "softmax_ratio".
-    :param int batch_size: The size of mini-batches used during gradient descent while training the neural network. Must be less than the num_rows in the dataset.
-    :param int epochs: The maximum number of epochs to train the model for. Each epoch the network will see a triplet based on each data-point once.
-    :param int n_epochs_without_progress: After n number of epochs without an improvement to the loss, terminate training early.
-    :param float margin: The distance that is enforced between points by the triplet loss functions.
-    :param int ntrees: The number of random projections trees built by Annoy to approximate KNN. The more trees the higher the memory usage, but the better the accuracy of results.
-    :param int search_k: The maximum number of nodes inspected during a nearest neighbour query by Annoy. The higher, the more computation time required, but the higher the accuracy. The default is n_trees * k, where k is the number of neighbours to retrieve. If this is set too low, a variable number of neighbours may be retrieved per data-point.
-    :param bool precompute: Whether to pre-compute the nearest neighbours. Pre-computing is significantly faster, but requires more memory. If memory is limited, try setting this to False.
-    :param str model: str or keras.models.Model. The keras model to train using triplet loss. If a model object is provided, an embedding layer of size 'embedding_dims' will be appended to the end of the network. If a string, a pre-defined network by that name will be used. Possible options are: 'default', 'hinton', 'maaten'. By default, a selu network composed of 3 dense layers of 128 neurons each will be created, followed by an embedding layer of size 'embedding_dims'.
-    :param str annoy_index_path: The filepath of a pre-trained annoy index file saved on disk. If provided, the annoy index file will be used. Otherwise, a new index will be generated and saved to disk in the current directory as 'annoy.index'.
-    :param int verbose: Controls the volume of logging output the model produces when training. When set to 0, silences outputs, when above 0 will print outputs.
+    :param int k: The number of neighbours to retrieve for each point.
+        Must be less than one minus the number of rows in the dataset.
+    :param str distance: The loss function used to train the neural network.
+        One of "pn", "euclidean", "manhattan_pn", "manhattan", "chebyshev",
+        "chebyshev_pn", "softmax_ratio_pn", "softmax_ratio".
+    :param int batch_size: The size of mini-batches used during gradient
+        descent while training the neural network. Must be less than the
+        num_rows in the dataset.
+    :param int epochs: The maximum number of epochs to train the model for.
+        Each epoch the network will see a triplet based on each data-point
+        once.
+    :param int n_epochs_without_progress: After n number of epochs without an
+        improvement to the loss, terminate training early.
+    :param float margin: The distance that is enforced between points by the
+        triplet loss functions.
+    :param int ntrees: The number of random projections trees built by Annoy to
+        approximate KNN. The more trees the higher the memory usage, but the
+        better the accuracy of results.
+    :param int search_k: The maximum number of nodes inspected during a nearest
+        neighbour query by Annoy. The higher, the more computation time
+        required, but the higher the accuracy. The default is n_trees * k,
+        where k is the number of neighbours to retrieve. If this is set too
+        low, a variable number of neighbours may be retrieved per data-point.
+    :param bool precompute: Whether to pre-compute the nearest neighbours.
+        Pre-computing is a little faster, but requires more memory. If memory
+        is limited, try setting this to False.
+    :param str model: str or keras.models.Model. The keras model to train using
+        triplet loss. If a model object is provided, an embedding layer of size
+        'embedding_dims' will be appended to the end of the network.
+        If a string, a pre-defined network by that name will be used. Possible
+        options are: 'default', 'hinton', 'maaten'. By default, a selu network
+        composed of 3 dense layers of 128 neurons each will be created,
+        followed by an embedding layer of size 'embedding_dims'.
+    :param str annoy_index_path: The filepath of a pre-trained annoy index file
+        saved on disk. If provided, the annoy index file will be used.
+        Otherwise, a new index will be generated and saved to disk in the
+        current directory as 'annoy.index'.
+    :param int verbose: Controls the volume of logging output the model
+        produces when training. When set to 0, silences outputs, when above 0
+        will print outputs.
 
     """
 
@@ -87,31 +119,39 @@ class Ivis(BaseEstimator):
 
         loss_monitor = 'loss'
         try:
-            triplet_loss_func = triplet_loss(distance=self.distance, margin=self.margin)
+            triplet_loss_func = triplet_loss(distance=self.distance,
+                                             margin=self.margin)
         except KeyError:
             raise ValueError('Loss function `{}` not implemented.'.format(self.distance))
 
         if self.model_ is None:
             if type(self.model_def) is str:
                 input_size = (X.shape[-1],)
-                self.model_, anchor_embedding, _, _ = triplet_network(base_network(self.model_def, input_size), embedding_dims=self.embedding_dims)
+                self.model_, anchor_embedding, _, _ = \
+                    triplet_network(base_network(self.model_def, input_size),
+                                    embedding_dims=self.embedding_dims)
             else:
-                self.model_, anchor_embedding, _, _ = triplet_network(self.model_def, embedding_dims=self.embedding_dims)
+                self.model_, anchor_embedding, _, _ = \
+                    triplet_network(self.model_def,
+                                    embedding_dims=self.embedding_dims)
 
             if Y is None:
                 self.model_.compile(optimizer='adam', loss=triplet_loss_func)
             else:
                 n_classes = len(np.unique(Y, axis=0))
 
-                classification_output = Dense(n_classes, activation='softmax', name='classification_out')(anchor_embedding)
-                final_network = Model(inputs=self.model_.inputs, outputs=[self.model_.output, classification_output])
+                classification_output = Dense(n_classes, activation='softmax',
+                                              name='classification_out')(anchor_embedding)
+                final_network = Model(inputs=self.model_.inputs,
+                                      outputs=[self.model_.output,
+                                               classification_output])
                 self.model_ = final_network
                 self.model_.compile(optimizer='adam',
-                    loss={'lambda_1': triplet_loss_func,
-                          'classification_out' : 'sparse_categorical_crossentropy'
-                        },
-                    loss_weights={'lambda_1': 0.5,
-                                  'classification_out': 0.5})
+                                    loss={'lambda_1': triplet_loss_func,
+                                          'classification_out': 'sparse_categorical_crossentropy'
+                                          },
+                                    loss_weights={'lambda_1': 0.5,
+                                                  'classification_out': 0.5})
 
         self.encoder = self.model_.layers[3]
 
@@ -121,7 +161,8 @@ class Ivis(BaseEstimator):
         hist = self.model_.fit_generator(datagen,
             steps_per_epoch=int(X.shape[0] / self.batch_size),
             epochs=self.epochs,
-            callbacks=[EarlyStopping(monitor=loss_monitor, patience=self.n_epochs_without_progress)],
+            callbacks=[EarlyStopping(monitor=loss_monitor,
+                                     patience=self.n_epochs_without_progress)],
             shuffle=shuffle_mode,
             workers=multiprocessing.cpu_count(),
             verbose=self.verbose)
@@ -134,6 +175,9 @@ class Ivis(BaseEstimator):
         ----------
         X : array, shape (n_samples, n_features)
             Data to be embedded.
+        Y : array, shape (n_samples)
+            Optional array for supervised dimentionality reduction. Currently
+            only classification is supported.
 
         Returns
         -------
@@ -150,6 +194,10 @@ class Ivis(BaseEstimator):
         ----------
         X : array, shape (n_samples, n_features)
             Data to be embedded.
+        Y : array, shape (n_samples)
+            Optional array for supervised dimentionality reduction. Currently
+            only classification is supported.
+
 
         Returns
         -------
@@ -190,7 +238,8 @@ class Ivis(BaseEstimator):
         # serialize weights to HDF5
         self.model_.save(os.path.join(folder_path, 'ivis_model.h5'))
 
-        json.dump(self.__getstate__(), open(os.path.join(folder_path, 'ivis_params.json'), 'w'))
+        json.dump(self.__getstate__(),
+                  open(os.path.join(folder_path, 'ivis_params.json'), 'w'))
 
     def load_model(self, folder_path):
         """Load ivis model
@@ -206,13 +255,13 @@ class Ivis(BaseEstimator):
         """
 
         ivis_config = json.load(open(os.path.join(folder_path,
-            'ivis_params.json'), 'r'))
+                                                  'ivis_params.json'), 'r'))
         self.__dict__ = ivis_config
 
         loss_function = triplet_loss(self.distance, self.margin)
         self.model_ = load_model(os.path.join(folder_path, 'ivis_model.h5'),
-                custom_objects={'tf':tf, loss_function.__name__ : loss_function })
+                                 custom_objects={'tf': tf,
+                                                 loss_function.__name__ : loss_function })
         self.encoder = self.model_.layers[3]
         self.encoder._make_predict_function()
         return self
-
