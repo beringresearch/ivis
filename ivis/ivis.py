@@ -1,11 +1,13 @@
 """ scikit-learn wrapper class for the Ivis algorithm. """
 from .data.triplet_generators import generator_from_index
-from .nn.network import build_network, base_network
+from .nn.network import triplet_network, base_network
 from .nn.losses import triplet_loss
 from .data.knn import build_annoy_index
 
 from keras.callbacks import EarlyStopping
-from keras.models import model_from_json, load_model
+from keras.models import model_from_json, load_model, Model
+from keras.layers import Dense
+import numpy as np
 
 from sklearn.base import BaseEstimator
 
@@ -65,7 +67,7 @@ class Ivis(BaseEstimator):
         del state['encoder']
         return state
 
-    def _fit(self, X, shuffle_mode=True):
+    def _fit(self, X, Y=None, shuffle_mode=True):
         
         if self.annoy_index_path is None:
             self.annoy_index_path = 'annoy.index'
@@ -73,7 +75,7 @@ class Ivis(BaseEstimator):
                 print('Building KNN index')
             build_annoy_index(X, self.annoy_index_path, ntrees=self.ntrees, verbose=self.verbose)
 
-        datagen = generator_from_index(X,
+        datagen = generator_from_index(X, Y,
                     index_path=self.annoy_index_path,
                     k=self.k,
                     batch_size=self.batch_size,
@@ -82,17 +84,33 @@ class Ivis(BaseEstimator):
                     verbose=self.verbose)
 
         loss_monitor = 'loss'
+        try:
+            triplet_loss_func = triplet_loss(distance=self.distance, margin=self.margin)
+        except KeyError:
+            raise ValueError('Loss function `{}` not implemented.'.format(self.distance))
 
         if self.model_ is None:       
             if type(self.model_def) is str:
                 input_size = (X.shape[-1],)
-                self.model_ = build_network(base_network(self.model_def, input_size), embedding_dims=self.embedding_dims)
+                self.model_, anchor_embedding, _, _ = triplet_network(base_network(self.model_def, input_size), embedding_dims=self.embedding_dims)
             else:
-                self.model_ = build_network(self.model_def, embedding_dims=self.embedding_dims)
-            try:
-                self.model_.compile(optimizer='adam', loss=triplet_loss(distance=self.distance, margin=self.margin))
-            except KeyError:
-                raise Exception('Loss function not implemented.')
+                self.model_, anchor_embedding, _, _ = triplet_network(self.model_def, embedding_dims=self.embedding_dims)
+
+            if Y is None:
+                self.model_.compile(optimizer='adam', loss=triplet_loss_func)
+            else:
+                n_classes = len(np.unique(Y, axis=0))
+
+                classification_output = Dense(n_classes, activation='softmax', name='classification_out')(anchor_embedding)
+                final_network = Model(inputs=self.model_.inputs, outputs=[self.model_.output, classification_output])
+                self.model_ = final_network
+                self.model_.compile(optimizer='adam',
+                    loss={'lambda_1': triplet_loss_func,
+                          'classification_out' : 'sparse_categorical_crossentropy'
+                        },
+                    loss_weights={'lambda_1': 0.5,
+                                  'classification_out': 0.5})
+                
         self.encoder = self.model_.layers[3]
 
         if self.verbose > 0:
@@ -107,7 +125,7 @@ class Ivis(BaseEstimator):
             verbose=self.verbose)
         self.loss_history_ += hist.history['loss']
 
-    def fit(self, X, shuffle_mode=True):
+    def fit(self, X, Y=None, shuffle_mode=True):
         """Fit an ivis model.
         
         Parameters
@@ -120,10 +138,10 @@ class Ivis(BaseEstimator):
         returns an instance of self
         """
 
-        self._fit(X, shuffle_mode)
+        self._fit(X, Y, shuffle_mode)
         return self
 
-    def fit_transform(self, X, shuffle_mode=True):
+    def fit_transform(self, X, Y=None, shuffle_mode=True):
         """Fit to data then transform
 
         Parameters
@@ -137,7 +155,7 @@ class Ivis(BaseEstimator):
             Embedding of the new data in low-dimensional space.
         """
 
-        self.fit(X, shuffle_mode)
+        self.fit(X, Y, shuffle_mode)
         return self.transform(X)
         
     def transform(self, X):

@@ -1,4 +1,4 @@
-from ivis.nn.network import get_base_networks, base_network, build_network
+from ivis.nn.network import get_base_networks, base_network, triplet_network
 
 import keras
 from keras.models import Model, Sequential
@@ -13,7 +13,7 @@ def test_base_networks():
         model = base_network(name, input_shape)
         assert isinstance(model, Model)
 
-def test_build_network():
+def test_triplet_network():
 
     X = np.zeros(shape=(10, 5))
     embedding_dims = 3
@@ -21,7 +21,7 @@ def test_build_network():
     base_model = Sequential()
     base_model.add(Dense(8, input_shape=(X.shape[-1],)))
 
-    model = build_network(base_model, embedding_dims=embedding_dims, embedding_l2=0.1)
+    model, _, _, _ = triplet_network(base_model, embedding_dims=embedding_dims, embedding_l2=0.1)
     encoder = model.layers[3]
 
     assert model.layers[3].output_shape == (None, 3)
