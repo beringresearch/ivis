@@ -7,7 +7,7 @@ from keras import backend as K
 from keras import regularizers
 
 
-def build_network(base_network, embedding_dims=2, embedding_l2=0.0):
+def triplet_network(base_network, embedding_dims=2, embedding_l2=0.0):
     def output_shape(shapes):
         shape1, shape2, shape3 = shapes
         return (3, shape1[0],)
@@ -30,7 +30,7 @@ def build_network(base_network, embedding_dims=2, embedding_l2=0.0):
                                                  processed_n])
     model = Model([input_a, input_p, input_n], triplet)
 
-    return model
+    return model, processed_a, processed_p, processed_n
 
 
 def base_network(model_name, input_shape):
