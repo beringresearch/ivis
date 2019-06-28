@@ -73,7 +73,8 @@ class Ivis(BaseEstimator):
                  epochs=1000, n_epochs_without_progress=50,
                  margin=1, ntrees=50, search_k=-1,
                  precompute=True, model='default',
-                 annoy_index_path=None, verbose=1):
+                 classification_weight=0.5, annoy_index_path=None,
+                 callbacks=[], verbose=1):
 
         self.embedding_dims = embedding_dims
         self.k = k
@@ -88,8 +89,10 @@ class Ivis(BaseEstimator):
         self.model_def = model
         self.model_ = None
         self.encoder = None
+        self.classification_weight = classification_weight
         self.loss_history_ = []
         self.annoy_index_path = annoy_index_path
+        self.callbacks = callbacks
         self.verbose = verbose
 
     def __getstate__(self):
@@ -98,6 +101,7 @@ class Ivis(BaseEstimator):
         state = dict(self.__dict__)
         del state['model_']
         del state['encoder']
+        del state['callbacks']
         return state
 
     def _fit(self, X, Y=None, shuffle_mode=True):
@@ -146,23 +150,29 @@ class Ivis(BaseEstimator):
                                       outputs=[self.model_.output,
                                                classification_output])
                 self.model_ = final_network
-                self.model_.compile(optimizer='adam',
-                                    loss={'lambda_1': triplet_loss_func,
-                                          'classification_out': 'sparse_categorical_crossentropy'
-                                          },
-                                    loss_weights={'lambda_1': 0.5,
-                                                  'classification_out': 0.5})
+                self.model_.compile(
+                    optimizer='adam',
+                    loss={
+                        'stacked_triplets': triplet_loss_func,
+                        'classification_out': 'sparse_categorical_crossentropy'
+                         },
+                    loss_weights={
+                        'stacked_triplets': 1 - self.classification_weight,
+                        'classification_out': self.classification_weight})
 
         self.encoder = self.model_.layers[3]
 
         if self.verbose > 0:
             print('Training neural network')
 
-        hist = self.model_.fit_generator(datagen,
-            steps_per_epoch=int(X.shape[0] / self.batch_size),
+        hist = self.model_.fit_generator(
+            datagen,
+            steps_per_epoch=X.shape[0] // self.batch_size,
             epochs=self.epochs,
-            callbacks=[EarlyStopping(monitor=loss_monitor,
-                                     patience=self.n_epochs_without_progress)],
+            callbacks=[
+                *self.callbacks,
+                EarlyStopping(monitor=loss_monitor,
+                              patience=self.n_epochs_without_progress)],
             shuffle=shuffle_mode,
             workers=multiprocessing.cpu_count(),
             verbose=self.verbose)
@@ -261,7 +271,7 @@ class Ivis(BaseEstimator):
         loss_function = triplet_loss(self.distance, self.margin)
         self.model_ = load_model(os.path.join(folder_path, 'ivis_model.h5'),
                                  custom_objects={'tf': tf,
-                                                 loss_function.__name__ : loss_function })
+                                                 loss_function.__name__: loss_function })
         self.encoder = self.model_.layers[3]
         self.encoder._make_predict_function()
         return self
