@@ -1,6 +1,7 @@
 """ scikit-learn wrapper class for the Ivis algorithm. """
 from .data.triplet_generators import generator_from_index
 from .nn.network import triplet_network, base_network
+from .nn.callbacks import ModelCheckpoint
 from .nn.losses import triplet_loss
 from .data.knn import build_annoy_index
 
@@ -13,6 +14,7 @@ from sklearn.base import BaseEstimator
 
 import json
 import os
+import shutil
 import multiprocessing
 import tensorflow as tf
 
@@ -100,6 +102,9 @@ class Ivis(BaseEstimator):
         self.loss_history_ = []
         self.annoy_index_path = annoy_index_path
         self.callbacks = callbacks
+        for callback in self.callbacks:
+            if isinstance(callback, ModelCheckpoint):
+                callback = callback.register_ivis_model(self)
         self.verbose = verbose
 
     def __getstate__(self):
@@ -243,7 +248,7 @@ class Ivis(BaseEstimator):
         embedding = self.encoder.predict(X, verbose=self.verbose)
         return embedding
 
-    def save_model(self, folder_path):
+    def save_model(self, folder_path, overwrite=False):
         """Save an ivis model
 
         Parameters
@@ -251,6 +256,9 @@ class Ivis(BaseEstimator):
         folder_path : string
             Path to serialised model files and metadata
         """
+        if overwrite:
+            if os.path.exists(folder_path):
+                shutil.rmtree(folder_path)
         os.makedirs(folder_path)
         # serialize weights to HDF5
         self.model_.save(os.path.join(folder_path, 'ivis_model.h5'))
