@@ -59,10 +59,17 @@ class Ivis(BaseEstimator):
         options are: 'default', 'hinton', 'maaten'. By default, a selu network
         composed of 3 dense layers of 128 neurons each will be created,
         followed by an embedding layer of size 'embedding_dims'.
+    :param float classification_weight: Float between 0 and 1 denoting the
+        weighting to give to classification vs triplet loss when training
+        in supervised mode. The higher the weight, the more classification
+        influences training. Ignored if using Ivis in unsupervised mode.
     :param str annoy_index_path: The filepath of a pre-trained annoy index file
         saved on disk. If provided, the annoy index file will be used.
         Otherwise, a new index will be generated and saved to disk in the
         current directory as 'annoy.index'.
+    :param list[keras.callbacks.Callback] callbacks: List of keras Callbacks to
+        pass model during training, such as the TensorBoard callback. A set of
+        ivis-specific callbacks are provided in the ivis.nn.callbacks module.
     :param int verbose: Controls the volume of logging output the model
         produces when training. When set to 0, silences outputs, when above 0
         will print outputs.
