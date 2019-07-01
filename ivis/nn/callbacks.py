@@ -85,3 +85,46 @@ class EmbeddingsImage(Callback):
 
         plt.savefig(os.path.join(self.log_dir, filename), dpi=300)
         plt.close(fig)
+
+
+class TensorBoardEmbeddingsImage(Callback):
+    def __init__(self, batch, batch_labels=None,
+                 log_dir='./logs', epoch_interval=1):
+        super(TensorBoardEmbeddingsImage, self).__init__()
+        self.batch = batch
+        self.log_dir = log_dir
+        if batch_labels is not None:
+            self.batch_labels = batch_labels
+        else:
+            self.batch_labels = np.zeros(len(batch))
+        self.n_classes = len(np.unique(self.batch_labels, axis=0))
+        self.epochs_since_last_save = 0
+
+    def on_epoch_end(self, epoch, logs=None):
+        self.epochs_since_last_save += 1
+        if self.epochs_since_last_save >= self.epoch_interval:
+            self.embeddings = self.model.layers[3].predict(self.batch)
+            image = self.plot_embeddings(self.embeddings)
+            summary = tf.summary.Summary(
+                value=[tf.Summary.Value(tag='Embeddings', image=image)])
+
+            writer = tf.summary.FileWriter(self.log_dir + '/embeddings')
+            writer.add_summary(summary, epoch)
+            writer.close()
+
+    def plot_embeddings(self, embeddings):
+        embeddings = MinMaxScaler((0, 1)).fit_transform(self.embeddings)
+
+        fig = plt.figure()
+        buf = io.BytesIO()
+        sns.scatterplot(x=embeddings[:, 0], y=embeddings[:, 1], s=1,
+                        hue=self.batch_labels,
+                        palette=sns.color_palette("hls", self.n_classes),
+                        linewidth=0)
+
+        plt.savefig(buf, format='png', dpi=300)
+        plt.close(fig)
+        buf.seek(0)
+
+        image = tf.Summary.Image(encoded_image_string=buf.getvalue())
+        return image
