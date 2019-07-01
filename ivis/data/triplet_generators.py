@@ -74,7 +74,7 @@ class AnnoyTripletGenerator(Sequence):
         self.placeholder_labels = np.empty(batch_size, dtype=np.uint8)
 
     def __len__(self):
-        return int(np.ceil(len(self.X) / float(self.batch_size)))
+        return int(np.ceil(self.X.shape[0] / float(self.batch_size)))
 
     def __getitem__(self, idx):
         batch_indices = range(idx * self.batch_size,
@@ -119,7 +119,7 @@ class KnnTripletGenerator(Sequence):
         self.placeholder_labels = np.empty(batch_size, dtype=np.uint8)
 
     def __len__(self):
-        return int(np.ceil(len(self.X) / float(self.batch_size)))
+        return int(np.ceil(self.X.shape[0] / float(self.batch_size)))
 
     def __getitem__(self, idx):
         batch_indices = range(idx * self.batch_size, min((idx + 1) * self.batch_size, self.X.shape[0]))
@@ -162,14 +162,14 @@ class LabeledAnnoyTripletGenerator(Sequence):
         self.search_k = search_k
 
     def __len__(self):
-        return int(np.ceil(len(self.X) / float(self.batch_size)))
+        return int(np.ceil(self.X.shape[0] / float(self.batch_size)))
 
     def __getitem__(self, idx):
         batch_indices = range(idx * self.batch_size, min((idx + 1) * self.batch_size, self.X.shape[0]))
 
         label_batch = self.Y[batch_indices]
-        triplet_batch = [ self.knn_triplet_from_annoy_index(row_index)
-                        for row_index in batch_indices ]
+        triplet_batch = [self.knn_triplet_from_annoy_index(row_index)
+                         for row_index in batch_indices]
 
         if (issparse(self.X)):
             triplet_batch = [[e.toarray()[0] for e in t] for t in triplet_batch]
@@ -196,6 +196,7 @@ class LabeledAnnoyTripletGenerator(Sequence):
         triplet += [self.X[row_index], self.X[neighbour_ind], self.X[negative_ind]]
         return triplet
 
+
 class LabeledKnnTripletGenerator(Sequence):
     
     def __init__(self, X, Y, neighbour_matrix, batch_size=32):
@@ -204,21 +205,22 @@ class LabeledKnnTripletGenerator(Sequence):
         self.batch_size = batch_size
         
     def __len__(self):
-        return int(np.ceil(len(self.X) / float(self.batch_size)))
+        return int(np.ceil(self.X.shape[0] / float(self.batch_size)))
     
     def __getitem__(self, idx):
         batch_indices = range(idx * self.batch_size, min((idx + 1) * self.batch_size, self.X.shape[0]))
         
         label_batch = self.Y[batch_indices]
-        triplet_batch = [ self.knn_triplet_from_neighbour_list(row_index, self.neighbour_matrix[row_index])
-                        for row_index in batch_indices ]
+        triplet_batch = [self.knn_triplet_from_neighbour_list(row_index, self.neighbour_matrix[row_index])
+                         for row_index in batch_indices]
         
         if (issparse(self.X)):
             triplet_batch = [[e.toarray()[0] for e in t] for t in triplet_batch]
         
         triplet_batch = np.array(triplet_batch)
         
-        return ([triplet_batch[:,0], triplet_batch[:,1], triplet_batch[:,2]], [np.array(label_batch), np.array(label_batch)])            
+        return ([triplet_batch[:, 0], triplet_batch[:, 1], triplet_batch[:, 2]],
+                [np.array(label_batch), np.array(label_batch)])
         
         
     def knn_triplet_from_neighbour_list(self, row_index, neighbour_list):
