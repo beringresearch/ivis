@@ -25,6 +25,7 @@ The latest development version is on `github <https://github.com/beringresearch/
    Installation <installation>
    Quickstart <quickstart>
    Hyperparameter Selection <hyperparameters>
+   Supervised ivis <supervised>
    Examples <auto_examples/index>
 
 .. toctree::
