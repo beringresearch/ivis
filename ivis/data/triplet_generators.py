@@ -66,7 +66,7 @@ def generator_from_index(X, Y, index_path, k, batch_size, search_k=-1,
 class AnnoyTripletGenerator(Sequence):
 
     def __init__(self, X, annoy_index, k=150, batch_size=32, search_k=-1):
-        self.X = np.array(X)
+        self.X = X
         self.annoy_index = annoy_index
         self.k = k
         self.batch_size = batch_size
@@ -113,7 +113,7 @@ class AnnoyTripletGenerator(Sequence):
 class KnnTripletGenerator(Sequence):
 
     def __init__(self, X, neighbour_matrix, batch_size=32):
-        self.X = np.array(X)
+        self.X = X
         self.neighbour_matrix = neighbour_matrix
         self.batch_size = batch_size
         self.placeholder_labels = np.empty(batch_size, dtype=np.uint8)
@@ -155,7 +155,7 @@ class KnnTripletGenerator(Sequence):
 class LabeledAnnoyTripletGenerator(Sequence):
 
     def __init__(self, X, Y, annoy_index, k=150, batch_size=32, search_k=-1):
-        self.X, self.Y = np.array(X), np.array(Y)
+        self.X, self.Y = X, Y
         self.annoy_index = annoy_index
         self.k = k
         self.batch_size = batch_size
@@ -200,7 +200,7 @@ class LabeledAnnoyTripletGenerator(Sequence):
 class LabeledKnnTripletGenerator(Sequence):
     
     def __init__(self, X, Y, neighbour_matrix, batch_size=32):
-        self.X, self.Y = np.array(X), np.array(Y)
+        self.X, self.Y = X, Y
         self.neighbour_matrix = neighbour_matrix
         self.batch_size = batch_size
         
@@ -221,8 +221,7 @@ class LabeledKnnTripletGenerator(Sequence):
         
         return ([triplet_batch[:, 0], triplet_batch[:, 1], triplet_batch[:, 2]],
                 [np.array(label_batch), np.array(label_batch)])
-        
-        
+             
     def knn_triplet_from_neighbour_list(self, row_index, neighbour_list):
         """ A random (unweighted) positive example chosen. """
         triplets = []
