@@ -1,11 +1,19 @@
 from keras.callbacks import Callback
-from matplotlib import pyplot as plt
-import seaborn as sns
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
 import io
 import tensorflow as tf
 import os
+
+# Matplotlib and seaborn are optional dependencies
+try:
+    from matplotlib import pyplot as plt
+except:
+    plt = None
+try:
+    import seaborn as sns
+except:
+    sns = None
 
 
 class ModelCheckpoint(Callback):
@@ -54,6 +62,8 @@ class EmbeddingsImage(Callback):
     def __init__(self, batch, batch_labels=None, log_dir='./logs',
                  filename='{}_embeddings.png', epoch_interval=1):
         super(EmbeddingsImage, self).__init__()
+        _check_visualization_libraries()
+
         self.batch = batch
         if batch_labels is not None:
             self.batch_labels = batch_labels
@@ -91,6 +101,8 @@ class TensorBoardEmbeddingsImage(Callback):
     def __init__(self, batch, batch_labels=None,
                  log_dir='./logs', epoch_interval=1):
         super(TensorBoardEmbeddingsImage, self).__init__()
+        _check_visualization_libraries()
+
         self.batch = batch
         self.log_dir = log_dir
         if batch_labels is not None:
@@ -128,3 +140,18 @@ class TensorBoardEmbeddingsImage(Callback):
 
         image = tf.Summary.Image(encoded_image_string=buf.getvalue())
         return image
+
+
+def _check_visualization_libraries():
+    if plt is None:
+        raise ImportError(
+            'Failed to import `matplotlib`.'
+            'To use visualization callbacks install `matplotlib`.'
+            'For example: pip install matplotlib'
+        )
+    if sns is None:
+        raise ImportError(
+            'Failed to import `seaborn`.'
+            'To use visualization callbacks install `seaborn`.'
+            'For example: pip install seaborn'
+        )
