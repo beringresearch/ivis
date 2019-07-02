@@ -24,6 +24,10 @@ cd ivis
 pip install -r requirements.txt --editable .
 ```
 
+The following **optional dependencies** are needed if using the visualization callbacks while training the Ivis model:
+- matplotlib
+- seaborn
+
 ## Upgrading
 
 Ivis Python package is updated frequently! To upgrade, run:

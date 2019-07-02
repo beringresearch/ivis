@@ -28,7 +28,8 @@ setup(name='ivis',
           'tqdm'
       ],
       extras_require={
-          'tests': ['pytest']
+          'tests': ['pytest'],
+          'visualization': ['matplotlib', 'seaborn']
       },
       classifiers=[
           "Programming Language :: Python :: 3",
