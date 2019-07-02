@@ -17,8 +17,9 @@ integers with each integer corresponding to a class.
 
 ::
 
-    from keras.datasets import mnist
     import numpy as np
+    from keras.datasets import mnist
+    from ivis import Ivis
 
     (X_train, Y_train), (X_test, Y_test)  = mnist.load_data()
 
