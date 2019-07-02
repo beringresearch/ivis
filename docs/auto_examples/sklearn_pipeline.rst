@@ -12,7 +12,6 @@ Integrating ivis with standard sklearn pipelines
 
 `Ivis` class extends sklearn's `BaseEstimator`, making it easy to incorporate ivis into a standard classification or regression pipeline.
 
-
 .. code-block:: default
 
 

@@ -1,17 +1,17 @@
 .. _supervised:
 
-ivis Supervised Dimensionality Reduction
-========================================
+Supervised Dimensionality Reduction
+===================================
 
 ``ivis`` is able to make use of any provided class labels to perform
-supervised dimensionality reduction. The resulting embeddings will
+supervised dimensionality reduction. Supervised embeddings
 combine the distance-based characteristics of the unsupervised ``ivis``
 algorithm with clear class boundaries between the class categories. The
 resulting embeddings encode relevant class-specific information into
 lower dimensional space, making them useful for enhancing the
 performance of a classifier.
 
-To train ``ivis`` is supervised mode, simply provide the labels to the
+To train ``ivis`` in supervised mode, simply provide the labels to the
 fit method's ``Y`` parameter. These labels should be a list of 0-indexed
 integers with each integer corresponding to a class.
 
@@ -56,7 +56,7 @@ Increasing it to 0.8 will result in more cleanly separated classes.
     model.fit(X_train, Y_train)
 
 As an illustration of the impact the ``classification_weight`` has on 
-the resulting embeddings, see the following plot of supervised ivis 
+the resulting embeddings, see the following plot of supervised ``ivis`` 
 applied to MNIST with different weight values:
 
 .. image:: _static/classification-weight-impact-mnist.png
