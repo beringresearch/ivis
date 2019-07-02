@@ -1,9 +1,10 @@
-import ivis
-
+import os
+import imp
 from setuptools import setup
 from setuptools import find_packages
 
-VERSION = ivis.__version__
+VERSION = imp.load_source(
+        'ivis.version', os.path.join('ivis', 'version.py')).VERSION
 
 with open('README.md', encoding='utf-8') as f:
     long_description = f.read()
