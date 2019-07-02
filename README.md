@@ -6,6 +6,8 @@ Implementation of the ivis algorithm as described in the paper [Structure-preser
 
 This algorithm uses a siamese neural network trained on triplets to reduce the dimensionality of data to two dimensions for visualization. Each triplet is sampled from one of the <i>k</i> nearest neighbours as approximated by the Annoy library, with neighbouring points being pulled together and non-neighours being pushed away.
 
+Unsupervised and supervised dimensionality reduction is supported.
+
 ## Installation
 
 Install the latest ivis releast from PyPi:
@@ -20,6 +22,14 @@ Alternatively, you can install the development version from github:
 git clone https://github.com/beringresearch/ivis
 cd ivis
 pip install -r requirements.txt --editable .
+```
+
+## Upgrading
+
+Ivis Python package is updated frequently! To upgrade, run:
+
+```
+pip install ivis --upgrade
 ```
 
 ## Features
