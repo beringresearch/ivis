@@ -4,10 +4,10 @@ from keras.models import Model
 from keras.layers import Input, Dense, AlphaDropout, Lambda
 from keras import backend as K
 
-from keras import regularizers
+from keras.regularizers import l2
 
 
-def build_network(base_network, embedding_dims=2, embedding_l2=0.0):
+def triplet_network(base_network, embedding_dims=2, embedding_l2=0.0):
     def output_shape(shapes):
         shape1, shape2, shape3 = shapes
         return (3, shape1[0],)
@@ -17,7 +17,7 @@ def build_network(base_network, embedding_dims=2, embedding_l2=0.0):
     input_n = Input(shape=base_network.input_shape[1:])
 
     embeddings = Dense(embedding_dims,
-                       kernel_regularizer=regularizers.l2(embedding_l2))(base_network.output)
+                       kernel_regularizer=l2(embedding_l2))(base_network.output)
     network = Model(base_network.input, embeddings)
 
     processed_a = network(input_a)
@@ -25,12 +25,13 @@ def build_network(base_network, embedding_dims=2, embedding_l2=0.0):
     processed_n = network(input_n)
 
     triplet = Lambda(K.stack,
-                     output_shape=output_shape)([processed_a,
-                                                 processed_p,
-                                                 processed_n])
+                     output_shape=output_shape,
+                     name='stacked_triplets')([processed_a,
+                                               processed_p,
+                                               processed_n],)
     model = Model([input_a, input_p, input_n], triplet)
 
-    return model
+    return model, processed_a, processed_p, processed_n
 
 
 def base_network(model_name, input_shape):
@@ -46,8 +47,10 @@ def base_network(model_name, input_shape):
     raise NotImplementedError(
         'Base network {} is not implemented'.format(model_name))
 
+
 def get_base_networks():
     return ['default', 'hinton', 'maaten']
+
 
 def default_base_network(input_shape):
     '''Base network to be shared (eq. to feature extraction).

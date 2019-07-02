@@ -1,11 +1,15 @@
+import ivis
+
 from setuptools import setup
 from setuptools import find_packages
+
+VERSION = ivis.__version__
 
 with open('README.md', encoding='utf-8') as f:
     long_description = f.read()
 
 setup(name='ivis',
-      version='1.1.5',
+      version=VERSION,
       description='Artificial neural network-driven visualization of high-dimensional data using triplets.',
       long_description=long_description,
       long_description_content_type='text/markdown',

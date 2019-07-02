@@ -14,7 +14,7 @@ ivis: structure preserving dimensionality reduction
 .. |fig2| image:: _static/ivis_retinal_bipolar_cells.png
   :width: 49 %
 
-ivis is a machine learning algorithm for reducing dimensionality of very large datasets. ivis preserves global data structures in a low-dimensional space, adds new data points to existing embeddings using a parametric mapping function, and scales linearly to millions of observations.
+``ivis`` is a machine learning algorithm for reducing dimensionality of very large datasets. ``ivis`` preserves global data structures in a low-dimensional space, adds new data points to existing embeddings using a parametric mapping function, and scales linearly to millions of observations. The algorithm is described in detail in `Structure-preserving visualisation of high dimensional single-cell datasets <https://www.nature.com/articles/s41598-019-45301-0>`_.
 
 The latest development version is on `github <https://github.com/beringresearch/ivis>`_.
 
@@ -25,6 +25,7 @@ The latest development version is on `github <https://github.com/beringresearch/
    Installation <installation>
    Quickstart <quickstart>
    Hyperparameter Selection <hyperparameters>
+   Supervised ivis <supervised>
    Examples <auto_examples/index>
 
 .. toctree::
