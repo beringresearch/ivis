@@ -4,7 +4,7 @@
 
 Implementation of the ivis algorithm as described in the paper [Structure-preserving visualisation of high dimensional single-cell datasets](https://www.nature.com/articles/s41598-019-45301-0).
 
-This algorithm uses a siamese neural network trained on triplets to reduce the data dimensionality. Each triplet is sampled from one of the <i>k</i> nearest neighbours as approximated by the Annoy library, with neighbouring points being pulled together and non-neighbours being pushed away.
+This algorithm uses a siamese neural network trained on triplets to reduce data dimensionality. Each triplet is sampled from one of the <i>k</i> nearest neighbours as approximated by the Annoy library, with neighbouring points being pulled together and non-neighbours being pushed away.
 
 Unsupervised and supervised dimensionality reduction is supported.
 
