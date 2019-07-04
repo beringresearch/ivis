@@ -48,14 +48,16 @@ And many more! See [ivis readme](https://bering-ivis.readthedocs.io) for latest 
 
 ```
 from ivis import Ivis
+from sklearn.preprocessing import MinMaxScaler()
 from sklearn import datasets
 
 iris = datasets.load_iris()
 X = iris.data
+X_scaled = MinMaxScaler().fit_transform(X)
 
 model = Ivis(embedding_dims=2, k=15)
 
-embeddings = model.fit_transform(X)
+embeddings = model.fit_transform(X_scaled)
 ```
 
 ## Ivis Universe
