@@ -48,7 +48,7 @@ And many more! See [ivis readme](https://bering-ivis.readthedocs.io) for latest 
 
 ```
 from ivis import Ivis
-from sklearn.preprocessing import MinMaxScaler()
+from sklearn.preprocessing import MinMaxScaler
 from sklearn import datasets
 
 iris = datasets.load_iris()
