@@ -51,4 +51,4 @@ To establish how well ``ivis`` and other dimensionality reduction techniques pre
 
 .. image:: _static/ivis_embeddings_benchmarks.png
 
-Mantel tests measures correlatino between two distance matrices - embedding space and original space Euclidean distances of cluster centroids. Overall, we can conclude that ``ivis`` preserves inter-cluster distances in low-dimensional spaces, outperforming other dimensionality reduction techniques.
+The Mantel Test measures correlation between two distance matrices - embedding space and original space Euclidean distances of cluster centroids. From our experiment, we can conclude that ``ivis`` preserves inter-cluster distances well, with average PCC being ~0.75 in the MNIST and Levine datasets. Importantly, ``ivis`` outperformes other dimensionality reduction techniques.
