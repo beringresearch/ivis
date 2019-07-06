@@ -38,6 +38,12 @@ The latest development version is on `github <https://github.com/beringresearch/
   Dimensionality Reduction <comparisons>
 
 .. toctree::
+    :maxdepth: 2
+    :caption: Benchmarks:
+
+    Distance Preservation <embeddings_benchmarks>
+
+.. toctree::
   :maxdepth: 2
   :caption: API Reference:
 
