@@ -1,5 +1,5 @@
 """
-SUpervised Dimensionality Reduction with ivis
+Supervised Dimensionality Reduction with ivis
 =============================================
 
 ivis is able to make use of any provided class labels to perform supervised
