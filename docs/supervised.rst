@@ -60,4 +60,4 @@ As an illustration of the impact the ``classification_weight`` has on
 the resulting embeddings, see the following plot of supervised ``ivis`` 
 applied to MNIST with different weight values:
 
-.. image:: _static/classification-weight-impact-mnist.png
+.. image:: _static/classification-weight-impact-mnist.jpg
