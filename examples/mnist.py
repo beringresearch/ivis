@@ -1,8 +1,8 @@
 """
-Applying ivis to the MNIST dataset
+Applying ivis to the MNIST Dataset
 ==================================
 
-Ivis can be applied easily applied to unstructured datasets, including images.
+Ivis can be easily applied to unstructured datasets, including images.
 Here we visualise the MNSIT digits dataset using two-dimensional ivis
 embeddings.
 """
