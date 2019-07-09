@@ -2,11 +2,10 @@
 
 # ivis
 
-Implementation of the ivis algorithm as described in the paper [Structure-preserving visualisation of high dimensional single-cell datasets](https://www.nature.com/articles/s41598-019-45301-0).
+Implementation of the ivis algorithm as described in the paper [Structure-preserving visualisation of high dimensional single-cell datasets](https://www.nature.com/articles/s41598-019-45301-0). Ivis is designed to reduce dimensionality in very large datasets using a siamese neural network trained on triplet. Both unsupervised and supervised modes are supported.
 
-This algorithm uses a siamese neural network trained on triplets to reduce data dimensionality. Each triplet is sampled from one of the <i>k</i> nearest neighbours as approximated by the Annoy library, with neighbouring points being pulled together and non-neighbours being pushed away.
+![ivis 10M data points](https://github.com/beringresearch/ivis/tree/master/docs/_static/parity_primes_ivis_1e7_16k_smaller_pts.png "ivis: 10M data points")
 
-Unsupervised and supervised dimensionality reduction is supported.
 
 ## Installation
 
