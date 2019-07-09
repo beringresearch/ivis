@@ -25,7 +25,7 @@ The latest development version is on `github <https://github.com/beringresearch/
    Installation <installation>
    Quickstart <quickstart>
    Hyperparameter Selection <hyperparameters>
-   Supervised ivis <supervised>
+   Supervised Dimensionality Reduction <supervised>
    Callbacks <callbacks>
    Examples <auto_examples/index>
 
