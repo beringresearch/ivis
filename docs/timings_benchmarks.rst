@@ -9,7 +9,7 @@ Dimensionality reduction (DR) algorithms enable useful exploration of feature-ri
 
 Algorithm implementation has significant impact on performance. In these experiments, we will use mainly `scikit-learn <http://scikit-learn.org>`_ implementation, with the exception of `multicore t-SNE <https://github.com/DmitryUlyanov/Multicore-TSNE>`_. Two benchmark datasets will be used to asses runtimes: MNIST (up to 70,000 observations) and the first 1,000,000 integers represented as `binary vectors indicating their prime factors <https://johnhw.github.io/umap_primes/index.md.html>`_. For all algorithms, default settings were adopted. Ivis hyperparameters were fixed to: ``embedding_dims=2``, ``k=15``, ``model=’default’``, and ``n_epochs_without_progress=3``. Our previous experiments have shown that these defaults yield accurate embeddings.
 
-Subsamples were created using scikit-learn's ``resample`` method, producing stratified random sub-samples. For each run, three random subsamples were generated to create a distribution of values.
+Subsamples were created using scikit-learn's ``resample`` method, producing stratified random sub-samples. For each run, three random subsamples were generated to create a distribution of values. All runs were carried out on a 16-core machine with 32GB of RAM.
 
 Effects of Data Size on Performance
 -----------------------------------
