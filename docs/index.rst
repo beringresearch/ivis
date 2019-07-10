@@ -32,15 +32,14 @@ The latest development version is on `github <https://github.com/beringresearch/
 .. toctree::
   :maxdepth: 2
   :caption: Applications:
-  
-  Clustering <clustering> 
-  Unsupervised Anomaly Detection <anomaly>
+   
   Dimensionality Reduction <comparisons>
 
 .. toctree::
     :maxdepth: 2
     :caption: Benchmarks:
 
+    Speed of Execution <timings_benchmarks>
     Distance Preservation <embeddings_benchmarks>
 
 .. toctree::

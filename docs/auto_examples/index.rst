@@ -13,7 +13,27 @@ Several examples of how ivis can be used in common machine learning tasks.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Ivis can be applied easily applied to unstructured datasets, including images. Here we visualis...">
+    <div class="sphx-glr-thumbcontainer" tooltip="ivis is able to make use of any provided class labels to perform supervised dimensionality redu...">
+
+.. only:: html
+
+    .. figure:: /auto_examples/images/thumb/sphx_glr_supervised_ivis_thumb.png
+
+        :ref:`sphx_glr_auto_examples_supervised_ivis.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/supervised_ivis
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Ivis can be easily applied to unstructured datasets, including images. Here we visualise the MN...">
 
 .. only:: html
 
