@@ -14,11 +14,11 @@ Subsamples were created using scikit-learn's ``resample`` method, producing stra
 Effects of Data Size on Performance
 -----------------------------------
 
-We begin with small subsample sizes – 1,000 to 5,000 observation. It becomes clear that MDS will be not usable as we increase data sizes. Additionally, scikit-learn implementation of t-SNE is beginning to slow down as we approach 5,000 subsamples. UMAP and multicore t-SNE perform very well.
+We begin with small subsample sizes – 1,000 to 5,000 observations. It becomes clear that MDS will not be usable as we increase subsample sizes. Additionally, scikit-learn's implementation of t-SNE is beginning to slow down as we approach 5,000 subsamples. UMAP and multicore t-SNE perform very well.
 
 .. image:: _static/ivis_timings_1000_5000.png
 
-That’s a reasonable start - let’s increase the subset size. Isomap and scikit-learn’s implementation of t-SNE seem to have reached their performance threshold and are now experiencing considerable slow down. ``ivis`` appears to be on-par with multicore t-SNE, albeit a little faster, whilst UMAP is the winner hands down!
+That’s a reasonable start - let’s increase the subset size. Isomap and scikit-learn’s t-SNE seem to have reached their performance threshold and are now experiencing considerable slow down. ``ivis`` appears to be on-par with multicore t-SNE, albeit a little faster, whilst UMAP is the winner hands down!
 
 .. image:: _static/ivis_timings_5000_20000.png
 
