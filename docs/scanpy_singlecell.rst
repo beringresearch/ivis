@@ -33,7 +33,7 @@ download the data and get started.
         cache=True)                                # write a cache file for faster subsequent reading
 
 
-We can now carry out basic filtering and handling of mitochondiral
+We can now carry out basic filtering and handling of mitochondrial
 genes:
 
 .. code:: python
@@ -72,13 +72,13 @@ Identify highly-variable genes and do the filtering:
 
     sc.pp.regress_out(adata, ['n_counts', 'percent_mito'])
 
-    sc.pp.scale(adata, max_value=10)
-
+ 
 It’s recommended to apply PCA-transformation of normalised data - this
 step tends to denoise the data.
 
 .. code:: python
 
+    sc.pp.scale(adata, max_value=10)
     sc.tl.pca(adata, svd_solver='arpack')
 
 
