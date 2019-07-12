@@ -6,18 +6,18 @@ Using ``ivis`` for Dimensionality Reduction of Single Cell Experiments
 This example will demonstrate how ``ivis`` can be used to visualise
 single cell experiments. Data import, preprocessing and normalisation
 are handled by the `Scanpy module <https://scanpy.readthedocs.io/>`__.
-The data that will be used in this example consists of 3K PBMCs from a
-Healthy Donor and is freely available from 10x Genomics. Now, let’s
+The data that will be used in this example consists of 3,000 PBMCs from a
+healthy donor and is freely available from 10x Genomics. Now, let’s
 download the data and get started.
 
-.. code:: ipython3
+.. code:: bash
 
-    !mkdir data
-    !wget http://cf.10xgenomics.com/samples/cell-exp/1.1.0/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz -O data/pbmc3k_filtered_gene_bc_matrices.tar.gz
-    !cd data; tar -xzf pbmc3k_filtered_gene_bc_matrices.tar.gz    
+    mkdir data
+    wget http://cf.10xgenomics.com/samples/cell-exp/1.1.0/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz -O data/pbmc3k_filtered_gene_bc_matrices.tar.gz
+    cd data; tar -xzf pbmc3k_filtered_gene_bc_matrices.tar.gz    
 
 
-.. code:: ipython3
+.. code:: python
 
     import numpy as np
     import pandas as pd
@@ -36,7 +36,7 @@ download the data and get started.
 We can now carry out basic filtering and handling of mitochondiral
 genes:
 
-.. code:: ipython3
+.. code:: python
 
     adata.var_names_make_unique()
     sc.pp.filter_cells(adata, min_genes=200)
@@ -55,7 +55,7 @@ genes:
 
 Let’s normalise the data and apply log-transformation:
 
-.. code:: ipython3
+.. code:: python
 
     sc.pp.normalize_per_cell(adata, counts_per_cell_after=1e4)
     sc.pp.log1p(adata)
@@ -64,7 +64,7 @@ Let’s normalise the data and apply log-transformation:
 
 Identify highly-variable genes and do the filtering:
 
-.. code:: ipython3
+.. code:: python
 
     sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=3, min_disp=0.5)
 
@@ -77,7 +77,7 @@ Identify highly-variable genes and do the filtering:
 It’s recommended to apply PCA-transformation of normalised data - this
 step tends to denoise the data.
 
-.. code:: ipython3
+.. code:: python
 
     sc.tl.pca(adata, svd_solver='arpack')
 
@@ -85,7 +85,7 @@ step tends to denoise the data.
 Reducing Dimensionality Using ``ivis``
 --------------------------------------
 
-.. code:: ipython3
+.. code:: python
 
     import matplotlib.pyplot as plt
     from ivis import Ivis
@@ -100,7 +100,7 @@ used:
 
 .. note:: Keep in mind that this is a very small experiment (<3000 observations) and there are plenty of fast and accurate algorithm designed for these kinds of datasets e.g. UMAP. However, if you have >250,000 cells, ``ivis`` considerably outperforms state-of-the-art both in speed and accuracy of embeddings. See our :ref:`timings benchmarks <timings_benchmarks>` for more information on this.
 
-.. code:: ipython3
+.. code:: python
 
     X = adata.obsm['X_pca']
     
@@ -111,12 +111,12 @@ used:
 
 Finally, let’s visualise our embeddings, coloured by the CST3 gene!
 
-.. code:: ipython3
+.. code:: python
 
     fill = adata.X[:, adata.var.gene_ids.index=='CST3']
     fill = fill.reshape((X.shape[0], ))
 
-.. code:: ipython3
+.. code:: python
 
     plt.figure(figsize=(6, 4), dpi=150)
     sc = plt.scatter(x=embeddings[:, 0], y=embeddings[:, 1], c=fill, s=5)
