@@ -32,7 +32,8 @@ The latest development version is on `github <https://github.com/beringresearch/
 .. toctree::
   :maxdepth: 2
   :caption: Applications:
-   
+  
+  Visualising Single Cell Experiments <scanpy_singlecell> 
   Dimensionality Reduction <comparisons>
 
 .. toctree::
