@@ -8,7 +8,6 @@ from collections import namedtuple
 from operator import attrgetter
 from tqdm import tqdm
 import time
-from scipy.sparse import issparse
 
 
 def build_annoy_index(X, path, ntrees=50, verbose=1):
@@ -22,7 +21,7 @@ def build_annoy_index(X, path, ntrees=50, verbose=1):
             index.add_item(i, v)
     else:
         for i in tqdm(range(X.shape[0]), disable=verbose < 1):
-            v = X[i] 
+            v = X[i]
             index.add_item(i, v)
 
     # Build n trees
@@ -73,6 +72,7 @@ def extract_knn(X, index_filepath, k=150, search_k=-1, verbose=1):
     neighbour_list = list(map(attrgetter('neighbour_list'), neighbour_list))
 
     return np.array(neighbour_list)
+
 
 IndexNeighbours = namedtuple('IndexNeighbours', 'row_index neighbour_list')
 

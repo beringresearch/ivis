@@ -129,5 +129,5 @@ Finally, let’s visualise our embeddings, coloured by the CST3 gene!
 .. image:: _static/output_24_1.png
 
 
-``ivis`` effectively capturered three distinct cellular populations in this small dataset. Note that ``ivis`` is an “honest” algorithm and distances between observations are meaningful. Our benchmarks show that ``ivis`` is ~10% better at preserving local and global distances in low-dimensional space than comparable state-of-the-art algorithms. Additionally, ``ivis`` is robust against noise and outliers, ulike t-SNE, which tends to group random noise into well-defined clusters that can be potentially misleading.
+``ivis`` effectively captured three distinct cellular populations in this small dataset. Note that ``ivis`` is an “honest” algorithm and distances between observations are meaningful. Our benchmarks show that ``ivis`` is ~10% better at preserving local and global distances in low-dimensional space than comparable state-of-the-art algorithms. Additionally, ``ivis`` is robust against noise and outliers, ulike t-SNE, which tends to group random noise into well-defined clusters that can be potentially misleading.
 
