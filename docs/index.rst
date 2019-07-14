@@ -35,6 +35,7 @@ The latest development version is on `github <https://github.com/beringresearch/
   
   Visualising Single Cell Experiments <scanpy_singlecell> 
   Dimensionality Reduction <comparisons>
+  Metric Learning <metric_learning>
 
 .. toctree::
     :maxdepth: 2
