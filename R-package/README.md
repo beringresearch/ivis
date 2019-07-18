@@ -24,7 +24,7 @@ library(ivis)
 
 model <- ivis(k = 3, batch_size = 3)
 
-X = data.matrix(iris[:, 1:4])
+X = data.matrix(iris[, 1:4])
 model = model$fit(X)
 
 xy = model$transform(X)
