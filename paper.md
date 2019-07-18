@@ -25,3 +25,6 @@ bibliography: paper.bib
 
 Further information on the algorithm and its application to single cell datasets can be found in [@ivis_scirep]. Implementation of the `ivis` algorithm is available on [GitHub](https://github.com/beringresearch/ivis).
 
+# Acknowledgements
+This work was supported by funding from the European Commission’s Seventh Framework Programme [FP7-2007-2013] under grant agreement n°HEALTH-F2-2013-602114 (Athero-B-Cell).
+
