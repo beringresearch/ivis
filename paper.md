@@ -28,3 +28,4 @@ Further information on the algorithm and its application to single cell datasets
 # Acknowledgements
 This work was supported by funding from the European Commission’s Seventh Framework Programme [FP7-2007-2013] under grant agreement n°HEALTH-F2-2013-602114 (Athero-B-Cell).
 
+# References
