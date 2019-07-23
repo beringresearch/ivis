@@ -8,12 +8,14 @@ from collections import namedtuple
 from operator import attrgetter
 from tqdm import tqdm
 import time
+import platform
 
 
 def build_annoy_index(X, path, ntrees=50, verbose=1):
 
-    index = AnnoyIndex(X.shape[1])
-    index.on_disk_build(path)
+    index = AnnoyIndex(X.shape[1], metric='angular')
+    if platform.system() != 'Windows':
+        index.on_disk_build(path)
 
     if issparse(X):
         for i in tqdm(range(X.shape[0]), disable=verbose < 1):
@@ -26,6 +28,9 @@ def build_annoy_index(X, path, ntrees=50, verbose=1):
 
     # Build n trees
     index.build(ntrees)
+    if platform.system() == 'Windows':
+        index.save(path)
+
     return index
 
 
@@ -89,9 +94,9 @@ class KNN_Worker(Process):
     """
     def __init__(self, index_filepath, k, search_k, n_dims,
                  data_indices, results_queue):
-        self.index = AnnoyIndex(n_dims)
-        self.index.load(index_filepath)
+        self.index_filepath = index_filepath
         self.k = k
+        self.n_dims = n_dims
         self.search_k = search_k
         self.data_indices = data_indices
         self.results_queue = results_queue
@@ -99,11 +104,13 @@ class KNN_Worker(Process):
 
     def run(self):
         try:
+            index = AnnoyIndex(self.n_dims, metric='angular')
+            index.load(self.index_filepath)
             for i in range(self.data_indices[0], self.data_indices[1]):
-                neighbour_indexes = self.index.get_nns_by_item(
+                neighbour_indexes = index.get_nns_by_item(
                     i, self.k, search_k=self.search_k, include_distances=False)
                 neighbour_indexes = np.array(neighbour_indexes,
-                                             dtype=np.uint32)
+                                                dtype=np.uint32)
                 self.results_queue.put(
                     IndexNeighbours(row_index=i,
                                     neighbour_list=neighbour_indexes))
