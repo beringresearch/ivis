@@ -41,7 +41,7 @@ def generator_from_index(X, Y, index_path, k, batch_size, search_k=-1,
             return KnnTripletGenerator(X, neighbour_matrix,
                                        batch_size=batch_size)
         else:
-            index = AnnoyIndex(X.shape[1])
+            index = AnnoyIndex(X.shape[1], metric='angular')
             index.load(index_path)
             return AnnoyTripletGenerator(X, index, k=k,
                                          batch_size=batch_size,
@@ -56,7 +56,7 @@ def generator_from_index(X, Y, index_path, k, batch_size, search_k=-1,
             return LabeledKnnTripletGenerator(X, Y, neighbour_matrix,
                                               batch_size=batch_size)
         else:
-            index = AnnoyIndex(X.shape[1])
+            index = AnnoyIndex(X.shape[1], metric='angular')
             index.load(index_path)
             return LabeledAnnoyTripletGenerator(X, Y, index,
                                                 k=k, batch_size=batch_size,
