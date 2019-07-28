@@ -11,7 +11,7 @@ library(ivis)
 install_ivis()
 ```
 
-After ivis is installed into a conda environment, restart your R session.
+After ivis is installed into a virtual environment, restart your R session.
 
 Finally, to set environment to tensorflow, add the following line to your environment variables:
 ```
