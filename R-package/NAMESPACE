@@ -2,7 +2,7 @@
 
 export(install_ivis)
 export(ivis)
-importFrom(reticulate,conda_binary)
-importFrom(reticulate,conda_create)
-importFrom(reticulate,conda_install)
-importFrom(reticulate,conda_list)
+importFrom(reticulate,py_install)
+importFrom(reticulate,virtualenv_create)
+importFrom(reticulate,virtualenv_install)
+importFrom(reticulate,virtualenv_list)
