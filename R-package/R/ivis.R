@@ -41,10 +41,16 @@
 #'                    By default, a selu network composed of 3 dense layers
 #'                    of 128 neurons each will be created, followed by an
 #'                    embedding layer of size 'embedding_dims'.
+#' @param classification_weight: Float between 0 and 1 denoting the
+#'                    weighting to give to classification vs triplet loss
+#'                    when training in supervised mode. The higher the
+#'                    weight, the more classification influences training.
+#                     Ignored if using Ivis in unsupervised mode.
 #' @param annoy_index_path: The filepath of a pre-trained annoy index file
 #'                    saved on disk. If provided, the annoy index file will
 #'                    be used. Otherwise, a new index will be generated and
-#'                    saved to disk in the current directory as 'annoy.index'.
+#'                    saved to disk in the current directory as
+#'                    'annoy.index'.
 #' @param verbose:    Controls the volume of logging output the model
 #'                    produces when training. When set to 0, silences
 #'                    outputs, when above 0 will print outputs.
@@ -61,6 +67,7 @@ ivis <- function(embedding_dims = 2L,
     search_k = -1L,
     precompute = TRUE,
     model = "default",
+    classification_weight = 0.5,
     annoy_index_path=NULL, verbose=1L){
 
 
@@ -81,6 +88,7 @@ ivis <- function(embedding_dims = 2L,
                               margin=margin, ntrees=ntrees,
                               search_k=search_k,
                               precompute=precompute, model=model,
+                              classification_weight=classification_weight,
                               annoy_index_path=annoy_index_path,
                               verbose=verbose)
   

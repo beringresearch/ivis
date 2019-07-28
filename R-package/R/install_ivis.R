@@ -1,36 +1,19 @@
 #' Set up ivis Python package
-#' @importFrom reticulate conda_list conda_create conda_binary conda_install
+#' @importFrom reticulate virtualenv_list virtualenv_create virtualenv_remove py_install
 #' @export
 
 install_ivis <- function(){    
-    cat("Creating a conda environment (ivis)\n")
-    conda_envs <- conda_list()
-    if ("ivis" %in% conda_envs$name){
-        stop("(ivis) environment already exists. Delete the environment and run install_ivis() again.")
+    cat("Creating a virtual environment (ivis)\n")
+    virtual_envs <- virtualenv_list()
+    if ("ivis" %in% virtual_envs){
+      ("(ivis) environment already exists. Deleting the environment and running install_ivis() again.")
+      virtualenv_remove("ivis")
     }
 
     envname <- "ivis"
-    conda_create(envname)
-    condaenv_bin <- function(bin) path.expand(file.path(dirname(conda_binary()), bin))
-    packages = c("pip", "tensorflow", "keras", "numpy", "scikit-learn", "tqdm")
-    conda_install("ivis", packages, forge = TRUE)
+    virtualenv_create(envname)
 
-    tmp <- tempdir()
-    current_dir <- getwd()
-    setwd(tmp)
-    system("git clone https://github.com/beringresearch/ivis")
-    setwd("ivis")
-
-    cmd <- sprintf("%s%s %s && pip install .",
-            ifelse(is_windows(), "", ifelse(is_osx() || is_linux(), "source ",
-                "/bin/bash -c \"source ")),
-            shQuote(path.expand(condaenv_bin("activate"))),
-            envname)
-    result <- system(cmd)
-
-  
-    setwd(current_dir)
-    unlink(tmp)
+    py_install("ivis", envname="ivis")
 }   
 
 

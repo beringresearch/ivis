@@ -3,9 +3,9 @@ ivis_object <- NULL
 
 .onLoad <- function(libname, pkgname) {
 
-    if ("ivis" %in% reticulate::conda_list()$name) {
+    if ("ivis" %in% reticulate::virtualenv_list()) {
         # use superassignment to update global reference to ivis
-        reticulate::use_condaenv("ivis")
+        reticulate::use_virtualenv("ivis")
         
         ivis_object <<- reticulate::import("ivis",
                                         delay_load = TRUE)

@@ -4,10 +4,11 @@
 \alias{ivis}
 \title{IVIS algorithm}
 \usage{
-ivis(X, embedding_dims = 2L, k = 150L, distance = "pn",
+ivis(embedding_dims = 2L, k = 150L, distance = "pn",
   batch_size = 128L, epochs = 1000L, n_epochs_without_progress = 50L,
   margin = 1, ntrees = 50L, search_k = -1L, precompute = TRUE,
-  model = "default", annoy_index_path = NULL, verbose = 1L)
+  model = "default", classification_weight = 0.5,
+  annoy_index_path = NULL, verbose = 1L)
 }
 \arguments{
 \item{embedding_dims:}{Number of dimensions in the embedding space}
@@ -62,10 +63,16 @@ By default, a selu network composed of 3 dense layers
 of 128 neurons each will be created, followed by an
 embedding layer of size 'embedding_dims'.}
 
+\item{classification_weight:}{Float between 0 and 1 denoting the
+weighting to give to classification vs triplet loss
+when training in supervised mode. The higher the
+weight, the more classification influences training.}
+
 \item{annoy_index_path:}{The filepath of a pre-trained annoy index file
 saved on disk. If provided, the annoy index file will
 be used. Otherwise, a new index will be generated and
-saved to disk in the current directory as 'annoy.index'.}
+saved to disk in the current directory as
+'annoy.index'.}
 
 \item{verbose:}{Controls the volume of logging output the model
 produces when training. When set to 0, silences
