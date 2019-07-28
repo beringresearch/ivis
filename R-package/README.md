@@ -22,7 +22,7 @@ export KERAS_BACKEND=tensorflow
 ```
 library(ivis)
 
-model <- ivis(k = 3, batch_size = 3)
+model <- ivis(k = 3)
 
 X = data.matrix(iris[, 1:4])
 model = model$fit(X)
