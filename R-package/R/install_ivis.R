@@ -1,5 +1,5 @@
 #' Set up ivis Python package
-#' @importFrom reticulate virtualenv_list virtualenv_create virtualenv_install py_install
+#' @importFrom reticulate virtualenv_list virtualenv_create virtualenv_remove py_install
 #' @export
 
 install_ivis <- function(){    
