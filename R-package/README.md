@@ -1,9 +1,14 @@
 # R wrapper for the IVIS algorithm
 
 ## Installation
-R will install ivis into "ivis" conda environment. 
+R wrapper for `ivis` is provided via the `reticulate` library. Prior to installation, ensure that `reticulate` is available on your machine.
 
-The easiest way to install ivis is using the `devtools` package:
+```R
+install.packages("reticulate")
+```
+
+
+The easiest way to install `ivis` is using the `devtools` package:
 
 ```
 devtools::install_github("beringresearch/ivis/R-package")
