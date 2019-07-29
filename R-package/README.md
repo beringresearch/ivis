@@ -24,7 +24,7 @@ export KERAS_BACKEND=tensorflow
 ```
 
 ## Example
-```
+```R
 library(ivis)
 
 model <- ivis(k = 3)
