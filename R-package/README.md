@@ -29,8 +29,23 @@ library(ivis)
 
 model <- ivis(k = 3)
 
-X = data.matrix(iris[, 1:4])
-model = model$fit(X)
+X <- data.matrix(iris[, 1:4])
+X <- scale(X)
+model <- model$fit(X)
 
-xy = model$transform(X)
+xy <- model$transform(X)
+```
+
+Embeddings can now be assessed through a scatterplot:
+
+```R
+library(ggplot2)
+
+dat <- data.frame(x=xy[,1],
+                  y=xy[,2],
+                  species=iris$Species)
+
+ggplot(dat, aes(x=x, y=y)) +
+  geom_point(aes(color=species)) +
+  theme_classic()
 ```
