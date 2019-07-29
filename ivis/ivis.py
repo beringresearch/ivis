@@ -111,9 +111,12 @@ class Ivis(BaseEstimator):
         """ Return object serializable variable dict """
 
         state = dict(self.__dict__)
-        del state['model_']
-        del state['encoder']
-        del state['callbacks']
+        if 'model_' in state:
+            del state['model_']
+        if 'encoder' in state:
+            del state['encoder']
+        if 'callbacks' in state:
+            del state['callbacks']
         return state
 
     def _fit(self, X, Y=None, shuffle_mode=True):
