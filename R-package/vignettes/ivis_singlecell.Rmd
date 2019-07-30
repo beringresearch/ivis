@@ -1,0 +1,91 @@
+---
+title: "Using `ivis` and Seurat for Analysis of Single Cell Datasets"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ivis_singlecell}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This example will demonstrate how `ivis` can be used to visualise single cell experiments. Data import, preprocessing and normalisation are handled by the Seurat library. The data that will be used in this example consists of 3,000 PBMCs from a healthy donor and is freely available from 10x Genomics. Now, let’s download the data and get started.
+
+```{bash, eval=FALSE}
+mkdir data
+wget http://cf.10xgenomics.com/samples/cell-exp/1.1.0/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz -O data/pbmc3k_filtered_gene_bc_matrices.tar.gz
+cd data; tar -xzf pbmc3k_filtered_gene_bc_matrices.tar.gz
+```
+
+```{r setup}
+library(Seurat)
+
+pbmc.data <- Read10X(data.dir = "../data/filtered_gene_bc_matrices/hg19/")
+pbmc <- CreateSeuratObject(counts = pbmc.data, project = "pbmc3k",
+                           min.cells = 3, min.features = 200)
+pbmc
+```
+
+## Data Preprocessing
+
+The steps below reflect a standard preprocessing workflow, as described in the [Seurat vignette](https://satijalab.org/seurat/v3.0/pbmc3k_tutorial.html).
+
+```{r preprocessing}
+pbmc[["percent.mt"]] <- PercentageFeatureSet(pbmc, pattern = "^MT-")
+pbmc <- subset(pbmc, subset = nFeature_RNA > 200 & nFeature_RNA < 2500 & percent.mt < 5)
+bmc <- NormalizeData(pbmc, normalization.method = "LogNormalize", scale.factor = 10000)
+
+pbmc <- FindVariableFeatures(pbmc, selection.method = "vst", nfeatures = 2000)
+all.genes <- rownames(pbmc)
+pbmc <- ScaleData(pbmc, features = all.genes)
+```
+
+Due to a large number of features (>13,000), it is recommended to initially perform linear dimensionality reduction using Principal Component Analysis (PCA) to reduce some noise that's present in the data.
+
+```{r pca}
+pbmc <- RunPCA(pbmc, features = VariableFeatures(object = pbmc))
+```
+
+## Cluster the Cells
+
+A standard approach is taken to identify cell clusters by applying the PhenoGraph algorithm using the first 10 PCs of the dataset.
+
+```{r phenograph}
+pbmc <- FindNeighbors(pbmc, dims = 1:10)
+pbmc <- FindClusters(pbmc, resolution = 0.5)
+```
+
+## Non-linear Dimensionality Reduction using `ivis`
+
+We are now ready to apply `ivis` to the PBMC dataset.
+
+```{r ivis, results = "hide"}
+library(ivis)
+
+model = ivis(embedding_dims=2, k=15, model='maaten',
+             n_epochs_without_progress=20)
+
+X = pbmc@reductions$pca@cell.embeddings
+
+embeddings = model$fit_transform(X)
+colnames(embeddings) <- paste0("ivis_", 1:2)
+rownames(embeddings) <- rownames(X)
+
+pbmc[["ivis"]] <- CreateDimReducObject(embeddings = embeddings,
+                                       key = "ivis_", assay = DefaultAssay(pbmc))
+```
+
+```{r plot, fig.height=6, fig.width=7}
+DimPlot(pbmc, reduction="ivis")
+```
+
+`ivis` effectively captured distinct cellular populations in this small dataset. Note that `ivis` is an “honest” algorithm and distances between observations are meaningful. Our benchmarks show that `ivis` is ~10% better at preserving local and global distances in low-dimensional space than comparable state-of-the-art algorithms. Additionally, `ivis` is robust against noise and outliers, ulike t-SNE, which tends to group random noise into well-defined clusters that can be potentially misleading.
+
+Keep in mind that this is a very small experiment (<3000 observations) and there are plenty of fast and accurate algorithm designed for these kinds of datasets e.g. UMAP. However, if you have >250,000 cells, `ivis` considerably outperforms state-of-the-art both in speed and accuracy of embeddings. See our [timings benchmarks](https://bering-ivis.readthedocs.io/en/latest/timings_benchmarks.html#timings-benchmarks) for more information on this.
+
+Finally, to find out more about `ivis` [hyperparameters](https://bering-ivis.readthedocs.io/en/latest/hyperparameters.html) and [API](https://bering-ivis.readthedocs.io/en/latest/api.html) checkout the official documentation.
