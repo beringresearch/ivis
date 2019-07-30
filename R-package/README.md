@@ -10,7 +10,7 @@ install.packages("reticulate")
 
 The easiest way to install `ivis` is using the `devtools` package:
 
-```
+```R
 devtools::install_github("beringresearch/ivis/R-package")
 library(ivis)
 install_ivis()
@@ -19,11 +19,13 @@ install_ivis()
 After ivis is installed into a virtual environment, restart your R session.
 
 Finally, to set environment to tensorflow, add the following line to your environment variables:
-```
+
+```bash
 export KERAS_BACKEND=tensorflow
 ```
 
 ## Example
+
 ```R
 library(ivis)
 
