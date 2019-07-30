@@ -35,11 +35,11 @@ You can also use Github issues to request features you would like to see in `ivi
 
 Here's a quick guide to submitting your improvements:
 
-1. If your PR introduces a change in functionality, make sure you start by writing a design doc.
+1. If your PR introduces a change in functionality, make sure you start by writing a design doc. See the [wiki page](https://github.com/beringresearch/ivis/wiki/API-Design-Review-Template) for a template example.
 
-2. Make sure any new function or class you introduce has proper docstrings. Make sure any code you touch still has up-to-date docstrings and documentation.
+2. Make sure any new function or class you introduce has proper docstrings. Make sure any edited code still has up-to-date docstrings and documentation.
 
-4. Write tests. Your code should have full unit test coverage. If you want to see your PR merged promptly, this is crucial.
+4. Write tests. Your code should have full unit test coverage. If you want to see your PR merged promptly, this is crucial. See existing [Python package tests](https://github.com/beringresearch/ivis/tree/master/tests).
 
 5. Run our test suite locally.
 
