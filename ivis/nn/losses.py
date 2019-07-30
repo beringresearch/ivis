@@ -23,7 +23,9 @@ def get_loss_functions(margin=1):
         'manhattan': manhattan_loss(margin=margin),
         'manhattan_pn': manhattan_pn_loss(margin=margin),
         'chebyshev': chebyshev_loss(margin=margin),
-        'chebyshev_pn': chebyshev_pn_loss(margin=margin)
+        'chebyshev_pn': chebyshev_pn_loss(margin=margin),
+        'cosine': cosine_loss(margin=margin),
+        'cosine_pn': cosine_pn_loss(margin=margin)
     }
     return losses
 
@@ -35,6 +37,9 @@ def _manhattan_distance(x, y):
 
 def _chebyshev_distance(x, y):
     return K.max(K.abs(x - y), axis=1, keepdims=True)
+
+def _cosine_distance(x, y):
+    return tf.losses.cosine_distance(tf.nn.l2_normalize(x, 0), tf.nn.l2_normalize(y, 0), axis=0)
 
 def pn_loss(margin=1):
     def _pn_loss(y_true, y_pred):    
@@ -91,6 +96,26 @@ def chebyshev_pn_loss(margin=1):
         positive_negative_distance = _chebyshev_distance(positive, negative)
 
         minimum_distance = K.min(K.concatenate([anchor_negative_distance, positive_negative_distance]), axis=1, keepdims=True)
+
+        return K.mean(K.maximum(anchor_positive_distance - minimum_distance + margin, 0))
+    
+    return _pn_loss
+
+def cosine_loss(margin=1):
+    def _cosine_loss(y_true, y_pred):
+        anchor, positive, negative = tf.unstack(y_pred)        
+        return K.mean(K.maximum(_cosine_distance(anchor, positive) - _cosine_distance(anchor, negative) + margin, 0))
+    return _cosine_loss
+
+def cosine_pn_loss(margin=1):
+    def _pn_loss(y_true, y_pred):
+        anchor, positive, negative = tf.unstack(y_pred)
+
+        anchor_positive_distance = _cosine_distance(anchor, positive)
+        anchor_negative_distance = _cosine_distance(anchor, negative)
+        positive_negative_distance = _cosine_distance(positive, negative)
+
+        minimum_distance = K.min(tf.stack([anchor_negative_distance, positive_negative_distance]), axis=0, keepdims=True)
 
         return K.mean(K.maximum(anchor_positive_distance - minimum_distance + margin, 0))
     
