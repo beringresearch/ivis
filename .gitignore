@@ -1,3 +1,4 @@
+R-package/data/
 build
 dist
 *.egg-info/
