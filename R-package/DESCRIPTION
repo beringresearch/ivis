@@ -16,5 +16,7 @@ LazyData: true
 RoxygenNote: 6.1.1
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    TENxPBMCData,
+    Seurat
 VignetteBuilder: knitr
