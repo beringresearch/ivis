@@ -32,7 +32,8 @@ class Ivis(BaseEstimator):
         Must be less than one minus the number of rows in the dataset.
     :param str distance: The loss function used to train the neural network.
         One of "pn", "euclidean", "manhattan_pn", "manhattan", "chebyshev",
-        "chebyshev_pn", "softmax_ratio_pn", "softmax_ratio".
+        "chebyshev_pn", "softmax_ratio_pn", "softmax_ratio", "cosine",
+        "cosine_pn".
     :param int batch_size: The size of mini-batches used during gradient
         descent while training the neural network. Must be less than the
         num_rows in the dataset.
