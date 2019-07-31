@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/144551119.svg)](https://zenodo.org/badge/latestdoi/144551119) [![Documentation Status](https://readthedocs.org/projects/bering-ivis/badge/?version=latest)](https://bering-ivis.readthedocs.io/en/latest/?badge=latest) [![Downloads](https://pepy.tech/badge/ivis/month)](https://pepy.tech/project/ivis/month) [![Travis-CI](https://travis-ci.org/beringresearch/ivis.svg?branch=master)]
+[![DOI](https://zenodo.org/badge/144551119.svg)](https://zenodo.org/badge/latestdoi/144551119) [![Documentation Status](https://readthedocs.org/projects/bering-ivis/badge/?version=latest)](https://bering-ivis.readthedocs.io/en/latest/?badge=latest) [![Downloads](https://pepy.tech/badge/ivis/month)](https://pepy.tech/project/ivis/month) [Travis-CI](https://travis-ci.org/beringresearch/ivis.svg?branch=master)
 
 # ivis
 
