@@ -1,6 +1,6 @@
 # R wrapper for the IVIS algorithm
 
-#[Installation](#installation-basic)
+#Installation
 
 R wrapper for `ivis` is provided via the `reticulate` library.
 Prior to installation, ensure that `reticulate` is available on your machine.
@@ -53,12 +53,12 @@ ggplot(dat, aes(x=x, y=y)) +
   theme_classic()
 ```
 
-[## Vignette](#installation-vignette)
+## Vignette
 
 The `ivis` package includes a [vignette](https://github.com/beringresearch/ivis/blob/master/R-package/vignettes/ivis_singlecell.Rmd) that demonstrates an example workflow using single-cell RNA-sequencing data.
 
 To compile and install this vignette on your system, you need to first have a working installation of `ivis`.
-For this, please follow the instructions [above](#installation-basic).
+For this, please follow the instructions [above](#installation).
 
 Once you have a working installation of `ivis`, you can reinstall the package including the compiled vignette using the following command:
 
