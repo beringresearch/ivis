@@ -1,6 +1,6 @@
 # R wrapper for the IVIS algorithm
 
-#Installation
+# Installation
 
 R wrapper for `ivis` is provided via the `reticulate` library.
 Prior to installation, ensure that `reticulate` is available on your machine.
