@@ -1,18 +1,18 @@
 # R wrapper for the IVIS algorithm
 
+# Installation {#installation-basic}
 
-## Installation
-R wrapper for `ivis` is provided via the `reticulate` library. Prior to installation, ensure that `reticulate` is available on your machine.
+R wrapper for `ivis` is provided via the `reticulate` library.
+Prior to installation, ensure that `reticulate` is available on your machine.
 
 ```R
 install.packages("reticulate")
 ```
 
-
 The easiest way to install `ivis` is using the `devtools` package:
 
 ```R
-devtools::install_github("beringresearch/ivis/R-package", build_vignettes = TRUE)
+devtools::install_github("beringresearch/ivis/R-package")
 library(ivis)
 install_ivis()
 ```
@@ -51,4 +51,17 @@ dat <- data.frame(x=xy[,1],
 ggplot(dat, aes(x=x, y=y)) +
   geom_point(aes(color=species)) +
   theme_classic()
+```
+
+## Vignette {#installation-vignette}
+
+The `ivis` package includes a [vignette](https://github.com/beringresearch/ivis/blob/master/R-package/vignettes/ivis_singlecell.Rmd) that demonstrates an example workflow using single-cell RNA-sequencing data.
+
+To compile and install this vignette on your system, you need to first have a working installation of `ivis`.
+For this, please follow the instructions [above](#installation-basic).
+
+Once you have a working installation of `ivis`, you can reinstall the package including the compiled vignette using the following command:
+
+```R
+devtools::install_github("beringresearch/ivis/R-package", build_vignettes = TRUE, force=TRUE)
 ```
