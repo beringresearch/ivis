@@ -1,5 +1,6 @@
 # R wrapper for the IVIS algorithm
 
+
 ## Installation
 R wrapper for `ivis` is provided via the `reticulate` library. Prior to installation, ensure that `reticulate` is available on your machine.
 
@@ -11,7 +12,7 @@ install.packages("reticulate")
 The easiest way to install `ivis` is using the `devtools` package:
 
 ```R
-devtools::install_github("beringresearch/ivis/R-package")
+devtools::install_github("beringresearch/ivis/R-package", build_vignettes = TRUE)
 library(ivis)
 install_ivis()
 ```
