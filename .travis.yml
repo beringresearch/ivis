@@ -1,0 +1,16 @@
+language: python
+
+cache:
+  apt: true
+  directories:
+  - $HOME/.cache/pip
+  - $HOME/download
+
+matrix:
+  include:
+    - name: 'Python 3.5 on Ubuntu-Xenial Linux'
+      python: 3.5
+      os: linux
+
+install: source ci_scripts/install.sh
+script: bash ci_scripts/test.sh
