@@ -1,8 +1,8 @@
 # R wrapper for the `ivis` algorithm
 
-# Installation
+## Installation
 
-## Prerequisites
+### Prerequisites
 
 R wrapper for `ivis` is provided via the `reticulate` library.
 Prior to installation, ensure that `reticulate` is available on your machine.
@@ -15,6 +15,8 @@ Next, install [virtualenv](https://virtualenv.pypa.io/en/latest/installation/) p
 
 Finally, the easiest way to install `ivis` is using the `devtools` package:
 
+### Running install
+ 
 ```R
 devtools::install_github("beringresearch/ivis/R-package")
 library(ivis)
@@ -23,13 +25,13 @@ install_ivis()
 
 After `ivis` is installed, **restart your R session**. 
 
-Finally, to set environment to tensorflow, add the following line to your environment variables:
+Newer versions of Keras use tensorflow as the default backend, however if for some reason this isn't the case, add the following line to your environment variables:
 
 ```bash
 export KERAS_BACKEND=tensorflow
 ```
 
-## Example
+# Example
 
 ```R
 library(ivis)
