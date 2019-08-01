@@ -185,10 +185,9 @@ class Ivis(BaseEstimator):
             datagen,
             steps_per_epoch=X.shape[0] // self.batch_size,
             epochs=self.epochs,
-            callbacks=[
-                *self.callbacks,
-                EarlyStopping(monitor=loss_monitor,
-                              patience=self.n_epochs_without_progress)],
+            callbacks=[callback for callback in self.callbacks] +
+                      [EarlyStopping(monitor=loss_monitor,
+                       patience=self.n_epochs_without_progress)],
             shuffle=shuffle_mode,
             workers=multiprocessing.cpu_count(),
             verbose=self.verbose)

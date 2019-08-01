@@ -6,7 +6,7 @@ from setuptools import find_packages
 VERSION = imp.load_source(
         'ivis.version', os.path.join('ivis', 'version.py')).VERSION
 
-with open('README.md', encoding='utf-8') as f:
+with open('README.md') as f:
     long_description = f.read()
 
 setup(name='ivis',
