@@ -18,34 +18,35 @@ ivis: structure preserving dimensionality reduction
 
 The latest development version is on `github <https://github.com/beringresearch/ivis>`_.
 
+
 .. toctree::
    :maxdepth: 2
    :caption: User Guide:
-
-   Installation <installation>
-   Quickstart <quickstart>
+  
+   Python Package <python_package>
+   R Package <r_package>
    Hyperparameter Selection <hyperparameters>
    Supervised Dimensionality Reduction <supervised>
    Callbacks <callbacks>
    Examples <auto_examples/index>
 
 .. toctree::
-  :maxdepth: 2
-  :caption: Applications:
+   :maxdepth: 2
+   :caption: Applications:
   
-  Visualising Single Cell Experiments <scanpy_singlecell> 
-  Dimensionality Reduction <comparisons>
-  Metric Learning <metric_learning>
+   Visualising Single Cell Experiments <scanpy_singlecell> 
+   Dimensionality Reduction <comparisons>
+   Metric Learning <metric_learning>
 
 .. toctree::
-    :maxdepth: 2
-    :caption: Benchmarks:
+   :maxdepth: 2
+   :caption: Benchmarks:
 
-    Speed of Execution <timings_benchmarks>
-    Distance Preservation <embeddings_benchmarks>
+   Speed of Execution <timings_benchmarks>
+   Distance Preservation <embeddings_benchmarks>
 
 .. toctree::
-  :maxdepth: 2
-  :caption: API Reference:
+   :maxdepth: 2
+   :caption: API Reference:
 
    API Guide <api>
