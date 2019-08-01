@@ -13,6 +13,12 @@ matrix:
       os: linux
 
 before_install:
+  deactivate
+  sudo apt-get install python3-setuptools
+  sudo apt-get install python3-pip
+  python3 -m pip install --user --upgrade pip
+  python3 -m pip install --user virtualenv 
+  python3 -m pip install --user numpy
   sudo apt-get install -y r-base r-base-dev
 
 install: 
