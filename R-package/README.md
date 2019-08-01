@@ -4,8 +4,6 @@
 
 ### Prerequisites
 
-## Prerequisites
-
 R wrapper for `ivis` is provided via the `reticulate` library.
 Prior to installation, ensure that `reticulate` is available on your machine.
 
