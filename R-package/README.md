@@ -1,6 +1,8 @@
-# R wrapper for the IVIS algorithm
+# R wrapper for the `ivis` algorithm
 
 # Installation
+
+## Prerequisites
 
 R wrapper for `ivis` is provided via the `reticulate` library.
 Prior to installation, ensure that `reticulate` is available on your machine.
@@ -9,7 +11,9 @@ Prior to installation, ensure that `reticulate` is available on your machine.
 install.packages("reticulate")
 ```
 
-The easiest way to install `ivis` is using the `devtools` package:
+Next, install [virtualenv](https://virtualenv.pypa.io/en/latest/installation/) package as it will be used to safely interface with the `ivis` Python package.
+
+Finally, the easiest way to install `ivis` is using the `devtools` package:
 
 ```R
 devtools::install_github("beringresearch/ivis/R-package")
@@ -17,7 +21,7 @@ library(ivis)
 install_ivis()
 ```
 
-After ivis is installed into a virtual environment, restart your R session.
+After `ivis` is installed, **restart your R session**. 
 
 Finally, to set environment to tensorflow, add the following line to your environment variables:
 
