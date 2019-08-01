@@ -12,5 +12,12 @@ matrix:
       python: 3.5
       os: linux
 
-install: source ci_scripts/install.sh
-script: bash ci_scripts/test.sh
+before_install:
+  apt-get install -y R-core
+
+install: 
+  - source ci_scripts/install.sh
+  - source ci_scripts/install-R.sh
+script: 
+  - bash ci_scripts/test.sh
+  - bash ci_scripts/test-R.sh
