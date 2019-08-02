@@ -27,3 +27,5 @@ install:
 script: 
   - bash ci_scripts/test.sh
   - bash ci_scripts/test-R.sh
+after_success:
+  - Rscript -e 'library(covr); codecov()'
