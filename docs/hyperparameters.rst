@@ -3,11 +3,11 @@
 Hyperparameter Selection
 ========================
 
-``ivis`` uses several hyperparameters that can have a significant impact
-on the desired embeddings:
+``ivis`` uses several hyperparameters that can have an impact on the desired embeddings:
 
 -  ``embedding_dims``: Number of dimensions in the embedding space.
 -  ``k``: The number of nearest neighbours to retrieve for each point.
+-  ``n_epochs_without_progress``: After n number of epochs without an improvement to the loss, terminate training early.
 -  ``model``: the keras model that is trained using triplet loss. If a
    model object is provided, an embedding layer of size
    ``embedding_dims`` will be appended to the end of the network. If a
@@ -16,7 +16,7 @@ on the desired embeddings:
    selu network composed of 3 dense layers of 128 neurons each will be
    created, followed by an embedding layer of size 'embedding\_dims'.
 
-``k`` and ``model`` are tunable parameters that should be selected on
+``k`` , ``n_epochs_without_progress``, and ``model`` are tunable parameters that should be selected on
 the basis of dataset size and complexity. We will look at each of these
 parameters in turn.
 
@@ -121,10 +121,25 @@ For larger values of ``k`` (≥500), the overall shape of the dataset is
 preserved, but individual points that make up the Swiss Roll tend to be
 localised to the peripheries.
 
-In our experiments, we observed that setting ``k`` values to 0.5%-1.5%
+In our experiments, we observed that setting ``k`` values to 0.01%-1%
 of the number of observations consistently results in greater embedding
-accuracies. Therefore, for a dataset with 10,000 observations ``k=150``
+accuracies. Therefore, for a dataset with 10,000 observations ``k=15``
 is a sensible default.
+
+
+``n_epochs_without_progress``
+-----------------------------
+
+This patience hyperparameter impacts both the quality of embeddings and speed with which they are generated. Generally, the higher ``n_epochs_without_progress`` are, the more accurate are the low-dimensional features. However, this comes at a computational cost. Here we examine, the speed vs. accuracy trade-off and recommend sensible defaults. For this experiment ``ivis`` hyperparameters were set to ``k=15`` and ``model='maaten'``.
+
+Three datasets were used `Levine <https://github.com/lmweber/benchmark-data-Levine-32-dim>`__ (104,184 x 32), `MNIST <https://www.openml.org/d/554>`__ (70,000 x 784), and `Melanoma <https://portals.broadinstitute.org/single_cell/study/SCP11/melanoma-intra-tumor-heterogeneity>`__ (4,645 x 23,686). The Melanoma featurespace was further reduced to n=50 using Principal Component Analysis.
+
+For each dataset, we trained a Support Vector Machine classifier to assess how well ``ivis`` embeddings capture manually supplied response variable information. For example, in case of an MNIST dataset, the response variable is the digit label, whilst for Levine and Melanoma datasets it is the cell type. SVM classifier was trained on  ``ivis`` embeddings representing 3%, 40%, and 95% of the data obtained using a stratified random subsampling. The classifier was then validated on the ``ivis`` embeddings of the remaining 97%, 60%, and 5% of data. For each training set split, an ``ivis`` model was trained by keeping the ``k`` and ``model`` hyperparameters constat, whilst varying ``n_epochs_without_progress``. Finally, classification accuracies were noramlised to a 0-1 range to facilitate comparisons between datasets.
+
+.. image:: _static/ivis_patience_boxplots.png
+
+Our final results indicate that oveall accuracy of embeddings is a function of dataset size and ``n_epochs_without_progress``. However, only marginal gain in performance is achieved when ``n_epochs_without_progress>20``. For large datasets (``n_observations>10000``), ``n_epochs_without_progress`` between 3 and 5 comes to within 85% of optimal classification accuracy.
+
 
 ``model``
 ---------
