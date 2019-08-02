@@ -6,7 +6,7 @@ install_ivis <- function(){
     cat("Creating a virtual environment (ivis)\n")
     virtual_envs <- virtualenv_list()
     if ("ivis" %in% virtual_envs){
-      ("(ivis) environment already exists. Deleting the environment and running install_ivis() again.")
+      cat("(ivis) environment already exists. The old environment will be updated.")
       virtualenv_remove("ivis")
     }
 

@@ -18,5 +18,6 @@ Suggests:
     knitr,
     rmarkdown,
     TENxPBMCData,
-    Seurat
+    Seurat,
+    testthat
 VignetteBuilder: knitr
