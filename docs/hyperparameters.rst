@@ -19,26 +19,18 @@ Hyperparameter Selection
 ``k`` , ``n_epochs_without_progress``, and ``model`` are tunable parameters that should be selected on
 the basis of dataset size and complexity.  The following table summarizes our findings:
 
-.. table:: Recommended hyperparameter settings for two-dimensional embeddings.
-    :widths: auto
+.. csv-table::
+    :header-rows: 1
 
-+----------------+--------+-------------------------------+------------+ 
-| Observations   |  ``k`` | ``n_epochs_without_progress`` | ``model``  |
-+================+========+===============================+============+
-| < 1,000        | 10-15  | 20-30                         | "maaten"   |
-+----------------+--------+-------------------------------+------------+
-| 1,000-10,000   | 10-15  | 10-20                         | "maaten"   |
-+----------------+--------+-------------------------------+------------+
-| 10,000-50,000  | 15-150 | 10-20                         | "maaten"   |
-+----------------+--------+-------------------------------+------------+
-| 50,000-100,000 | 15-150 | 10-15                         | "maaten"   |
-+----------------+--------+-------------------------------+------------+
-| 100K - 500K    | 15-150 | 5-10                          | "maaten" |
-+----------------+--------+-------------------------------+------------+
-| 500K - 1M      | 15-150 | 3-5                           | "default``|
-+----------------+--------+-------------------------------+------------+
-| > 1M           | 15-150 | 2-3                           | +default``|
-+----------------+--------+-------------------------------+------------+
+    Observations, ``k``, ``n_epochs_without_progress``, ``model``
+    < 1000, 10-15, 20-30, "maaten"
+    1000-10000, 10-30, 10-20, "maaten"
+    10000-50000, 15-150, 10-20, "maaten"
+    50K-100K, 15-150, 10-15, "maaten"
+    100K-500K, 15-150, 5-10, "maaten"
+    500K-1M, 15-150, 3-5, "default"
+    > 1M,15-150, 2-3, "default"
+
 
 We will now look at each of these parameters in turn.
 
