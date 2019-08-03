@@ -17,64 +17,30 @@ Hyperparameter Selection
    created, followed by an embedding layer of size 'embedding\_dims'.
 
 ``k`` , ``n_epochs_without_progress``, and ``model`` are tunable parameters that should be selected on
-the basis of dataset size and complexity. We will look at each of these
-parameters in turn.
+the basis of dataset size and complexity.  The following table summarizes our findings:
 
+.. table:: Recommended hyperparameter settings for two-dimensional embeddings.
+    :widths: auto
 
-.. code:: ipython3
++----------------+--------+-------------------------------+------------+ 
+| Observations   |  ``k`` | ``n_epochs_without_progress`` | ``model``  |
++================+========+===============================+============+
+| < 1,000        | 10-15  | 20-30                         | "maaten"   |
++----------------+--------+-------------------------------+------------+
+| 1,000-10,000   | 10-15  | 10-20                         | "maaten"   |
++----------------+--------+-------------------------------+------------+
+| 10,000-50,000  | 15-150 | 10-20                         | "maaten"   |
++----------------+--------+-------------------------------+------------+
+| 50,000-100,000 | 15-150 | 10-15                         | "maaten"   |
++----------------+--------+-------------------------------+------------+
+| 100K - 500K    | 15-150 | 5-10                          | "maaten" |
++----------------+--------+-------------------------------+------------+
+| 500K - 1M      | 15-150 | 3-5                           | "default``|
++----------------+--------+-------------------------------+------------+
+| > 1M           | 15-150 | 2-3                           | +default``|
++----------------+--------+-------------------------------+------------+
 
-    import matplotlib.pyplot as plt
-    import mpl_toolkits.mplot3d.axes3d as p3
-    
-    from sklearn.datasets.samples_generator import make_swiss_roll
-    from sklearn.preprocessing import PolynomialFeatures, MinMaxScaler
-    
-    from sklearn.manifold import TSNE
-    from sklearn.decomposition import PCA
-    
-    import keras
-    import pydot as pyd
-    from IPython.display import SVG
-    from keras.utils.vis_utils import model_to_dot
-    
-    keras.utils.vis_utils.pydot = pyd
-    
-    from ivis import Ivis
-    from ivis.nn.network import base_network
-
-
-The Swiss Roll dataset with 10,000 points will be used to demonstrate
-the effects of ``k`` and ``model`` on embeddings.
-
-.. note::
-  Our aim is not to unfold the data in the Swiss Roll, but rather recover original structure from high-dimensional feature set.
-
-.. code:: ipython3
-
-    X, y = make_swiss_roll(n_samples=10000, noise=0.05)
-    X_poly = PolynomialFeatures(10).fit_transform(X)
-    X_poly = MinMaxScaler().fit_transform(X_poly)
-
-
-Since ``ivis`` is a dimensionality reduction algorithm, we will
-artificially add reduntant features to the original three-dimensional
-Swiss Roll dataset using polynomial combinations (degree ≤ 10) of the
-original features.
-   
-
-.. code:: ipython3
-
-    fig = plt.figure(figsize=(14, 10))
-    ax = fig.add_subplot(1, 1, 1, projection='3d')
-    
-    ax.view_init(7, -65)
-    ax.scatter(X[:, 0], X[:, 1], X[:, 2],
-                   c = y,
-                   s=1)
-    ax.set_title('Original')
-
-
-.. image:: _static/swiss_roll_original.png
+We will now look at each of these parameters in turn.
 
 
 ``k``
@@ -85,46 +51,21 @@ the dataset. Low ``k`` values will result in prioritisation of local
 dataset features and the overall global structure may be missed.
 Conversely, high ``k`` values will force ``ivis`` to look at broader
 aspects of the data, losing desired granularity. We can visualise
-effects of low and large values on ``k`` on the Swiss Roll dataset.
+effects of low and large values on ``k`` on the 
+`Levine dataset <https://github.com/lmweber/benchmark-data-Levine-32-dim>`__ (104,184 x 32).
 
-.. code:: ipython3
+.. image:: _static/ivis_k_embeddings.png
 
-    k = [5, 25, 50, 100, 150, 250, 500, 750]
-    embeddings = {}
-    for nn in k:
-        ivis = Ivis(k=nn, model = 'maaten').fit(X_poly)
-        embeddings[nn] = ivis.transform(X_poly)
+Box plots represent distances across pairs of points in the embeddings, binned using 50 equal-width bins over the pairwise distances in the original space using 10,000 randomly selected points, leading to 49,995,000 pairs of pairwise distances. For each embedding, the value of the Pearson correlation coefficient computed over the pairs of pairwise distances is reported. We can see that where ``k=5``, smaller distances are better preserved, whilst larger distances have higher variability in the embedding space. As ``k`` values increase, larger distances are beginning to be better preserved as well. However, for very large ``k``, smaller distances are no longer preserved.
 
-.. code:: ipython3
+To establish an appropriate value of ``k``, we evaluated a range of values across a severao subsamples of varying sizes,  keeping ``n_epochs_without_progress`` and ``model`` hyperparameters fixed.
 
-    fig, axs = plt.subplots(2, 4, figsize=(15, 8), facecolor='w', edgecolor='k')
-    fig.subplots_adjust(hspace = 0.3, wspace = 0.2)
-    
-    axs = axs.ravel()
-    for i, nn in enumerate(k):
-        xy=embeddings[nn]
-        axs[i].scatter(xy[:, 0], xy[:, 1], s = 0.1, c = y)
-        axs[i].set_title('k='+str(nn))
-        
+.. image:: _static/ivis_k_accuracy.png
 
+Accuracy was calculated by training a Support Vector Machine classifier on 75% of each subsample and evaluating the classifier performance on the remaining 25%, whilst predicting manually assigned cell types in the Levine dataset. Accuracy was high and generally stable for ``k`` between 10 and 150. A decrease was observed when ``k`` was considerably large in relation to subsample size.
 
+Overall, ``ivis`` is fairly robust to values of ``k``, which can control the local vs. global trade off in the embedding space.
 
-.. image:: _static/swiss_roll_knn.png
-
-
-We can see that with small values of ``k`` (<100), the spiraling
-structure of the Swiss Roll Dataset is not recovered. Emphasis is placed
-on grouping similar points together rather than extracting original
-dataset structure.
-
-For larger values of ``k`` (≥500), the overall shape of the dataset is
-preserved, but individual points that make up the Swiss Roll tend to be
-localised to the peripheries.
-
-In our experiments, we observed that setting ``k`` values to 0.01%-1%
-of the number of observations consistently results in greater embedding
-accuracies. Therefore, for a dataset with 10,000 observations ``k=15``
-is a sensible default.
 
 
 ``n_epochs_without_progress``
