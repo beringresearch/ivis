@@ -15,6 +15,7 @@ def annoy_index_file():
     yield filepath
     os.remove(filepath)
 
+
 def test_build_sparse_annoy_index(annoy_index_file):
     data = np.random.choice([0, 1], size=(10, 5))
     sparse_data = csr_matrix(data)
@@ -23,7 +24,7 @@ def test_build_sparse_annoy_index(annoy_index_file):
     assert os.path.exists(annoy_index_file)
 
     loaded_index = AnnoyIndex(5, metric='angular')
-    loaded_index.load(annoy_index_file) 
+    loaded_index.load(annoy_index_file)
 
     assert index.f == loaded_index.f == 5
     assert index.get_n_items() == loaded_index.get_n_items() == 10
@@ -39,7 +40,7 @@ def test_dense_annoy_index(annoy_index_file):
     assert os.path.exists(annoy_index_file)
 
     loaded_index = AnnoyIndex(5, metric='angular')
-    loaded_index.load(annoy_index_file) 
+    loaded_index.load(annoy_index_file)
 
     assert index.f == loaded_index.f == 5
     assert index.get_n_items() == loaded_index.get_n_items() == 10
@@ -48,15 +49,17 @@ def test_dense_annoy_index(annoy_index_file):
     index.unload()
     loaded_index.unload()
 
+
 def test_knn_retrieval():
     annoy_index_filepath = 'tests/data/.test-annoy-index.index'
     expected_neighbour_list = np.load('tests/data/test_knn_k4.npy')
-    
+
     iris = datasets.load_iris()
     X = iris.data
-    
+
     k = 4
     search_k = -1
-    neighbour_list = extract_knn(X, annoy_index_filepath, k=k, search_k=search_k)
+    neighbour_list = extract_knn(X, annoy_index_filepath,
+                                 k=k, search_k=search_k)
 
     assert np.all(expected_neighbour_list == neighbour_list)

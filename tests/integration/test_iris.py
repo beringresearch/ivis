@@ -8,9 +8,6 @@ def test_iris_embedding():
     x = iris.data
     y = iris.target
 
-    val_x = x
-    val_y = y
-
     ivis_iris = Ivis(n_epochs_without_progress=5)
     ivis_iris.k = 15
     ivis_iris.batch_size = 16
