@@ -259,7 +259,7 @@ class Ivis(BaseEstimator):
         embedding = self.encoder.predict(X, verbose=self.verbose)
         return embedding
 
-    def classification_proba(self, X):
+    def score_samples(self, X):
         """Passes X through classification network to obtain predicted 
         softmax class probabilities. Only applicable when trained in 
         supervised mode.
