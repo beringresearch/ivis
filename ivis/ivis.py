@@ -7,7 +7,7 @@ from .data.knn import build_annoy_index
 
 from keras.callbacks import EarlyStopping
 from keras.models import load_model, Model
-from keras.layers import Dense
+from keras.layers import Dense, Input
 import numpy as np
 
 from sklearn.base import BaseEstimator
@@ -99,6 +99,7 @@ class Ivis(BaseEstimator):
         self.model_def = model
         self.model_ = None
         self.encoder = None
+        self.classification_model_ = None
         self.classification_weight = classification_weight
         self.loss_history_ = []
         self.annoy_index_path = annoy_index_path
@@ -176,6 +177,13 @@ class Ivis(BaseEstimator):
                         'stacked_triplets': 1 - self.classification_weight,
                         'classification_out': self.classification_weight})
 
+                # Store dedicated classification model
+                classification_model_input = Input(shape=(X.shape[-1],))
+                embedding = self.model_.layers[3](classification_model_input)
+                softmax_out = self.model_.layers[-1](embedding)
+
+                self.classification_model_ = Model(classification_model_input, softmax_out)
+
         self.encoder = self.model_.layers[3]
 
         if self.verbose > 0:
@@ -251,6 +259,28 @@ class Ivis(BaseEstimator):
         embedding = self.encoder.predict(X, verbose=self.verbose)
         return embedding
 
+    def classification_proba(self, X):
+        """Passes X through classification network to obtain predicted 
+        softmax class probabilities. Only applicable when trained in 
+        supervised mode.
+
+        Parameters
+        ----------
+        X : array, shape (n_samples, n_features)
+            Data to be passed through classification network.
+
+        Returns
+        -------
+        X_new : array, shape (n_samples, embedding_dims)
+            Softmax class probabilities of the data.
+        """
+
+        if self.classification_model_ is None:
+            raise Exception("Model was not trained in classification mode.")
+
+        softmax_output = self.classification_model_.predict(X)
+        return softmax_output
+
     def save_model(self, folder_path, overwrite=False):
         """Save an ivis model
 
@@ -259,6 +289,7 @@ class Ivis(BaseEstimator):
         folder_path : string
             Path to serialised model files and metadata
         """
+
         if overwrite:
             if os.path.exists(folder_path):
                 shutil.rmtree(folder_path)
