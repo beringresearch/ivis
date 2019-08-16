@@ -63,6 +63,11 @@ class Ivis(BaseEstimator):
         options are: 'default', 'hinton', 'maaten'. By default, a selu network
         composed of 3 dense layers of 128 neurons each will be created,
         followed by an embedding layer of size 'embedding_dims'.
+    :param str supervision_metric: str or function. The supervision metric to
+        optimize when training keras in supervised mode. Supports all of the
+        classification or regression losses included with keras, so long as
+        the labels are provided in the correct format. A list of keras' loss
+        functions can be found at https://keras.io/losses/ .
     :param float supervision_weight: Float between 0 and 1 denoting the
         weighting to give to classification vs triplet loss when training
         in supervised mode. The higher the weight, the more classification
@@ -84,7 +89,7 @@ class Ivis(BaseEstimator):
                  epochs=1000, n_epochs_without_progress=50,
                  margin=1, ntrees=50, search_k=-1,
                  precompute=True, model='default',
-                 supervised_metric='sparse_categorical_crossentropy',
+                 supervision_metric='sparse_categorical_crossentropy',
                  supervision_weight=0.5, annoy_index_path=None,
                  callbacks=[], verbose=1):
 
@@ -101,9 +106,9 @@ class Ivis(BaseEstimator):
         self.model_def = model
         self.model_ = None
         self.encoder = None
-        self.supervised_metric = supervised_metric
-        self.supervised_model_ = None
+        self.supervision_metric = supervision_metric
         self.supervision_weight = supervision_weight
+        self.supervised_model_ = None
         self.loss_history_ = []
         self.annoy_index_path = annoy_index_path
         self.callbacks = callbacks
@@ -164,9 +169,9 @@ class Ivis(BaseEstimator):
             if Y is None:
                 self.model_.compile(optimizer='adam', loss=triplet_loss_func)
             else:
-                if is_categorical(self.supervised_metric):
-                    if not is_multiclass(self.supervised_metric):
-                        if not is_hinge(self.supervised_metric):
+                if is_categorical(self.supervision_metric):
+                    if not is_multiclass(self.supervision_metric):
+                        if not is_hinge(self.supervision_metric):
                             # Binary logistic classifier
                             supervised_output = Dense(1, activation='sigmoid',
                                                       name='supervised')(anchor_embedding)
@@ -177,7 +182,7 @@ class Ivis(BaseEstimator):
                                                       kernel_regularizer=regularizers.l2())(anchor_embedding)
                     else:
                         n_classes = len(np.unique(Y, axis=0))
-                        if not is_hinge(self.supervised_metric):
+                        if not is_hinge(self.supervision_metric):
                             # Softmax classifier
                             supervised_output = Dense(n_classes, activation='softmax',
                                                     name='supervised')(anchor_embedding)
@@ -199,7 +204,7 @@ class Ivis(BaseEstimator):
                     optimizer='adam',
                     loss={
                         'stacked_triplets': triplet_loss_func,
-                        'supervised': self.supervised_metric
+                        'supervised': self.supervision_metric
                          },
                     loss_weights={
                         'stacked_triplets': 1 - self.supervision_weight,
