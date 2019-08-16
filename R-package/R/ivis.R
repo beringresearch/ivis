@@ -41,7 +41,12 @@
 #'                    By default, a selu network composed of 3 dense layers
 #'                    of 128 neurons each will be created, followed by an
 #'                    embedding layer of size 'embedding_dims'.
-#' @param classification_weight: Float between 0 and 1 denoting the
+#' @param supervision_metric: str or function. The supervision metric to
+#'                    optimize when training keras in supervised mode. Supports all of the
+#'                    classification or regression losses included with keras, so long as
+#'                    the labels are provided in the correct format. A list of keras' loss
+#'                    functions can be found at https://keras.io/losses/ .
+#' @param supervision_weight: Float between 0 and 1 denoting the
 #'                    weighting to give to classification vs triplet loss
 #'                    when training in supervised mode. The higher the
 #'                    weight, the more classification influences training.
@@ -67,7 +72,8 @@ ivis <- function(embedding_dims = 2L,
     search_k = -1L,
     precompute = TRUE,
     model = "default",
-    classification_weight = 0.5,
+    supervision_metric = "sparse_categorical_crossentropy",
+    supervision_weight = 0.5,
     annoy_index_path=NULL, verbose=1L){
 
 
@@ -88,7 +94,8 @@ ivis <- function(embedding_dims = 2L,
                               margin=margin, ntrees=ntrees,
                               search_k=search_k,
                               precompute=precompute, model=model,
-                              classification_weight=classification_weight,
+                              supervision_metric=supervision_metric,
+                              supervision_weight=supervision_weight,
                               annoy_index_path=annoy_index_path,
                               verbose=verbose)
   
