@@ -14,7 +14,7 @@ performance of a classifier.
 
 Many supervision metrics are available; for instance, it is also possible
 to perform supervised training on continous labels, by providing a regression
-metric to the ``supervised_metric`` parameter when constructing an Ivis obect.
+metric to the ``supervision_metric`` parameter when constructing an Ivis obect.
 ``ivis`` supports the use of any of the classification or regression
 losses included with keras, so long as the labels are provided in the
 correct format.
@@ -151,7 +151,7 @@ function from keras utils followed by a quick rescale.
     Y_test = to_categorical(Y_test) * 2 - 1
 
     model = Ivis(n_epochs_without_progress=5,
-                 supervised_metric='categorical_hinge')
+                 supervision_metric='categorical_hinge')
     model.fit(X_train, Y_train)
 
     embeddings = model.transform(X_test)
@@ -172,7 +172,7 @@ Supervised Regression
 ---------------------
 
 It is also possible to perform supervised training on continous labels.
-To do this, a regression metric should be provided to ``supervised_metric``
+To do this, a regression metric should be provided to ``supervision_metric``
 when constructing the Ivis object. Many of these exist in Keras, including
 mean-absolute-error, mean-squared error, and logcosh.
 
@@ -187,8 +187,8 @@ the mean-absolute-error supervised metric (mae).
 
     (X_train, Y_train), (X_test, Y_test) = boston_housing.load_data()
 
-    supervised_metric = 'mae'
-    ivis_boston = Ivis(k=15, batch_size=16, supervised_metric=supervised_metric)
+    supervision_metric = 'mae'
+    ivis_boston = Ivis(k=15, batch_size=16, supervision_metric=supervision_metric)
     ivis_boston.fit(X_train, Y_train)
 
     train_embeddings = ivis_boston.transform(X_train)
