@@ -130,25 +130,25 @@ to optimize a linear SVM on the data in conjunction with the triplet loss.
 Below is an example of training ``ivis`` in supervised mode in tandem with
 a linear SVM on the Fashion MNIST dataset.
 Note that the ``categorical_hinge`` loss function expects one-hot encoded
-labels rescaled to {-1, 1}. We can achieve this using the ``to_categorical``
-function from keras utils followed by a quick rescale.
+labels. We can achieve this using the ``to_categorical`` function from
+keras utils.
 
 ::
 
-    from keras.datasets import fashion_mnist
+    from keras.datasets import mnist
     from keras.utils import to_categorical
     from ivis import Ivis
     import numpy as np
 
-    (X_train, Y_train), (X_test, Y_test) = fashion_mnist.load_data()
+    (X_train, Y_train), (X_test, Y_test) = mnist.load_data()
 
     # Flatten images
     X_train = np.reshape(X_train, (len(X_train), 28 * 28)) / 255.
     X_test = np.reshape(X_test, (len(X_test), 28 * 28)) / 255.
 
-    # One-hot encode labels and rescale to {-1, 1} for SVM
-    Y_train = to_categorical(Y_train) * 2 - 1
-    Y_test = to_categorical(Y_test) * 2 - 1
+    # One-hot encode labels
+    Y_train = to_categorical(Y_train)
+    Y_test = to_categorical(Y_test)
 
     model = Ivis(n_epochs_without_progress=5,
                  supervision_metric='categorical_hinge')
@@ -158,14 +158,15 @@ function from keras utils followed by a quick rescale.
     y_pred = model.score_samples(X_test)
 
 
-.. image:: _static/fashion-mnist-test_svm-softmax.png
+.. image:: _static/SVM-classification-weight-impact-mnist.png
 
-The resulting embeddings on the left are from ivis trained with a
-Linear SVM using the ``categorical_hinge`` metric; on the right are
-the embeddings when using a softmax classifier.
+The resulting embeddings show ivis trained with a
+Linear SVM using the ``categorical_hinge`` metric over a variety of
+supevision_weight values. The maximum achieved accuracy on the test
+set was 98.02% - once again, a supervision weight of 0.9 led to the
+highest classification performance.
 
-In terms of classification accuracy, the SVM achieved 88.3% accuracy
-on the test set, while the softmax classifier achieved 87.4%.
+.. image:: _static/SVM-accuracy-classification-weight-zoomed.png
 
 
 Supervised Regression
