@@ -33,10 +33,6 @@ def get_loss_functions(margin=1):
     return losses
 
 
-def get_supported_losses():
-    return True
-
-
 def is_hinge(supervised_loss):
     loss = keras.losses.get(supervised_loss)
     if loss in get_hinge_losses():
@@ -46,7 +42,8 @@ def is_hinge(supervised_loss):
 
 def get_hinge_losses():
     hinge_losses = set([keras.losses.hinge,
-                        keras.losses.squared_hinge])
+                        keras.losses.squared_hinge,
+                        keras.losses.categorical_hinge])
     return hinge_losses
 
 

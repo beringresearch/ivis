@@ -185,7 +185,7 @@ class Ivis(BaseEstimator):
                         if not is_hinge(self.supervision_metric):
                             # Softmax classifier
                             supervised_output = Dense(n_classes, activation='softmax',
-                                                    name='supervised')(anchor_embedding)
+                                                      name='supervised')(anchor_embedding)
                         else:
                             # Multiclass Linear SVM output
                             supervised_output = Dense(n_classes, activation='linear',
