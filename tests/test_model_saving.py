@@ -46,21 +46,21 @@ def test_ivis_model_saving(model_filepath):
     # Check that trying to save over an existing folder raises an Exception
     with pytest.raises(FileExistsError) as exception_info:
         model.save_model(model_filepath)
-    assert isinstance(exception_info.value, FileExistsError)
+        assert isinstance(exception_info.value, FileExistsError)
 
     # Check that can overwrite existing model if requested
     model.save_model(model_filepath, overwrite=True)
 
 
 def test_supervised_model_saving(model_filepath):
-    model = Ivis(k=15, batch_size=16, n_epochs_without_progress=5,
+    model = Ivis(k=15, batch_size=16, epochs=5,
                  supervision_metric='sparse_categorical_crossentropy')
     iris = datasets.load_iris()
     X = iris.data
     Y = iris.target
 
     model.fit(X, Y)
-    model.save_model(model_filepath)
+    model.save_model(model_filepath, overwrite=True)
 
     model_2 = Ivis()
     model_2.load_model(model_filepath)
@@ -88,7 +88,7 @@ def test_supervised_model_saving(model_filepath):
     # Check that trying to save over an existing folder raises an Exception
     with pytest.raises(FileExistsError) as exception_info:
         model.save_model(model_filepath)
-    assert isinstance(exception_info.value, FileExistsError)
+        assert isinstance(exception_info.value, FileExistsError)
 
     # Check that can overwrite existing model if requested
     model.save_model(model_filepath, overwrite=True)
