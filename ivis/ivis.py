@@ -2,12 +2,13 @@
 from .data.triplet_generators import generator_from_index
 from .nn.network import triplet_network, base_network
 from .nn.callbacks import ModelCheckpoint
-from .nn.losses import triplet_loss
+from .nn.losses import triplet_loss, is_categorical, is_multiclass, is_hinge
 from .data.knn import build_annoy_index
 
 from keras.callbacks import EarlyStopping
 from keras.models import load_model, Model
 from keras.layers import Dense, Input
+from keras import regularizers
 import numpy as np
 
 from sklearn.base import BaseEstimator
@@ -62,7 +63,12 @@ class Ivis(BaseEstimator):
         options are: 'default', 'hinton', 'maaten'. By default, a selu network
         composed of 3 dense layers of 128 neurons each will be created,
         followed by an embedding layer of size 'embedding_dims'.
-    :param float classification_weight: Float between 0 and 1 denoting the
+    :param str supervision_metric: str or function. The supervision metric to
+        optimize when training keras in supervised mode. Supports all of the
+        classification or regression losses included with keras, so long as
+        the labels are provided in the correct format. A list of keras' loss
+        functions can be found at https://keras.io/losses/ .
+    :param float supervision_weight: Float between 0 and 1 denoting the
         weighting to give to classification vs triplet loss when training
         in supervised mode. The higher the weight, the more classification
         influences training. Ignored if using Ivis in unsupervised mode.
@@ -83,7 +89,8 @@ class Ivis(BaseEstimator):
                  epochs=1000, n_epochs_without_progress=50,
                  margin=1, ntrees=50, search_k=-1,
                  precompute=True, model='default',
-                 classification_weight=0.5, annoy_index_path=None,
+                 supervision_metric='sparse_categorical_crossentropy',
+                 supervision_weight=0.5, annoy_index_path=None,
                  callbacks=[], verbose=1):
 
         self.embedding_dims = embedding_dims
@@ -99,8 +106,9 @@ class Ivis(BaseEstimator):
         self.model_def = model
         self.model_ = None
         self.encoder = None
-        self.classification_model_ = None
-        self.classification_weight = classification_weight
+        self.supervision_metric = supervision_metric
+        self.supervision_weight = supervision_weight
+        self.supervised_model_ = None
         self.loss_history_ = []
         self.annoy_index_path = annoy_index_path
         self.callbacks = callbacks
@@ -114,11 +122,13 @@ class Ivis(BaseEstimator):
 
         state = dict(self.__dict__)
         if 'model_' in state:
-            del state['model_']
+            state['model_'] = None
         if 'encoder' in state:
-            del state['encoder']
+            state['encoder'] = None
+        if 'supervised_model_' in state:
+            state['supervised_model_'] = None
         if 'callbacks' in state:
-            del state['callbacks']
+            state['callbacks'] = []
         return state
 
     def _fit(self, X, Y=None, shuffle_mode=True):
@@ -159,30 +169,53 @@ class Ivis(BaseEstimator):
             if Y is None:
                 self.model_.compile(optimizer='adam', loss=triplet_loss_func)
             else:
-                n_classes = len(np.unique(Y, axis=0))
+                if is_categorical(self.supervision_metric):
+                    if not is_multiclass(self.supervision_metric):
+                        if not is_hinge(self.supervision_metric):
+                            # Binary logistic classifier
+                            supervised_output = Dense(1, activation='sigmoid',
+                                                      name='supervised')(anchor_embedding)
+                        else:
+                            # Binary Linear SVM output
+                            supervised_output = Dense(1, activation='linear',
+                                                      name='supervised',
+                                                      kernel_regularizer=regularizers.l2())(anchor_embedding)
+                    else:
+                        n_classes = len(np.unique(Y, axis=0))
+                        if not is_hinge(self.supervision_metric):
+                            # Softmax classifier
+                            supervised_output = Dense(n_classes, activation='softmax',
+                                                      name='supervised')(anchor_embedding)
+                        else:
+                            # Multiclass Linear SVM output
+                            supervised_output = Dense(n_classes, activation='linear',
+                                                      name='supervised',
+                                                      kernel_regularizer=regularizers.l2())(anchor_embedding)
+                else:
+                    # Regression
+                    supervised_output = Dense(1, activation='linear',
+                                              name='supervised')(anchor_embedding)
 
-                classification_output = Dense(n_classes, activation='softmax',
-                                              name='classification_out')(anchor_embedding)
                 final_network = Model(inputs=self.model_.inputs,
                                       outputs=[self.model_.output,
-                                               classification_output])
+                                               supervised_output])
                 self.model_ = final_network
                 self.model_.compile(
                     optimizer='adam',
                     loss={
                         'stacked_triplets': triplet_loss_func,
-                        'classification_out': 'sparse_categorical_crossentropy'
+                        'supervised': self.supervision_metric
                          },
                     loss_weights={
-                        'stacked_triplets': 1 - self.classification_weight,
-                        'classification_out': self.classification_weight})
+                        'stacked_triplets': 1 - self.supervision_weight,
+                        'supervised': self.supervision_weight})
 
                 # Store dedicated classification model
-                classification_model_input = Input(shape=(X.shape[-1],))
-                embedding = self.model_.layers[3](classification_model_input)
+                supervised_model_input = Input(shape=(X.shape[-1],))
+                embedding = self.model_.layers[3](supervised_model_input)
                 softmax_out = self.model_.layers[-1](embedding)
 
-                self.classification_model_ = Model(classification_model_input, softmax_out)
+                self.supervised_model_ = Model(supervised_model_input, softmax_out)
 
         self.encoder = self.model_.layers[3]
 
@@ -209,8 +242,7 @@ class Ivis(BaseEstimator):
         X : array, shape (n_samples, n_features)
             Data to be embedded.
         Y : array, shape (n_samples)
-            Optional array for supervised dimentionality reduction. Currently
-            only classification is supported.
+            Optional array for supervised dimentionality reduction.
 
         Returns
         -------
@@ -228,8 +260,7 @@ class Ivis(BaseEstimator):
         X : array, shape (n_samples, n_features)
             Data to be embedded.
         Y : array, shape (n_samples)
-            Optional array for supervised dimentionality reduction. Currently
-            only classification is supported.
+            Optional array for supervised dimentionality reduction.
 
 
         Returns
@@ -260,8 +291,8 @@ class Ivis(BaseEstimator):
         return embedding
 
     def score_samples(self, X):
-        """Passes X through classification network to obtain predicted 
-        softmax class probabilities. Only applicable when trained in 
+        """Passes X through classification network to obtain predicted
+        supervised values. Only applicable when trained in
         supervised mode.
 
         Parameters
@@ -275,10 +306,10 @@ class Ivis(BaseEstimator):
             Softmax class probabilities of the data.
         """
 
-        if self.classification_model_ is None:
+        if self.supervised_model_ is None:
             raise Exception("Model was not trained in classification mode.")
 
-        softmax_output = self.classification_model_.predict(X)
+        softmax_output = self.supervised_model_.predict(X)
         return softmax_output
 
     def save_model(self, folder_path, overwrite=False):
@@ -296,6 +327,10 @@ class Ivis(BaseEstimator):
         os.makedirs(folder_path)
         # serialize weights to HDF5
         self.model_.save(os.path.join(folder_path, 'ivis_model.h5'))
+        # Have to serialize supervised model separately
+        if self.supervised_model_ is not None:
+            self.supervised_model_.save(os.path.join(folder_path,
+                                        'supervised_model.h5'))
 
         json.dump(self.__getstate__(),
                   open(os.path.join(folder_path, 'ivis_params.json'), 'w'))
@@ -323,4 +358,9 @@ class Ivis(BaseEstimator):
                                                  loss_function.__name__: loss_function })
         self.encoder = self.model_.layers[3]
         self.encoder._make_predict_function()
+
+        # If a supervised model exists, load it
+        supervised_path = os.path.join(folder_path, 'supervised_model.h5')
+        if os.path.exists(supervised_path):
+            self.supervised_model_ = load_model(supervised_path)
         return self
