@@ -122,13 +122,13 @@ class Ivis(BaseEstimator):
 
         state = dict(self.__dict__)
         if 'model_' in state:
-            del state['model_']
+            state['model_'] = None
         if 'encoder' in state:
-            del state['encoder']
+            state['encoder'] = None
         if 'supervised_model_' in state:
-            del state['supervised_model_']
+            state['supervised_model_'] = None
         if 'callbacks' in state:
-            del state['callbacks']
+            state['callbacks'] = []
         return state
 
     def _fit(self, X, Y=None, shuffle_mode=True):
@@ -327,6 +327,10 @@ class Ivis(BaseEstimator):
         os.makedirs(folder_path)
         # serialize weights to HDF5
         self.model_.save(os.path.join(folder_path, 'ivis_model.h5'))
+        # Have to serialize supervised model separately
+        if self.supervised_model_ is not None:
+            self.supervised_model_.save(os.path.join(folder_path,
+                                        'supervised_model.h5'))
 
         json.dump(self.__getstate__(),
                   open(os.path.join(folder_path, 'ivis_params.json'), 'w'))
@@ -354,4 +358,9 @@ class Ivis(BaseEstimator):
                                                  loss_function.__name__: loss_function })
         self.encoder = self.model_.layers[3]
         self.encoder._make_predict_function()
+
+        # If a supervised model exists, load it
+        supervised_path = os.path.join(folder_path, 'supervised_model.h5')
+        if os.path.exists(supervised_path):
+            self.supervised_model_ = load_model(supervised_path)
         return self
