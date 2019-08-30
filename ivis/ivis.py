@@ -173,11 +173,19 @@ class Ivis(BaseEstimator):
                     if not is_multiclass(self.supervision_metric):
                         if not is_hinge(self.supervision_metric):
                             # Binary logistic classifier
-                            supervised_output = Dense(1, activation='sigmoid',
+                            if len(Y.shape) > 1:
+                                n_classes = Y.shape[-1]
+                            else:
+                                n_classes = 1
+                            supervised_output = Dense(n_classes, activation='sigmoid',
                                                       name='supervised')(anchor_embedding)
                         else:
                             # Binary Linear SVM output
-                            supervised_output = Dense(1, activation='linear',
+                            if len(Y.shape) > 1:
+                                n_classes = Y.shape[-1]
+                            else:
+                                n_classes = 1
+                            supervised_output = Dense(n_classes, activation='linear',
                                                       name='supervised',
                                                       kernel_regularizer=regularizers.l2())(anchor_embedding)
                     else:
@@ -193,7 +201,11 @@ class Ivis(BaseEstimator):
                                                       kernel_regularizer=regularizers.l2())(anchor_embedding)
                 else:
                     # Regression
-                    supervised_output = Dense(1, activation='linear',
+                    if len(Y.shape) > 1:
+                        n_classes = Y.shape[-1]
+                    else:
+                        n_classes = 1
+                    supervised_output = Dense(n_classes, activation='linear',
                                               name='supervised')(anchor_embedding)
 
                 final_network = Model(inputs=self.model_.inputs,
