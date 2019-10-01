@@ -25,7 +25,7 @@ each integer corresponding to a class.
 
 
     import numpy as np
-    from keras.datasets import mnist
+    from tensorflow.keras.datasets import mnist
     from ivis import Ivis
 
     (X_train, Y_train), (X_test, Y_test) = mnist.load_data()

@@ -5,10 +5,10 @@ from .nn.callbacks import ModelCheckpoint
 from .nn.losses import triplet_loss, is_categorical, is_multiclass, is_hinge
 from .data.knn import build_annoy_index
 
-from keras.callbacks import EarlyStopping
-from keras.models import load_model, Model
-from keras.layers import Dense, Input
-from keras import regularizers
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.models import load_model, Model
+from tensorflow.keras.layers import Dense, Input
+from tensorflow.keras import regularizers
 import numpy as np
 
 from sklearn.base import BaseEstimator

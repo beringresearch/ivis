@@ -16,7 +16,7 @@ a concern, dynamically generated triplets can be useful.
 import numpy as np
 from .knn import extract_knn
 from annoy import AnnoyIndex
-from keras.utils import Sequence
+from tensorflow.keras.utils import Sequence
 from scipy.sparse import issparse
 
 

@@ -1,7 +1,7 @@
 from ivis.nn import losses
 from ivis.nn.losses import triplet_loss, get_loss_functions
 
-from keras import backend as K
+from tensorflow.keras import backend as K
 import numpy as np
 import tensorflow as tf
 

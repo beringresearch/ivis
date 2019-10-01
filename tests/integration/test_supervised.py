@@ -1,5 +1,5 @@
-from keras.datasets import boston_housing
-from keras.utils import to_categorical
+from tensorflow.keras.datasets import boston_housing
+from tensorflow.keras.utils import to_categorical
 from ivis import Ivis
 import numpy as np
 import pytest
@@ -64,12 +64,8 @@ def test_svm_score_samples():
     ivis_iris = Ivis(k=15, batch_size=16, epochs=5,
                      supervision_metric=supervision_metric)
 
-    # Incorrectly formatted labels from SVM
-    with pytest.raises(ValueError):
-        embeddings = ivis_iris.fit_transform(x, y)
-
-    # Correctly formatted labels train successfully
-    y = to_categorical(y) * 2 - 1
+    # Correctly formatted one-hot labels train successfully
+    y = to_categorical(y)
     embeddings = ivis_iris.fit_transform(x, y)
 
     y_pred = ivis_iris.score_samples(x)

@@ -23,7 +23,7 @@ integers with each integer corresponding to a class.
 ::
 
     import numpy as np
-    from keras.datasets import mnist
+    from tensorflow.keras.datasets import mnist
     from ivis import Ivis
 
     (X_train, Y_train), (X_test, Y_test)  = mnist.load_data()
@@ -106,8 +106,8 @@ keras utils.
 
 ::
 
-    from keras.datasets import mnist
-    from keras.utils import to_categorical
+    from tensorflow.keras.datasets import mnist
+    from tensorflow.keras.utils import to_categorical
     from ivis import Ivis
     import numpy as np
 
@@ -167,7 +167,7 @@ the mean-absolute-error supervised metric (mae).
 ::
 
     from ivis import Ivis
-    from keras.datasets import boston_housing
+    from tensorflow.keras.datasets import boston_housing
     import numpy as np
 
     (X_train, Y_train), (X_test, Y_test) = boston_housing.load_data()

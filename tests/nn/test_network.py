@@ -1,8 +1,8 @@
 from ivis.nn.network import get_base_networks, base_network, triplet_network
 
-import keras
-from keras.models import Model, Sequential
-from keras.layers import Dense
+from tensorflow import keras
+from tensorflow.keras.models import Model, Sequential
+from tensorflow.keras.layers import Dense
 import numpy as np
 
 def test_base_networks():

@@ -1,10 +1,10 @@
 """ Creates a Siamese Dense Neural Network with three subnetworks """
 
-from keras.models import Model
-from keras.layers import Input, Dense, AlphaDropout, Lambda
-from keras import backend as K
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input, Dense, AlphaDropout, Lambda
+from tensorflow.keras import backend as K
 
-from keras.regularizers import l2
+from tensorflow.keras.regularizers import l2
 
 
 def triplet_network(base_network, embedding_dims=2, embedding_l2=0.0):
