@@ -129,6 +129,8 @@ class Ivis(BaseEstimator):
             state['supervised_model_'] = None
         if 'callbacks' in state:
             state['callbacks'] = []
+        if not isinstance(state['model_def'], str):
+            state['model_def'] = None
         return state
 
     def _fit(self, X, Y=None, shuffle_mode=True):
