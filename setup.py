@@ -21,7 +21,6 @@ setup(name='ivis',
       packages=find_packages(),
       install_requires=[
           'tensorflow',
-          'keras',
           'numpy',
           'scikit-learn',
           'annoy>=1.15.2',
