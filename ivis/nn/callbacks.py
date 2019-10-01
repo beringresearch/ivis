@@ -1,4 +1,4 @@
-from keras.callbacks import Callback
+from tensorflow.keras.callbacks import Callback
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
 import io
@@ -79,7 +79,7 @@ class EmbeddingsLogging(Callback):
     ::
         from ivis.nn.callbacks import EmbeddingsLogging
         from ivis import Ivis
-        from keras.datasets import mnsit
+        from tensorflow.keras.datasets import mnsit
 
         (X_train, Y_train), (X_test, Y_test)  = mnist.load_data()
 
@@ -131,7 +131,7 @@ class EmbeddingsImage(Callback):
     ::
         from ivis.nn.callbacks import EmbeddingsImage
         from ivis import Ivis
-        from keras.datasets import mnsit
+        from tensorflow.keras.datasets import mnsit
 
         (X_train, Y_train), (X_test, Y_test)  = mnist.load_data()
 
@@ -204,7 +204,7 @@ class TensorBoardEmbeddingsImage(Callback):
     ::
         from ivis.nn.callbacks import TensorBoardEmbeddingsImage
         from ivis import Ivis
-        from keras.datasets import mnsit
+        from tensorflow.keras.datasets import mnsit
 
         (X_train, Y_train), (X_test, Y_test)  = mnist.load_data()
 

@@ -2,9 +2,9 @@
     All loss function variants are accessible through the `triplet_loss` function by specifying the distance as a string.
 """
 
-from keras import backend as K
+from tensorflow.keras import backend as K
 import tensorflow as tf
-import keras
+from tensorflow import keras
 
 
 def triplet_loss(distance='pn', margin=1):

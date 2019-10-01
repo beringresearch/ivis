@@ -55,7 +55,7 @@ other hyperparameters are left at their default values.
 
 .. code:: python
 
-    from keras.utils.io_utils import HDF5Matrix
+    from tensorflow.keras.utils import HDF5Matrix
 
     X = HDF5Matrix(h5_filepath, 'data')
     y = HDF5Matrix(h5_filepath, 'labels')

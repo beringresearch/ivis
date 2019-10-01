@@ -1,8 +1,8 @@
 import h5py
 from ivis import Ivis
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.utils.io_utils import HDF5Matrix
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.utils import HDF5Matrix
 import numpy as np
 import pytest
 import os
