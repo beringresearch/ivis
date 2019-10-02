@@ -79,6 +79,8 @@ class Ivis(BaseEstimator):
     :param list[keras.callbacks.Callback] callbacks: List of keras Callbacks to
         pass model during training, such as the TensorBoard callback. A set of
         ivis-specific callbacks are provided in the ivis.nn.callbacks module.
+    :param bool eager_execution: Whether to use eager execution with TensorFlow.
+        Disabled by default, as training is much faster with this option off. 
     :param int verbose: Controls the volume of logging output the model
         produces when training. When set to 0, silences outputs, when above 0
         will print outputs.
