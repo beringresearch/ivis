@@ -93,7 +93,7 @@ class Ivis(BaseEstimator):
                  precompute=True, model='default',
                  supervision_metric='sparse_categorical_crossentropy',
                  supervision_weight=0.5, annoy_index_path=None,
-                 callbacks=[], verbose=1):
+                 callbacks=[], eager_execution=False, verbose=1):
 
         self.embedding_dims = embedding_dims
         self.k = k
@@ -117,6 +117,9 @@ class Ivis(BaseEstimator):
         for callback in self.callbacks:
             if isinstance(callback, ModelCheckpoint):
                 callback = callback.register_ivis_model(self)
+        self.eager_execution = eager_execution
+        if not eager_execution:
+            tf.compat.v1.disable_eager_execution()
         self.verbose = verbose
 
     def __getstate__(self):
