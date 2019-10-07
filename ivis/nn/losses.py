@@ -33,6 +33,17 @@ def get_loss_functions(margin=1):
     return losses
 
 
+def semi_supervised_loss(loss_function):
+    def new_loss_function(y_true, y_pred):
+        mask = tf.cast(~tf.math.equal(y_true, -1), tf.float32)
+        y_true_pos = tf.nn.relu(y_true)
+        loss = loss_function(y_true_pos, y_pred)
+        masked_loss = loss * mask
+        batch_loss = tf.math.reduce_mean(masked_loss)
+        return batch_loss
+    return new_loss_function
+
+
 def is_hinge(supervised_loss):
     loss = keras.losses.get(supervised_loss)
     if loss in get_hinge_losses():

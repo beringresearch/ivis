@@ -3,8 +3,10 @@ from .data.triplet_generators import generator_from_index
 from .nn.network import triplet_network, base_network
 from .nn.callbacks import ModelCheckpoint
 from .nn.losses import triplet_loss, is_categorical, is_multiclass, is_hinge
+from .nn.losses import semi_supervised_loss
 from .data.knn import build_annoy_index
 
+from tensorflow import keras
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.models import load_model, Model
 from tensorflow.keras.layers import Dense, Input
@@ -174,39 +176,43 @@ class Ivis(BaseEstimator):
                         if not is_hinge(self.supervision_metric):
                             # Binary logistic classifier
                             if len(Y.shape) > 1:
-                                n_classes = Y.shape[-1]
+                                self.n_classes = Y.shape[-1]
                             else:
-                                n_classes = 1
-                            supervised_output = Dense(n_classes, activation='sigmoid',
+                                self.n_classes = 1
+                            supervised_output = Dense(self.n_classes, activation='sigmoid',
                                                       name='supervised')(anchor_embedding)
                         else:
                             # Binary Linear SVM output
                             if len(Y.shape) > 1:
-                                n_classes = Y.shape[-1]
+                                self.n_classes = Y.shape[-1]
                             else:
-                                n_classes = 1
-                            supervised_output = Dense(n_classes, activation='linear',
+                                self.n_classes = 1
+                            supervised_output = Dense(self.n_classes, activation='linear',
                                                       name='supervised',
                                                       kernel_regularizer=regularizers.l2())(anchor_embedding)
                     else:
-                        n_classes = len(np.unique(Y, axis=0))
                         if not is_hinge(self.supervision_metric):
+                            self.n_classes = len(np.unique(Y[Y != np.array(-1)]))
                             # Softmax classifier
-                            supervised_output = Dense(n_classes, activation='softmax',
+                            supervised_output = Dense(self.n_classes, activation='softmax',
                                                       name='supervised')(anchor_embedding)
                         else:
                             # Multiclass Linear SVM output
-                            supervised_output = Dense(n_classes, activation='linear',
+                            supervised_output = Dense(self.n_classes, activation='linear',
                                                       name='supervised',
                                                       kernel_regularizer=regularizers.l2())(anchor_embedding)
                 else:
                     # Regression
                     if len(Y.shape) > 1:
-                        n_classes = Y.shape[-1]
+                        self.n_classes = Y.shape[-1]
                     else:
-                        n_classes = 1
-                    supervised_output = Dense(n_classes, activation='linear',
+                        self.n_classes = 1
+                    supervised_output = Dense(self.n_classes, activation='linear',
                                               name='supervised')(anchor_embedding)
+
+                supervised_loss = keras.losses.get(self.supervision_metric)
+                if self.supervision_metric == 'sparse_categorical_crossentropy':
+                    supervised_loss = semi_supervised_loss(supervised_loss)
 
                 final_network = Model(inputs=self.model_.inputs,
                                       outputs=[self.model_.output,
@@ -216,7 +222,7 @@ class Ivis(BaseEstimator):
                     optimizer='adam',
                     loss={
                         'stacked_triplets': triplet_loss_func,
-                        'supervised': self.supervision_metric
+                        'supervised': supervised_loss
                          },
                     loss_weights={
                         'stacked_triplets': 1 - self.supervision_weight,
@@ -236,7 +242,6 @@ class Ivis(BaseEstimator):
 
         hist = self.model_.fit_generator(
             datagen,
-            steps_per_epoch=X.shape[0] // self.batch_size,
             epochs=self.epochs,
             callbacks=[callback for callback in self.callbacks] +
                       [EarlyStopping(monitor=loss_monitor,
