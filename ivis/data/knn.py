@@ -8,14 +8,13 @@ from collections import namedtuple
 from operator import attrgetter
 from tqdm import tqdm
 import time
-import platform
 
 
-def build_annoy_index(X, path, ntrees=50, verbose=1):
+def build_annoy_index(X, path, ntrees=50, build_index_on_disk=True, verbose=1):
 
     index = AnnoyIndex(X.shape[1], metric='angular')
-    if platform.system() != 'Windows':
-        index.on_disk_build(path)
+    if build_index_on_disk:
+        index.on_disk_build(path)        
 
     if issparse(X):
         for i in tqdm(range(X.shape[0]), disable=verbose < 1):
@@ -28,7 +27,7 @@ def build_annoy_index(X, path, ntrees=50, verbose=1):
 
     # Build n trees
     index.build(ntrees)
-    if platform.system() == 'Windows':
+    if not build_index_on_disk:
         index.save(path)
 
     return index
