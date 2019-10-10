@@ -199,11 +199,13 @@ class Ivis(BaseEstimator):
                                                       kernel_regularizer=regularizers.l2())(anchor_embedding)
                     else:
                         if not is_hinge(self.supervision_metric):
+                            # Is there a requirement for a specific sparse CE n_classes case?
                             self.n_classes = len(np.unique(Y[Y != np.array(-1)]))
                             # Softmax classifier
                             supervised_output = Dense(self.n_classes, activation='softmax',
                                                       name='supervised')(anchor_embedding)
                         else:
+                            self.n_classes = len(np.unique(Y, axis=0))
                             # Multiclass Linear SVM output
                             supervised_output = Dense(self.n_classes, activation='linear',
                                                       name='supervised',
