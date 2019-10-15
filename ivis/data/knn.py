@@ -14,7 +14,7 @@ def build_annoy_index(X, path, ntrees=50, build_index_on_disk=True, verbose=1):
 
     index = AnnoyIndex(X.shape[1], metric='angular')
     if build_index_on_disk:
-        index.on_disk_build(path)        
+        index.on_disk_build(path)
 
     if issparse(X):
         for i in tqdm(range(X.shape[0]), disable=verbose < 1):
@@ -24,13 +24,17 @@ def build_annoy_index(X, path, ntrees=50, build_index_on_disk=True, verbose=1):
         for i in tqdm(range(X.shape[0]), disable=verbose < 1):
             v = X[i]
             index.add_item(i, v)
-
-    # Build n trees
-    index.build(ntrees)
-    if not build_index_on_disk:
-        index.save(path)
-
-    return index
+    
+    try:
+        index.build(ntrees)
+    except Exception:
+        msg = ("Error building Annoy Index. Passing on_disk_build=False"
+                " may solve the issue, especially on Windows.")
+        raise IndexBuildingError(msg)
+    else:
+        if not build_index_on_disk:
+            index.save(path)
+        return index
 
 
 def extract_knn(X, index_filepath, k=150, search_k=-1, verbose=1):
@@ -117,3 +121,7 @@ class KNN_Worker(Process):
             self.exception = e
         finally:
             self.results_queue.close()
+
+
+class IndexBuildingError(OSError):
+    pass
