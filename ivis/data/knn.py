@@ -58,28 +58,35 @@ def extract_knn(X, index_filepath, k=150, search_k=-1, verbose=1):
         process_pool.append(KNN_Worker(index_filepath, k, search_k, n_dims,
                                        (i, X.shape[0]), results_queue))
 
-    for process in process_pool:
-        process.start()
+    try:
+        for process in process_pool:
+            process.start()
 
-    # Read from queue constantly to prevent it from becoming full
-    with tqdm(total=X.shape[0], disable=verbose < 1) as pbar:
-        neighbour_list = []
-        neighbour_list_length = len(neighbour_list)
-        while any(process.is_alive() for process in process_pool):
+        # Read from queue constantly to prevent it from becoming full
+        with tqdm(total=X.shape[0], disable=verbose < 1) as pbar:
+            neighbour_list = []
+            neighbour_list_length = len(neighbour_list)
+            while any(process.is_alive() for process in process_pool):
+                while not results_queue.empty():
+                    neighbour_list.append(results_queue.get())
+                progress = len(neighbour_list) - neighbour_list_length
+                pbar.update(progress)
+                neighbour_list_length = len(neighbour_list)
+                time.sleep(0.1)
+
             while not results_queue.empty():
                 neighbour_list.append(results_queue.get())
-            progress = len(neighbour_list) - neighbour_list_length
-            pbar.update(progress)
-            neighbour_list_length = len(neighbour_list)
-            time.sleep(0.1)
 
-        while not results_queue.empty():
-            neighbour_list.append(results_queue.get())
+        neighbour_list = sorted(neighbour_list, key=attrgetter('row_index'))
+        neighbour_list = list(map(attrgetter('neighbour_list'), neighbour_list))
 
-    neighbour_list = sorted(neighbour_list, key=attrgetter('row_index'))
-    neighbour_list = list(map(attrgetter('neighbour_list'), neighbour_list))
-
-    return np.array(neighbour_list)
+        return np.array(neighbour_list)
+    
+    except:
+        print('Halting KNN retrieval and cleaning up')
+        for process in process_pool:
+            process.terminate()
+        raise
 
 
 IndexNeighbours = namedtuple('IndexNeighbours', 'row_index neighbour_list')
