@@ -18,6 +18,7 @@ import os
 import shutil
 import multiprocessing
 import tensorflow as tf
+import platform
 
 
 class Ivis(BaseEstimator):
@@ -79,6 +80,10 @@ class Ivis(BaseEstimator):
     :param list[keras.callbacks.Callback] callbacks: List of keras Callbacks to
         pass model during training, such as the TensorBoard callback. A set of
         ivis-specific callbacks are provided in the ivis.nn.callbacks module.
+    :param bool build_index_on_disk: Whether to build the annoy index directly
+        on disk. Building on disk should allow for bigger datasets to be indexed,
+        but may cause issues. If None, on-disk building will be enabled for Linux, 
+        but not Windows due to issues on Windows.
     :param int verbose: Controls the volume of logging output the model
         produces when training. When set to 0, silences outputs, when above 0
         will print outputs.
@@ -91,7 +96,7 @@ class Ivis(BaseEstimator):
                  precompute=True, model='default',
                  supervision_metric='sparse_categorical_crossentropy',
                  supervision_weight=0.5, annoy_index_path=None,
-                 callbacks=[], verbose=1):
+                 callbacks=[], build_index_on_disk=None, verbose=1):
 
         self.embedding_dims = embedding_dims
         self.k = k
@@ -115,6 +120,10 @@ class Ivis(BaseEstimator):
         for callback in self.callbacks:
             if isinstance(callback, ModelCheckpoint):
                 callback = callback.register_ivis_model(self)
+        if build_index_on_disk is None:
+            self.build_index_on_disk = True if platform.system() != 'Windows' else False
+        else:
+            self.build_index_on_disk = build_index_on_disk
         self.verbose = verbose
 
     def __getstate__(self):
@@ -140,7 +149,9 @@ class Ivis(BaseEstimator):
             if self.verbose > 0:
                 print('Building KNN index')
             build_annoy_index(X, self.annoy_index_path,
-                              ntrees=self.ntrees, verbose=self.verbose)
+                              ntrees=self.ntrees,
+                              build_index_on_disk=self.build_index_on_disk,
+                              verbose=self.verbose)
 
         datagen = generator_from_index(X, Y,
                                        index_path=self.annoy_index_path,
