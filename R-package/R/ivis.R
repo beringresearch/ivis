@@ -37,10 +37,11 @@
 #'                    embedding layer of size 'embedding_dims' will be
 #'                    appended to the end of the network. If a string, a
 #'                    pre-defined network by that name will be used.
-#'                    Possible options are: 'default', 'hinton', 'maaten'.
-#'                    By default, a selu network composed of 3 dense layers
-#'                    of 128 neurons each will be created, followed by an
-#'                    embedding layer of size 'embedding_dims'.
+#'                    Possible options are: 'szubert', 'hinton', 'maaten'.
+#'                    By default the 'szubert' network will be created, which
+#'                    is a selu network composed of 3 dense layers of 128
+#'                    neurons each, followed by an embedding layer of size
+#'                    'embedding_dims'.
 #' @param supervision_metric: str or function. The supervision metric to
 #'                    optimize when training keras in supervised mode. Supports all of the
 #'                    classification or regression losses included with keras, so long as
@@ -71,7 +72,7 @@ ivis <- function(embedding_dims = 2L,
     ntrees = 50L,
     search_k = -1L,
     precompute = TRUE,
-    model = "default",
+    model = "szubert",
     supervision_metric = "sparse_categorical_crossentropy",
     supervision_weight = 0.5,
     annoy_index_path=NULL, verbose=1L){
