@@ -10,7 +10,8 @@ ivis(embedding_dims = 2L, k = 150L, distance = "pn",
   model = "szubert",
   supervision_metric = "sparse_categorical_crossentropy",
   supervision_weight = 0.5,
-  annoy_index_path = NULL, verbose = 1L)
+  annoy_index_path = NULL,
+  build_index_on_disk = NULL, verbose = 1L)
 }
 \arguments{
 \item{embedding_dims:}{Number of dimensions in the embedding space}
@@ -82,6 +83,11 @@ saved on disk. If provided, the annoy index file will
 be used. Otherwise, a new index will be generated and
 saved to disk in the current directory as
 'annoy.index'.}
+
+\item{build_index_on_disk:}{Whether to build the annoy index directly
+on disk. Building on disk should allow for bigger datasets to be indexed,
+but may cause issues. If None, on-disk building will be enabled for Linux,
+but not Windows due to issues on Windows.}
 
 \item{verbose:}{Controls the volume of logging output the model
 produces when training. When set to 0, silences

@@ -57,6 +57,10 @@
 #'                    be used. Otherwise, a new index will be generated and
 #'                    saved to disk in the current directory as
 #'                    'annoy.index'.
+#' @param build_index_on_disk: Whether to build the annoy index directly
+#'                    on disk. Building on disk should allow for bigger datasets to be
+#'                    indexed, but may cause issues. If None, on-disk building will be
+#'                    enabled for Linux, but not Windows due to issues on Windows.
 #' @param verbose:    Controls the volume of logging output the model
 #'                    produces when training. When set to 0, silences
 #'                    outputs, when above 0 will print outputs.
@@ -75,7 +79,8 @@ ivis <- function(embedding_dims = 2L,
     model = "szubert",
     supervision_metric = "sparse_categorical_crossentropy",
     supervision_weight = 0.5,
-    annoy_index_path=NULL, verbose=1L){
+    annoy_index_path=NULL,
+    build_index_on_disk=NULL, verbose=1L){
 
 
     #X <- data.matrix(X)
@@ -98,6 +103,7 @@ ivis <- function(embedding_dims = 2L,
                               supervision_metric=supervision_metric,
                               supervision_weight=supervision_weight,
                               annoy_index_path=annoy_index_path,
+                              build_index_on_disk=build_index_on_disk,
                               verbose=verbose)
   
     return(model)
