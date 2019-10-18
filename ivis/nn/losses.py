@@ -39,8 +39,7 @@ def semi_supervised_loss(loss_function):
         y_true_pos = tf.nn.relu(y_true)
         loss = loss_function(y_true_pos, y_pred)
         masked_loss = loss * mask
-        batch_loss = tf.math.reduce_mean(masked_loss)
-        return batch_loss
+        return masked_loss
     return new_loss_function
 
 
