@@ -79,8 +79,6 @@ class Ivis(BaseEstimator):
     :param list[keras.callbacks.Callback] callbacks: List of keras Callbacks to
         pass model during training, such as the TensorBoard callback. A set of
         ivis-specific callbacks are provided in the ivis.nn.callbacks module.
-    :param bool eager_execution: Whether to use eager execution with TensorFlow.
-        Disabled by default, as training is much faster with this option off. 
     :param int verbose: Controls the volume of logging output the model
         produces when training. When set to 0, silences outputs, when above 0
         will print outputs.
@@ -93,7 +91,7 @@ class Ivis(BaseEstimator):
                  precompute=True, model='default',
                  supervision_metric='sparse_categorical_crossentropy',
                  supervision_weight=0.5, annoy_index_path=None,
-                 callbacks=[], eager_execution=False, verbose=1):
+                 callbacks=[], verbose=1):
 
         self.embedding_dims = embedding_dims
         self.k = k
@@ -117,9 +115,6 @@ class Ivis(BaseEstimator):
         for callback in self.callbacks:
             if isinstance(callback, ModelCheckpoint):
                 callback = callback.register_ivis_model(self)
-        self.eager_execution = eager_execution
-        if not eager_execution:
-            tf.compat.v1.disable_eager_execution()
         self.verbose = verbose
 
     def __getstate__(self):

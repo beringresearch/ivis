@@ -56,8 +56,6 @@
 #'                    be used. Otherwise, a new index will be generated and
 #'                    saved to disk in the current directory as
 #'                    'annoy.index'.
-#' @param eager_execution: Whether to use eager execution with TensorFlow.
-#                     Disabled by default, as training is much faster with this option off. 
 #' @param verbose:    Controls the volume of logging output the model
 #'                    produces when training. When set to 0, silences
 #'                    outputs, when above 0 will print outputs.
@@ -76,7 +74,6 @@ ivis <- function(embedding_dims = 2L,
     model = "default",
     supervision_metric = "sparse_categorical_crossentropy",
     supervision_weight = 0.5,
-    eager_execution = FALSE,
     annoy_index_path=NULL, verbose=1L){
 
 
@@ -100,7 +97,6 @@ ivis <- function(embedding_dims = 2L,
                               supervision_metric=supervision_metric,
                               supervision_weight=supervision_weight,
                               annoy_index_path=annoy_index_path,
-                              eager_execution=eager_execution,
                               verbose=verbose)
   
     return(model)
