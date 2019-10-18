@@ -82,12 +82,15 @@ class Ivis(BaseEstimator):
     :param list[keras.callbacks.Callback] callbacks: List of keras Callbacks to
         pass model during training, such as the TensorBoard callback. A set of
         ivis-specific callbacks are provided in the ivis.nn.callbacks module.
+<<<<<<< HEAD
     :param bool eager_execution: Whether to use eager execution with TensorFlow.
         Disabled by default, as training is much faster with this option off.
     :param bool build_index_on_disk: Whether to build the annoy index directly
         on disk. Building on disk should allow for bigger datasets to be indexed,
         but may cause issues. If None, on-disk building will be enabled for Linux, 
         but not Windows due to issues on Windows.
+=======
+>>>>>>> 3b143aa (Remove eager execution parameter from the Ivis object, eager execution performance issues were addressed by switching to "fit" function over "fit_generator".)
     :param int verbose: Controls the volume of logging output the model
         produces when training. When set to 0, silences outputs, when above 0
         will print outputs.
@@ -100,8 +103,12 @@ class Ivis(BaseEstimator):
                  precompute=True, model='default',
                  supervision_metric='sparse_categorical_crossentropy',
                  supervision_weight=0.5, annoy_index_path=None,
+<<<<<<< HEAD
                  callbacks=[], eager_execution=False,
                  build_index_on_disk=None, verbose=1):
+=======
+                 callbacks=[], verbose=1):
+>>>>>>> 3b143aa (Remove eager execution parameter from the Ivis object, eager execution performance issues were addressed by switching to "fit" function over "fit_generator".)
 
         self.embedding_dims = embedding_dims
         self.k = k
@@ -125,13 +132,6 @@ class Ivis(BaseEstimator):
         for callback in self.callbacks:
             if isinstance(callback, ModelCheckpoint):
                 callback = callback.register_ivis_model(self)
-        self.eager_execution = eager_execution
-        if not eager_execution:
-            tf.compat.v1.disable_eager_execution()
-        if build_index_on_disk is None:
-            self.build_index_on_disk = True if platform.system() != 'Windows' else False
-        else:
-            self.build_index_on_disk = build_index_on_disk
         self.verbose = verbose
 
     def __getstate__(self):
