@@ -260,7 +260,7 @@ class Ivis(BaseEstimator):
         if self.verbose > 0:
             print('Training neural network')
 
-        hist = self.model_.fit_generator(
+        hist = self.model_.fit(
             datagen,
             epochs=self.epochs,
             callbacks=[callback for callback in self.callbacks] +
