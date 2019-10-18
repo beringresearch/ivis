@@ -5,7 +5,7 @@
 \title{IVIS algorithm}
 \usage{
 ivis(embedding_dims = 2L, k = 150L, distance = "pn",
-  batch_size = 128L, epochs = 1000L, n_epochs_without_progress = 50L,
+  batch_size = 128L, epochs = 1000L, n_epochs_without_progress = 20L,
   margin = 1, ntrees = 50L, search_k = -1L, precompute = TRUE,
   model = "szubert",
   supervision_metric = "sparse_categorical_crossentropy",

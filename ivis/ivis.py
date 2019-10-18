@@ -99,7 +99,7 @@ class Ivis(BaseEstimator):
     """
 
     def __init__(self, embedding_dims=2, k=150, distance='pn', batch_size=128,
-                 epochs=1000, n_epochs_without_progress=50,
+                 epochs=1000, n_epochs_without_progress=20,
                  margin=1, ntrees=50, search_k=-1,
                  precompute=True, model='szubert',
                  supervision_metric='sparse_categorical_crossentropy',
