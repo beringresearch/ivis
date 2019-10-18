@@ -9,7 +9,7 @@ ivis(embedding_dims = 2L, k = 150L, distance = "pn",
   margin = 1, ntrees = 50L, search_k = -1L, precompute = TRUE,
   model = "szubert",
   supervision_metric = "sparse_categorical_crossentropy",
-  supervision_weight = 0.5, eager_execution = FALSE,
+  supervision_weight = 0.5,
   annoy_index_path = NULL, verbose = 1L)
 }
 \arguments{
@@ -82,8 +82,6 @@ saved on disk. If provided, the annoy index file will
 be used. Otherwise, a new index will be generated and
 saved to disk in the current directory as
 'annoy.index'.}
-
-\item{eager_execution:}{Whether to use eager execution with TensorFlow.}
 
 \item{verbose:}{Controls the volume of logging output the model
 produces when training. When set to 0, silences
