@@ -37,8 +37,8 @@ def triplet_network(base_network, embedding_dims=2, embedding_l2=0.0):
 def base_network(model_name, input_shape):
     '''Return the defined base_network defined by the model_name string.
     '''
-    if model_name == 'default':
-        return default_base_network(input_shape)
+    if model_name == 'szubert':
+        return szubert_base_network(input_shape)
     elif model_name == 'hinton':
         return hinton_base_network(input_shape)
     elif model_name == 'maaten':
@@ -49,10 +49,10 @@ def base_network(model_name, input_shape):
 
 
 def get_base_networks():
-    return ['default', 'hinton', 'maaten']
+    return ['szubert', 'hinton', 'maaten']
 
 
-def default_base_network(input_shape):
+def szubert_base_network(input_shape):
     '''Base network to be shared (eq. to feature extraction).
     '''
     inputs = Input(shape=input_shape)
