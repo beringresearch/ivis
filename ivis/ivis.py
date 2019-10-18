@@ -340,7 +340,7 @@ class Ivis(BaseEstimator):
         if self.supervised_model_ is None:
             raise Exception("Model was not trained in classification mode.")
 
-        softmax_output = self.supervised_model_.predict(X)
+        softmax_output = self.supervised_model_.predict(X, verbose=self.verbose)
         return softmax_output
 
     def save_model(self, folder_path, overwrite=False):
