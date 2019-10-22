@@ -40,7 +40,9 @@ def semi_supervised_loss(loss_function):
         loss = loss_function(y_true_pos, y_pred)
         masked_loss = loss * mask
         return masked_loss
-    return new_loss_function
+    new_func = new_loss_function
+    new_func.__name__ = loss_function.__name__
+    return new_func
 
 
 def is_hinge(supervised_loss):
