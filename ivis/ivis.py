@@ -61,9 +61,10 @@ class Ivis(BaseEstimator):
         triplet loss. If a model object is provided, an embedding layer of size
         'embedding_dims' will be appended to the end of the network.
         If a string, a pre-defined network by that name will be used. Possible
-        options are: 'default', 'hinton', 'maaten'. By default, a selu network
-        composed of 3 dense layers of 128 neurons each will be created,
-        followed by an embedding layer of size 'embedding_dims'.
+        options are: 'szubert', 'hinton', 'maaten'. By default the 'szubert'
+        network will be created, which is a selu network composed of 3 dense
+        layers of 128 neurons each, followed by an embedding layer of size
+        'embedding_dims'.
     :param str supervision_metric: str or function. The supervision metric to
         optimize when training keras in supervised mode. Supports all of the
         classification or regression losses included with keras, so long as
@@ -80,8 +81,6 @@ class Ivis(BaseEstimator):
     :param list[keras.callbacks.Callback] callbacks: List of keras Callbacks to
         pass model during training, such as the TensorBoard callback. A set of
         ivis-specific callbacks are provided in the ivis.nn.callbacks module.
-    :param bool eager_execution: Whether to use eager execution with TensorFlow.
-        Disabled by default, as training is much faster with this option off.
     :param bool build_index_on_disk: Whether to build the annoy index directly
         on disk. Building on disk should allow for bigger datasets to be indexed,
         but may cause issues. If None, on-disk building will be enabled for Linux, 
@@ -93,13 +92,12 @@ class Ivis(BaseEstimator):
     """
 
     def __init__(self, embedding_dims=2, k=150, distance='pn', batch_size=128,
-                 epochs=1000, n_epochs_without_progress=50,
+                 epochs=1000, n_epochs_without_progress=20,
                  margin=1, ntrees=50, search_k=-1,
-                 precompute=True, model='default',
+                 precompute=True, model='szubert',
                  supervision_metric='sparse_categorical_crossentropy',
                  supervision_weight=0.5, annoy_index_path=None,
-                 callbacks=[], eager_execution=False,
-                 build_index_on_disk=None, verbose=1):
+                 callbacks=[], build_index_on_disk=None, verbose=1):
 
         self.embedding_dims = embedding_dims
         self.k = k
@@ -123,9 +121,6 @@ class Ivis(BaseEstimator):
         for callback in self.callbacks:
             if isinstance(callback, ModelCheckpoint):
                 callback = callback.register_ivis_model(self)
-        self.eager_execution = eager_execution
-        if not eager_execution:
-            tf.compat.v1.disable_eager_execution()
         if build_index_on_disk is None:
             self.build_index_on_disk = True if platform.system() != 'Windows' else False
         else:
@@ -253,9 +248,8 @@ class Ivis(BaseEstimator):
         if self.verbose > 0:
             print('Training neural network')
 
-        hist = self.model_.fit_generator(
+        hist = self.model_.fit(
             datagen,
-            steps_per_epoch=X.shape[0] // self.batch_size,
             epochs=self.epochs,
             callbacks=[callback for callback in self.callbacks] +
                       [EarlyStopping(monitor=loss_monitor,

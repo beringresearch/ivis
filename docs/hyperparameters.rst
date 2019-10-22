@@ -12,9 +12,10 @@ Hyperparameter Selection
    model object is provided, an embedding layer of size
    ``embedding_dims`` will be appended to the end of the network. If a
    string is provided, a pre-defined network by that name will be used.
-   Possible options are: 'default', 'hinton', 'maaten'. By default, a
-   selu network composed of 3 dense layers of 128 neurons each will be
-   created, followed by an embedding layer of size 'embedding\_dims'.
+   Possible options are: 'szubert', 'hinton', 'maaten'. By default the
+   'szubert' network will be created, which is a selu network composed
+   of 3 dense layers of 128 neurons each, followed by an embedding layer
+   of size 'embedding\_dims'.
 
 ``k`` , ``n_epochs_without_progress``, and ``model`` are tunable parameters that should be selected on
 the basis of dataset size and complexity.  The following table summarizes our findings:
@@ -28,8 +29,8 @@ the basis of dataset size and complexity.  The following table summarizes our fi
     10000-50000, 15-150, 10-20, "maaten"
     50K-100K, 15-150, 10-15, "maaten"
     100K-500K, 15-150, 5-10, "maaten"
-    500K-1M, 15-150, 3-5, "default"
-    > 1M,15-150, 2-3, "default"
+    500K-1M, 15-150, 3-5, "szubert"
+    > 1M,15-150, 2-3, "szubert"
 
 
 We will now look at each of these parameters in turn.
@@ -96,13 +97,13 @@ dimensionality of outputs.
 model <https://keras.io>`__. This flexibility allows ivis to be trained
 using complex architectures and patterns, including convolutions. Out of
 the box, ivis supports three styles of baseline architectures -
-**default**, **hinton**, and **maaten**. This can be passed as string
+**szubert**, **hinton**, and **maaten**. This can be passed as string
 values to the ``model`` parameter.
 
-'default'
+'szubert'
 ~~~~~~~~~
 
-The **default** network has three dense layers of 128 neurons followed by a
+The **szubert** network has three dense layers of 128 neurons followed by a
 final embedding layer (128-128-128). The size of the embedding layer reflects 
 the desired dimensionality of outputs. The layers preceding the embedding
 layer use the SELU activation function, which gives the network a
@@ -138,7 +139,7 @@ Let's examine each architectural option in greater detail:
 
 .. code:: ipython3
 
-    architecture = ['default', 'hinton', 'maaten']
+    architecture = ['szubert', 'hinton', 'maaten']
     embeddings = {}
     for a in architecture:
         ivis = Ivis(k=150).fit(X_poly)
@@ -165,7 +166,7 @@ Let's examine each architectural option in greater detail:
 Selecting an appropriate baseline architecture is a data-driven task.
 Three unique architectures that are shipped with ivis perform
 consistently well across a wide array of tasks. A general rule of thumb
-in our own experiments is to use the **default** network for
+in our own experiments is to use the **szubert** network for
 computationally-intensive processing on large datasets (>1 million
 observations) and select **maaten** architecture for smaller real-world
 datasets.
