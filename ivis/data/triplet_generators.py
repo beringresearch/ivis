@@ -89,8 +89,7 @@ class AnnoyTripletGenerator(Sequence):
 
         triplet_batch = np.array(triplet_batch)
 
-        return ([triplet_batch[:, 0], triplet_batch[:, 1], triplet_batch[:, 2]],
-                placeholder_labels)
+        return tuple([triplet_batch[:, 0], triplet_batch[:, 1], triplet_batch[:, 2]]), placeholder_labels
 
     def knn_triplet_from_annoy_index(self, row_index):
         """ A random (unweighted) positive example chosen. """
@@ -132,10 +131,7 @@ class KnnTripletGenerator(Sequence):
             triplet_batch = [[e.toarray()[0] for e in t] for t in triplet_batch]
         triplet_batch = np.array(triplet_batch)
 
-        return ([triplet_batch[:, 0],
-                 triplet_batch[:, 1],
-                 triplet_batch[:, 2]],
-                placeholder_labels)
+        return tuple([triplet_batch[:, 0], triplet_batch[:, 1], triplet_batch[:, 2]]), placeholder_labels
 
     def knn_triplet_from_neighbour_list(self, row_index, neighbour_list):
         """ A random (unweighted) positive example chosen. """
@@ -181,8 +177,7 @@ class LabeledAnnoyTripletGenerator(Sequence):
 
         triplet_batch = np.array(triplet_batch)
 
-        return ([triplet_batch[:, 0], triplet_batch[:, 1], triplet_batch[:, 2]],
-                [np.array(label_batch), np.array(label_batch)])
+        return tuple([triplet_batch[:, 0], triplet_batch[:, 1], triplet_batch[:, 2]]), tuple([np.array(label_batch), np.array(label_batch)])
 
     def knn_triplet_from_annoy_index(self, row_index):
         """ A random (unweighted) positive example chosen. """
@@ -225,10 +220,7 @@ class LabeledKnnTripletGenerator(Sequence):
 
         triplet_batch = np.array(triplet_batch)
 
-        return ([triplet_batch[:, 0],
-                 triplet_batch[:, 1],
-                 triplet_batch[:, 2]],
-                [np.array(label_batch), np.array(label_batch)])
+        return tuple([triplet_batch[:, 0], triplet_batch[:, 1], triplet_batch[:, 2]]), tuple([np.array(label_batch), np.array(label_batch)])
 
     def knn_triplet_from_neighbour_list(self, row_index, neighbour_list):
         """ A random (unweighted) positive example chosen. """

@@ -5,12 +5,13 @@
 \title{IVIS algorithm}
 \usage{
 ivis(embedding_dims = 2L, k = 150L, distance = "pn",
-  batch_size = 128L, epochs = 1000L, n_epochs_without_progress = 50L,
+  batch_size = 128L, epochs = 1000L, n_epochs_without_progress = 20L,
   margin = 1, ntrees = 50L, search_k = -1L, precompute = TRUE,
-  model = "default",
+  model = "szubert",
   supervision_metric = "sparse_categorical_crossentropy",
-  supervision_weight = 0.5, eager_execution = FALSE,
-  annoy_index_path = NULL, verbose = 1L)
+  supervision_weight = 0.5,
+  annoy_index_path = NULL,
+  build_index_on_disk = NULL, verbose = 1L)
 }
 \arguments{
 \item{embedding_dims:}{Number of dimensions in the embedding space}
@@ -60,9 +61,10 @@ using triplet loss. If a model object is provided, an
 embedding layer of size 'embedding_dims' will be
 appended to the end of the network. If a string, a
 pre-defined network by that name will be used.
-Possible options are: 'default', 'hinton', 'maaten'.
-By default, a selu network composed of 3 dense layers
-of 128 neurons each will be created, followed by an
+Possible options are: 'szubert', 'hinton', 'maaten'.
+By default the 'szubert' network will be created,
+which is a selu network composed of 3 dense
+layers of 128 neurons each, followed by an
 embedding layer of size 'embedding_dims'.}
 
 \item{supervision_metric:}{str or function. The supervision metric to
@@ -82,7 +84,10 @@ be used. Otherwise, a new index will be generated and
 saved to disk in the current directory as
 'annoy.index'.}
 
-\item{eager_execution:}{Whether to use eager execution with TensorFlow.}
+\item{build_index_on_disk:}{Whether to build the annoy index directly
+on disk. Building on disk should allow for bigger datasets to be indexed,
+but may cause issues. If None, on-disk building will be enabled for Linux,
+but not Windows due to issues on Windows.}
 
 \item{verbose:}{Controls the volume of logging output the model
 produces when training. When set to 0, silences
