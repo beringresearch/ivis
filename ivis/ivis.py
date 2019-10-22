@@ -20,6 +20,7 @@ import os
 import shutil
 import multiprocessing
 import tensorflow as tf
+import platform
 
 
 class Ivis(BaseEstimator):
@@ -82,7 +83,11 @@ class Ivis(BaseEstimator):
         pass model during training, such as the TensorBoard callback. A set of
         ivis-specific callbacks are provided in the ivis.nn.callbacks module.
     :param bool eager_execution: Whether to use eager execution with TensorFlow.
-        Disabled by default, as training is much faster with this option off. 
+        Disabled by default, as training is much faster with this option off.
+    :param bool build_index_on_disk: Whether to build the annoy index directly
+        on disk. Building on disk should allow for bigger datasets to be indexed,
+        but may cause issues. If None, on-disk building will be enabled for Linux, 
+        but not Windows due to issues on Windows.
     :param int verbose: Controls the volume of logging output the model
         produces when training. When set to 0, silences outputs, when above 0
         will print outputs.
@@ -95,7 +100,8 @@ class Ivis(BaseEstimator):
                  precompute=True, model='default',
                  supervision_metric='sparse_categorical_crossentropy',
                  supervision_weight=0.5, annoy_index_path=None,
-                 callbacks=[], eager_execution=False, verbose=1):
+                 callbacks=[], eager_execution=False,
+                 build_index_on_disk=None, verbose=1):
 
         self.embedding_dims = embedding_dims
         self.k = k
@@ -122,6 +128,10 @@ class Ivis(BaseEstimator):
         self.eager_execution = eager_execution
         if not eager_execution:
             tf.compat.v1.disable_eager_execution()
+        if build_index_on_disk is None:
+            self.build_index_on_disk = True if platform.system() != 'Windows' else False
+        else:
+            self.build_index_on_disk = build_index_on_disk
         self.verbose = verbose
 
     def __getstate__(self):
@@ -147,7 +157,9 @@ class Ivis(BaseEstimator):
             if self.verbose > 0:
                 print('Building KNN index')
             build_annoy_index(X, self.annoy_index_path,
-                              ntrees=self.ntrees, verbose=self.verbose)
+                              ntrees=self.ntrees,
+                              build_index_on_disk=self.build_index_on_disk,
+                              verbose=self.verbose)
 
         datagen = generator_from_index(X, Y,
                                        index_path=self.annoy_index_path,
@@ -334,7 +346,7 @@ class Ivis(BaseEstimator):
         if self.supervised_model_ is None:
             raise Exception("Model was not trained in classification mode.")
 
-        softmax_output = self.supervised_model_.predict(X)
+        softmax_output = self.supervised_model_.predict(X, verbose=self.verbose)
         return softmax_output
 
     def save_model(self, folder_path, overwrite=False):
