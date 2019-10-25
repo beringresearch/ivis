@@ -43,6 +43,50 @@ def test_score_samples():
     assert ivis_iris.model_.layers[-1].activation.__name__ == 'softmax'
 
 
+def test_correctly_indexed_classificaton_classes():
+    iris = datasets.load_iris()
+    x = iris.data
+    y = iris.target
+
+    supervision_metric = 'sparse_categorical_crossentropy'
+    ivis_iris = Ivis(k=15, batch_size=16, epochs=5,
+                     supervision_metric=supervision_metric)
+
+    embeddings = ivis_iris.fit_transform(x, y)
+
+
+def test_non_zero_indexed_classificaton_classes():
+    iris = datasets.load_iris()
+    x = iris.data
+    y = iris.target
+
+    # Make labels non-zero indexed
+    y = y + 1
+
+    supervision_metric = 'sparse_categorical_crossentropy'
+    ivis_iris = Ivis(k=15, batch_size=16, epochs=5,
+                     supervision_metric=supervision_metric)
+
+    with pytest.raises(ValueError):
+        embeddings = ivis_iris.fit_transform(x, y)
+
+
+def test_non_consecutive_indexed_classificaton_classes():
+    iris = datasets.load_iris()
+    x = iris.data
+    y = iris.target
+
+    # Make labels non-consecutive indexed
+    y[y == max(y)] = max(y) + 1
+
+    supervision_metric = 'sparse_categorical_crossentropy'
+    ivis_iris = Ivis(k=15, batch_size=16, epochs=5,
+                     supervision_metric=supervision_metric)
+
+    with pytest.raises(ValueError):
+        embeddings = ivis_iris.fit_transform(x, y)
+
+
 def test_invalid_metric():
     iris = datasets.load_iris()
     x = iris.data
