@@ -27,6 +27,7 @@ The latest development version is on `github <https://github.com/beringresearch/
    R Package <r_package>
    Hyperparameter Selection <hyperparameters>
    Supervised Dimensionality Reduction <supervised>
+   Semi-supervised Dimensionality Reduction <semi_supervised>
    Callbacks <callbacks>
    Examples <auto_examples/index>
 

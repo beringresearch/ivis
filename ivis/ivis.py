@@ -282,6 +282,8 @@ class Ivis(BaseEstimator):
             Data to be embedded.
         Y : array, shape (n_samples)
             Optional array for supervised dimentionality reduction.
+            If Y contains -1 labels, and 'sparse_categorical_crossentropy'
+            is the loss function, semi-supervised learning will be used.
 
         Returns
         -------
@@ -300,7 +302,8 @@ class Ivis(BaseEstimator):
             Data to be embedded.
         Y : array, shape (n_samples)
             Optional array for supervised dimentionality reduction.
-
+            If Y contains -1 labels, and 'sparse_categorical_crossentropy'
+            is the loss function, semi-supervised learning will be used.
 
         Returns
         -------
