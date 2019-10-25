@@ -5,6 +5,7 @@
 from tensorflow.keras import backend as K
 import tensorflow as tf
 from tensorflow import keras
+import numpy as np
 
 
 def triplet_loss(distance='pn', margin=1):
@@ -217,3 +218,24 @@ def softmax_ratio_pn(y_true, y_pred):
     softmax = K.softmax(K.concatenate([anchor_positive_distance, minimum_distance]))
     ideal_distance = K.variable([0, 1])
     return K.mean(K.maximum(softmax - ideal_distance, 0))
+
+
+def validate_sparse_labels(Y):
+    if not zero_indexed(Y):
+        raise ValueError('Ensure that your labels are zero-indexed')
+    if not consecutive_indexed(Y):
+        raise ValueError('Ensure that your labels are indexed consecutively')
+
+
+def zero_indexed(Y):
+    if min(abs(Y)) != 0:
+        return False
+    return True
+
+
+def consecutive_indexed(Y):
+    """ Assumes that Y is zero-indexed. """
+    n_classes = len(np.unique(Y[Y != np.array(-1)]))
+    if max(Y) >= n_classes:
+        return False
+    return True
