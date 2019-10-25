@@ -3,7 +3,7 @@ from .data.triplet_generators import generator_from_index
 from .nn.network import triplet_network, base_network
 from .nn.callbacks import ModelCheckpoint
 from .nn.losses import triplet_loss, is_categorical, is_multiclass, is_hinge
-from .nn.losses import semi_supervised_loss
+from .nn.losses import semi_supervised_loss, validate_sparse_labels
 from .data.knn import build_annoy_index
 
 from tensorflow import keras
@@ -206,6 +206,7 @@ class Ivis(BaseEstimator):
                                                       kernel_regularizer=regularizers.l2())(anchor_embedding)
                     else:
                         if not is_hinge(self.supervision_metric):
+                            validate_sparse_labels(Y)
                             self.n_classes = len(np.unique(Y[Y != np.array(-1)]))
                             # Softmax classifier
                             supervised_output = Dense(self.n_classes, activation='softmax',
