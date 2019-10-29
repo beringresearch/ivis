@@ -1,5 +1,6 @@
 from tensorflow.keras.datasets import boston_housing
 from tensorflow.keras.utils import to_categorical
+from tensorflow.keras import losses
 from ivis import Ivis
 import numpy as np
 import pytest
@@ -37,8 +38,53 @@ def test_score_samples():
     assert y_pred.shape[1] == len(np.unique(y))
 
     # Check that loss function and activation are correct
-    assert ivis_iris.model_.loss['supervised'] == supervision_metric
+    loss_name = ivis_iris.model_.loss['supervised'].__name__
+    assert losses.get(loss_name).__name__  == losses.get(supervision_metric).__name__
     assert ivis_iris.model_.layers[-1].activation.__name__ == 'softmax'
+
+
+def test_correctly_indexed_classificaton_classes():
+    iris = datasets.load_iris()
+    x = iris.data
+    y = iris.target
+
+    supervision_metric = 'sparse_categorical_crossentropy'
+    ivis_iris = Ivis(k=15, batch_size=16, epochs=5,
+                     supervision_metric=supervision_metric)
+
+    embeddings = ivis_iris.fit_transform(x, y)
+
+
+def test_non_zero_indexed_classificaton_classes():
+    iris = datasets.load_iris()
+    x = iris.data
+    y = iris.target
+
+    # Make labels non-zero indexed
+    y = y + 1
+
+    supervision_metric = 'sparse_categorical_crossentropy'
+    ivis_iris = Ivis(k=15, batch_size=16, epochs=5,
+                     supervision_metric=supervision_metric)
+
+    with pytest.raises(ValueError):
+        embeddings = ivis_iris.fit_transform(x, y)
+
+
+def test_non_consecutive_indexed_classificaton_classes():
+    iris = datasets.load_iris()
+    x = iris.data
+    y = iris.target
+
+    # Make labels non-consecutive indexed
+    y[y == max(y)] = max(y) + 1
+
+    supervision_metric = 'sparse_categorical_crossentropy'
+    ivis_iris = Ivis(k=15, batch_size=16, epochs=5,
+                     supervision_metric=supervision_metric)
+
+    with pytest.raises(ValueError):
+        embeddings = ivis_iris.fit_transform(x, y)
 
 
 def test_invalid_metric():
@@ -69,7 +115,9 @@ def test_svm_score_samples():
     embeddings = ivis_iris.fit_transform(x, y)
 
     y_pred = ivis_iris.score_samples(x)
-    assert ivis_iris.model_.loss['supervised'] == supervision_metric
+
+    loss_name = ivis_iris.model_.loss['supervised'].__name__
+    assert losses.get(loss_name).__name__ == losses.get(supervision_metric).__name__
     assert ivis_iris.model_.layers[-1].activation.__name__ == 'linear'
     assert ivis_iris.model_.layers[-1].kernel_regularizer is not None
     assert ivis_iris.model_.layers[-1].output_shape[-1] == y.shape[-1]
@@ -86,6 +134,7 @@ def test_regression():
     embeddings = ivis_boston.transform(x_train)
     y_pred = ivis_boston.score_samples(x_train)
 
-    assert ivis_boston.model_.loss['supervised'] == 'mae'
+    loss_name = ivis_boston.model_.loss['supervised'].__name__
+    assert losses.get(loss_name).__name__ == losses.get(supervision_metric).__name__
     assert ivis_boston.model_.layers[-1].activation.__name__ == 'linear'
     assert ivis_boston.model_.layers[-1].output_shape[-1] == 1

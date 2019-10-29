@@ -16,7 +16,7 @@ def model_filepath():
 
 
 def test_ivis_model_saving(model_filepath):
-    model = Ivis(k=15, batch_size=16, n_epochs_without_progress=5)
+    model = Ivis(k=15, batch_size=16, epochs=5)
     iris = datasets.load_iris()
     X = iris.data
 
@@ -52,6 +52,8 @@ def test_ivis_model_saving(model_filepath):
     # Check that can overwrite existing model if requested
     model.save_model(model_filepath, overwrite=True)
 
+    # Train new model
+    y_pred_2 = model_2.fit_transform(X)
 
 def test_supervised_model_saving(model_filepath):
     model = Ivis(k=15, batch_size=16, epochs=5,
@@ -94,6 +96,8 @@ def test_supervised_model_saving(model_filepath):
     # Check that can overwrite existing model if requested
     model.save_model(model_filepath, overwrite=True)
 
+    # Train new model
+    y_pred_2 = model_2.fit_transform(X, Y)
 
 def test_custom_model_saving(model_filepath):
     iris = datasets.load_iris()
