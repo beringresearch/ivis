@@ -50,7 +50,7 @@ To start, let's examine how various dimensionality reduction methods behave in t
 
 .. image:: _static/random_projections_benchmaks.png
 
-Both ``ivis`` and PCA reliably recovered the random nature of our dataset. Conversely, Isomap, UMAP, and t-SNE appeared to back certain points together, creating an impression of clusters within uniform random noise.
+Both ``ivis`` and PCA reliably recovered the random nature of our dataset. Conversely, Isomap, UMAP, and t-SNE appeared to pack certain points together, creating an impression of clusters within uniform random noise.
 
 Structured Datasets
 ~~~~~~~~~~~~~~~~~~~
