@@ -60,7 +60,7 @@ Next, we examine how well global features of a dataset, such as relative positio
 .. image:: _static/comparisons_moons.png
 
 
-Using default parameters, we can see that ``ivis`` succesfully captures both
+Using default parameters, we can see that ``ivis`` captures both
 the general structure of each half-moon, as well as their relative
 positions to one another. Both UMAP and t-SNE appear to introduce
 spurious clusters and global relationships between the half-moons appear
