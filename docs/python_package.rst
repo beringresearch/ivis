@@ -34,7 +34,6 @@ Dependencies
 
 - Python 3.5+
 - tensorflow
-- keras
 - numpy>1.14.2
 - scikit-learn>0.20.0
 - tqdm
