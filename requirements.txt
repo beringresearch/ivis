@@ -1,5 +1,4 @@
 tensorflow
-keras
 numpy
 scikit-learn>0.20.0
 tqdm
