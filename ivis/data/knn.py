@@ -11,6 +11,23 @@ import time
 
 
 def build_annoy_index(X, path, ntrees=50, build_index_on_disk=True, verbose=1):
+    """ Build a standalone annoy index.
+
+    :param array X: numpy array with shape (n_samples, n_features)
+    :param str path: The filepath of a trained annoy index file
+        saved on disk.
+    :param int ntrees: The number of random projections trees built by Annoy to
+        approximate KNN. The more trees the higher the memory usage, but the
+        better the accuracy of results.
+    :param bool build_index_on_disk: Whether to build the annoy index directly
+        on disk. Building on disk should allow for bigger datasets to be indexed,
+        but may cause issues. If None, on-disk building will be enabled for Linux, 
+        but not Windows due to issues on Windows.
+    :param int verbose: Controls the volume of logging output the model
+        produces when training. When set to 0, silences outputs, when above 0
+        will print outputs.
+
+    """
 
     index = AnnoyIndex(X.shape[1], metric='angular')
     if build_index_on_disk:
