@@ -1,7 +1,7 @@
 .. _semi_supervised:
 
 Semi-supervised Dimensionality Reduction
-===================================
+========================================
 
 Sometimes only part of a dataset has ground-truth labels available. 
 In such a scenario, ``ivis`` is still able to make use of existing 
@@ -20,7 +20,7 @@ works with semi-supervised inputs.
 
 
 Semi-supervised Classification
---------------
+------------------------------
 
 To train ``ivis`` in semi-supervised mode using the default softmax
 classification loss, simply provide the labels to the fit method's
