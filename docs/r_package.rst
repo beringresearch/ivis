@@ -19,6 +19,9 @@ Prior to installation, ensure that `reticulate` is available on your machine.
 
 Next, install `virtualenv <https://virtualenv.pypa.io/en/latest/installation/>`_ as it will be used to safely interface with the ``ivis`` Python package.
 
+.. note:: **Windows Installation**. 
+	Note that virtual environment functions in the ``reticulate`` library are `not supported on Windows <https://rstudio.github.io/reticulate/reference/virtualenv-tools.html>`_. Instead, `conda environment <https://docs.conda.io/en/latest/miniconda.html>`_ is recommended.
+
 Finally, the easiest way to install ``ivis`` is using the ``devtools`` package:
 
 Running install
@@ -34,11 +37,12 @@ Running install
 
 After ``ivis`` is installed, **restart your R session**. 
 
-Newer versions of Keras use tensorflow as the default backend, however if for some reason this isn't the case, add the following line to your environment variables:
+.. note::
+	Newer versions of Keras use tensorflow as the default backend, however if for some reason this isn't the case, add the following line to your environment variables:
 
-.. code-block:: bash
+	.. code-block:: bash
 	
-	export KERAS_BACKEND=tensorflow
+		export KERAS_BACKEND=tensorflow
 
 
 Example
