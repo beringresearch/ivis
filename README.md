@@ -37,7 +37,7 @@ pip install ivis --upgrade
 
 ## Features
 * __Scalable:__ ivis is fast and easily extends to millions of observations and thousands of features. 
-* __Versatile:__ numpy arrays, sparse matrices, and hdf5 files are supported out of the box, making it easy to apply ivis to heterogeneous problems including clustering and anomaly detection.
+* __Versatile:__ numpy arrays, sparse matrices, and hdf5 files are supported out of the box. Additionally, both categorical and continuous features are handled well, making it easy to apply ivis to heterogeneous problems including clustering and anomaly detection.
 * __Accurate:__ ivis excels at preserving both local and global features of a dataset. Often, ivis performs better at preserving global structure of the data than t-SNE, making it easy to visualise and interpret high-dimensional datasets.
 * __Generalisable:__ ivis supports addition of new data points to original embeddings via a `transform` method, making it easy to incorporate ivis into standard sklearn Pipelines.
 
