@@ -9,18 +9,23 @@ Implementation of the ivis algorithm as described in the paper [Structure-preser
 
 ## Installation
 
-Install the latest ivis release from PyPi:
+Ivis runs on top of TensorFlow, and needs it to be installed to run.
+
+To install the latest ivis release from PyPi running on the CPU TensorFlow package, run:
 
 ```
-pip install ivis
+pip install ivis[cpu]
 ```
+
+If you have CUDA installed and want ivis to use the tensorflow-gpu package, instead run `pip install ivis[gpu]`.
+
 
 Alternatively, you can install the development version from github:
 
 ```
 git clone https://github.com/beringresearch/ivis
 cd ivis
-pip install -r requirements.txt --editable .
+pip install -e '.[cpu]'
 ```
 
 The following **optional dependencies** are needed if using the visualization callbacks while training the Ivis model:
