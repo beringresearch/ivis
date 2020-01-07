@@ -20,15 +20,16 @@ setup(name='ivis',
       license='GNU General Public License v2.0',
       packages=find_packages(),
       install_requires=[
-          'tensorflow',
           'numpy',
-          'scikit-learn',
+          'scikit-learn>0.20.0',
           'annoy>=1.15.2',
           'tqdm'
       ],
       extras_require={
           'tests': ['pytest'],
-          'visualization': ['matplotlib', 'seaborn']
+          'visualization': ['matplotlib', 'seaborn'],
+          'cpu': ['tensorflow>=1.4.0'],
+          'gpu': ['tensorflow-gpu>=1.4.0']
       },
       classifiers=[
           "Programming Language :: Python :: 3",

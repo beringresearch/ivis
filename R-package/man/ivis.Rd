@@ -4,13 +4,24 @@
 \alias{ivis}
 \title{IVIS algorithm}
 \usage{
-ivis(embedding_dims = 2L, k = 150L, distance = "pn",
-  batch_size = 128L, epochs = 1000L, n_epochs_without_progress = 20L,
-  margin = 1, ntrees = 50L, search_k = -1L, precompute = TRUE,
+ivis(
+  embedding_dims = 2L,
+  k = 150L,
+  distance = "pn",
+  batch_size = 128L,
+  epochs = 1000L,
+  n_epochs_without_progress = 20L,
+  margin = 1,
+  ntrees = 50L,
+  search_k = -1L,
+  precompute = TRUE,
   model = "szubert",
   supervision_metric = "sparse_categorical_crossentropy",
-  supervision_weight = 0.5, annoy_index_path = NULL,
-  build_index_on_disk = NULL, verbose = 1L)
+  supervision_weight = 0.5,
+  annoy_index_path = NULL,
+  build_index_on_disk = NULL,
+  verbose = 1L
+)
 }
 \arguments{
 \item{embedding_dims:}{Number of dimensions in the embedding space}

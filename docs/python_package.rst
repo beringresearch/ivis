@@ -11,7 +11,9 @@ The latest stable release can be installed from PyPi:
 
 .. code:: bash
 
-  pip install ivis
+  pip install ivis[cpu]
+
+If you have CUDA installed and want ivis to use the tensorflow-gpu package, instead run `pip install ivis[gpu]`.
 
 
 Alternatively, you can use ``pip`` to install the development version directly from github:
@@ -26,7 +28,7 @@ Another option would be to clone the github repository and install from your loc
 
   git clone https://github.com/beringresearch/ivis
   cd ivis
-  pip install -r requirements.txt -e .
+  pip install -e '.[cpu]'
 
 
 Dependencies
