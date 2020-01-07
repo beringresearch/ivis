@@ -19,14 +19,14 @@ install_ivis <- function(){
     cat("Creating a virtual environment (ivis)\n")
     virtual_envs <- env_list()
     if ("ivis" %in% virtual_envs){
-      cat("(ivis) environment already exists. The old environment will be updated.")
+      cat("(ivis) environment already exists. The old environment will be updated. ")
       env_remove("ivis")
     }
 
     envname <- "ivis"
     env_create(envname)
 
-    py_install("ivis", envname="ivis")
+    py_install("ivis[cpu]", envname="ivis")
 }   
 
 
