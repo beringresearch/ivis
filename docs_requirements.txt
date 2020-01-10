@@ -1,3 +1,2 @@
-tensorflow
 sphinx
 sphinx_gallery
