@@ -12,15 +12,15 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+sys.path.insert(0, os.path.abspath('../..'))
 
 
 # -- Project information -----------------------------------------------------
 
 project = 'ivis'
-copyright = '2019, Bering Limited'
+copyright = '2020, Bering Limited'
 author = 'Bering Limited'
 
 # The short X.Y version
@@ -40,12 +40,12 @@ release = ''
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary', 
+    'sphinx.ext.autosummary',
     'sphinx_gallery.gen_gallery'
 ]
 
 sphinx_gallery_conf = {
-        'examples_dirs': '../examples',  
+        'examples_dirs': '../examples',
         'gallery_dirs': 'auto_examples',
         'plot_gallery': True
         }
