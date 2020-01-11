@@ -13,7 +13,11 @@ The latest stable release can be installed from PyPi:
 
   pip install ivis[cpu]
 
-If you have CUDA installed and want ivis to use the tensorflow-gpu package, instead run `pip install ivis[gpu]`.
+If you have CUDA installed and want ivis to use the tensorflow-gpu package, instead run ``pip install ivis[gpu]``.
+
+.. note:: **ZSH users**. 
+  If you're running ZSH, square brackets are used for globbing / pattern matching. That means `ivis` should be installed as ``pip install 'ivis[cpu]'`` or ``pip install 'ivis[gpu]'``
+
 
 
 Alternatively, you can use ``pip`` to install the development version directly from github:
