@@ -9,18 +9,19 @@ Implementation of the ivis algorithm as described in the paper [Structure-preser
 
 ## Installation
 
-Ivis runs on top of TensorFlow, and needs it to be installed to run.
-
-To install the latest ivis release from PyPi running on the CPU TensorFlow package, run:
+Ivis runs on top of TensorFlow. To install the latest ivis release from PyPi running on the CPU TensorFlow package, run:
 
 ```
 pip install ivis[cpu]
 ```
 
-If you have CUDA installed and want ivis to use the tensorflow-gpu package, instead run `pip install ivis[gpu]`.
+If you have CUDA installed and want ivis to use the tensorflow-gpu package, run
 
+```
+pip install ivis[gpu]
+```
 
-Alternatively, you can install the development version from github:
+Development version can be installed directly from from github:
 
 ```
 git clone https://github.com/beringresearch/ivis
@@ -71,4 +72,4 @@ Ivis can be used in a wide variety of real-world applications. The Ivis Universe
 * [ivis-animate](https://github.com/beringresearch/ivis-animate) - visualise the Ivis learning process.
 * [ivis-explain](https://github.com/beringresearch/ivis-explain) - explain which features contribute the most to ivis embeddings.
 
-Copyright 2019 Bering Limited
+Copyright 2020 Bering Limited
