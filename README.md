@@ -12,6 +12,11 @@ Implementation of the ivis algorithm as described in the paper [Structure-preser
 Ivis runs on top of TensorFlow. To install the latest ivis release from PyPi running on the CPU TensorFlow package, run:
 
 ```
+# TensorFlow 2 packages require a pip version >19.0.
+pip install --upgrade pip
+```
+
+```
 pip install ivis[cpu]
 ```
 
