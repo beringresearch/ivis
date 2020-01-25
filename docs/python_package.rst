@@ -10,6 +10,10 @@ Installation
 The latest stable release can be installed from PyPi:
 
 .. code:: bash
+  #TensorFlow 2 packages require a pip version >19.0.
+  pip install --upgrade pip
+
+.. code:: bash
 
   pip install ivis[cpu]
 
