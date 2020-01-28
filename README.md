@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/144551119.svg)](https://zenodo.org/badge/latestdoi/144551119) [![Documentation Status](https://readthedocs.org/projects/bering-ivis/badge/?version=latest)](https://bering-ivis.readthedocs.io/en/latest/?badge=latest) [![Downloads](https://pepy.tech/badge/ivis/month)](https://pepy.tech/project/ivis/month) [![Build Status](https://travis-ci.org/beringresearch/ivis.svg?branch=master)](https://travis-ci.org/beringresearch/ivis)
+[![DOI](https://zenodo.org/badge/144551119.svg)](https://zenodo.org/badge/latestdoi/144551119) [![Documentation Status](https://readthedocs.org/projects/bering-ivis/badge/?version=latest)](https://bering-ivis.readthedocs.io/en/latest/?badge=latest) [![Downloads](https://pepy.tech/badge/ivis/month)](https://pepy.tech/project/ivis/month) [![Build Status](https://travis-ci.org/beringresearch/ivis.svg?branch=master)](https://travis-ci.org/beringresearch/ivis) [![DOI](https://joss.theoj.org/papers/10.21105/joss.01596/status.svg)](https://doi.org/10.21105/joss.01596)
 
 # ivis
 
