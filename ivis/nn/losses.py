@@ -92,15 +92,15 @@ def is_multiclass(supervised_loss):
 
 
 def _euclidean_distance(x, y):
-    return K.sqrt(K.maximum(K.sum(K.square(x - y), axis=1, keepdims=True), K.epsilon()))
+    return K.sqrt(K.maximum(K.sum(K.square(x - y), axis=-1, keepdims=True), K.epsilon()))
 
 
 def _manhattan_distance(x, y):
-    return K.sum(K.abs(x - y), axis=1, keepdims=True)
+    return K.sum(K.abs(x - y), axis=-1, keepdims=True)
 
 
 def _chebyshev_distance(x, y):
-    return K.max(K.abs(x - y), axis=1, keepdims=True)
+    return K.max(K.abs(x - y), axis=-1, keepdims=True)
 
 
 def _cosine_distance(x, y):
@@ -115,7 +115,7 @@ def pn_loss(margin=1):
         anchor_negative_distance = _euclidean_distance(anchor, negative)
         positive_negative_distance = _euclidean_distance(positive, negative)
 
-        minimum_distance = K.min(K.concatenate([anchor_negative_distance, positive_negative_distance]), axis=1, keepdims=True)
+        minimum_distance = K.min(K.concatenate([anchor_negative_distance, positive_negative_distance]), axis=-1, keepdims=True)
 
         return K.mean(K.maximum(anchor_positive_distance - minimum_distance + margin, 0))
 
@@ -144,7 +144,7 @@ def manhattan_pn_loss(margin=1):
         anchor_negative_distance = _manhattan_distance(anchor, negative)
         positive_negative_distance = _manhattan_distance(positive, negative)
 
-        minimum_distance = K.min(K.concatenate([anchor_negative_distance, positive_negative_distance]), axis=1, keepdims=True)
+        minimum_distance = K.min(K.concatenate([anchor_negative_distance, positive_negative_distance]), axis=-1, keepdims=True)
 
         return K.mean(K.maximum(anchor_positive_distance - minimum_distance + margin, 0))
 
@@ -166,7 +166,7 @@ def chebyshev_pn_loss(margin=1):
         anchor_negative_distance = _chebyshev_distance(anchor, negative)
         positive_negative_distance = _chebyshev_distance(positive, negative)
 
-        minimum_distance = K.min(K.concatenate([anchor_negative_distance, positive_negative_distance]), axis=1, keepdims=True)
+        minimum_distance = K.min(K.concatenate([anchor_negative_distance, positive_negative_distance]), axis=-1, keepdims=True)
 
         return K.mean(K.maximum(anchor_positive_distance - minimum_distance + margin, 0))
 
@@ -213,7 +213,7 @@ def softmax_ratio_pn(y_true, y_pred):
     anchor_negative_distance = _euclidean_distance(anchor, negative)
     positive_negative_distance = _euclidean_distance(positive, negative)
 
-    minimum_distance = K.min(K.concatenate([anchor_negative_distance, positive_negative_distance]), axis=1, keepdims=True)
+    minimum_distance = K.min(K.concatenate([anchor_negative_distance, positive_negative_distance]), axis=-1, keepdims=True)
 
     softmax = K.softmax(K.concatenate([anchor_positive_distance, minimum_distance]))
     ideal_distance = K.variable([0, 1])
