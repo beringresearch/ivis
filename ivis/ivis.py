@@ -262,14 +262,14 @@ class Ivis(BaseEstimator):
         if self.verbose > 0:
             print('Training neural network')
 
-        hist = self.model_.fit(
+        hist = self.model_.fit_generator(
             datagen,
             epochs=self.epochs,
             callbacks=[callback for callback in self.callbacks] +
                       [EarlyStopping(monitor=loss_monitor,
                        patience=self.n_epochs_without_progress)],
             shuffle=shuffle_mode,
-            workers=multiprocessing.cpu_count(),
+            use_multiprocessing=False,
             verbose=self.verbose)
         self.loss_history_ += hist.history['loss']
 
