@@ -13,7 +13,6 @@ a concern, dynamically generated triplets can be useful.
 
 """
 
-import threading
 import numpy as np
 from .knn import extract_knn
 from annoy import AnnoyIndex
@@ -67,7 +66,6 @@ def generator_from_index(X, Y, index_path, k, batch_size, search_k=-1,
 class AnnoyTripletGenerator(Sequence):
 
     def __init__(self, X, annoy_index, k=150, batch_size=32, search_k=-1):
-        self.lock = threading.Lock()
         self.X = X
         self.annoy_index = annoy_index
         self.k = k
@@ -90,9 +88,8 @@ class AnnoyTripletGenerator(Sequence):
             triplet_batch = [[e.toarray()[0] for e in t] for t in triplet_batch]
 
         triplet_batch = np.array(triplet_batch)
-        
-        with self.lock:
-            return tuple([triplet_batch[:, 0], triplet_batch[:, 1], triplet_batch[:, 2]]), placeholder_labels
+
+        return tuple([triplet_batch[:, 0], triplet_batch[:, 1], triplet_batch[:, 2]]), placeholder_labels
 
     def knn_triplet_from_annoy_index(self, row_index):
         """ A random (unweighted) positive example chosen. """
@@ -115,7 +112,6 @@ class AnnoyTripletGenerator(Sequence):
 class KnnTripletGenerator(Sequence):
 
     def __init__(self, X, neighbour_matrix, batch_size=32):
-        self.lock = threading.Lock()
         self.X = X
         self.neighbour_matrix = neighbour_matrix
         self.batch_size = batch_size
@@ -134,9 +130,8 @@ class KnnTripletGenerator(Sequence):
         if (issparse(self.X)):
             triplet_batch = [[e.toarray()[0] for e in t] for t in triplet_batch]
         triplet_batch = np.array(triplet_batch)
-        
-        with self.lock:
-            return tuple([triplet_batch[:, 0], triplet_batch[:, 1], triplet_batch[:, 2]]), placeholder_labels
+
+        return tuple([triplet_batch[:, 0], triplet_batch[:, 1], triplet_batch[:, 2]]), placeholder_labels
 
     def knn_triplet_from_neighbour_list(self, row_index, neighbour_list):
         """ A random (unweighted) positive example chosen. """
@@ -159,7 +154,6 @@ class KnnTripletGenerator(Sequence):
 class LabeledAnnoyTripletGenerator(Sequence):
 
     def __init__(self, X, Y, annoy_index, k=150, batch_size=32, search_k=-1):
-        self.lock = threading.Lock()
         self.X, self.Y = X, Y
         self.annoy_index = annoy_index
         self.k = k
@@ -182,8 +176,8 @@ class LabeledAnnoyTripletGenerator(Sequence):
             triplet_batch = [[e.toarray()[0] for e in t] for t in triplet_batch]
 
         triplet_batch = np.array(triplet_batch)
-        with self.lock:
-            return tuple([triplet_batch[:, 0], triplet_batch[:, 1], triplet_batch[:, 2]]), tuple([np.array(label_batch), np.array(label_batch)])
+
+        return tuple([triplet_batch[:, 0], triplet_batch[:, 1], triplet_batch[:, 2]]), tuple([np.array(label_batch), np.array(label_batch)])
 
     def knn_triplet_from_annoy_index(self, row_index):
         """ A random (unweighted) positive example chosen. """
@@ -207,7 +201,6 @@ class LabeledAnnoyTripletGenerator(Sequence):
 class LabeledKnnTripletGenerator(Sequence):
 
     def __init__(self, X, Y, neighbour_matrix, batch_size=32):
-        self.lock = threading.Lock()
         self.X, self.Y = X, Y
         self.neighbour_matrix = neighbour_matrix
         self.batch_size = batch_size
@@ -226,8 +219,8 @@ class LabeledKnnTripletGenerator(Sequence):
             triplet_batch = [[e.toarray()[0] for e in t] for t in triplet_batch]
 
         triplet_batch = np.array(triplet_batch)
-        with self.lock:
-            return tuple([triplet_batch[:, 0], triplet_batch[:, 1], triplet_batch[:, 2]]), tuple([np.array(label_batch), np.array(label_batch)])
+
+        return tuple([triplet_batch[:, 0], triplet_batch[:, 1], triplet_batch[:, 2]]), tuple([np.array(label_batch), np.array(label_batch)])
 
     def knn_triplet_from_neighbour_list(self, row_index, neighbour_list):
         """ A random (unweighted) positive example chosen. """
