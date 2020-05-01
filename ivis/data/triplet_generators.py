@@ -18,6 +18,24 @@ from .knn import extract_knn
 from annoy import AnnoyIndex
 from tensorflow.keras.utils import Sequence
 from scipy.sparse import issparse
+from functools import partial
+import tensorflow as tf
+
+
+def generator_from_knn_matrix(X, Y, neighbour_matrix, k, batch_size, search_k, verbose=1):
+    if k >= X.shape[0] - 1:
+        raise Exception('''k value greater than or equal to (num_rows - 1)
+                        (k={}, rows={}). Lower k to a smaller
+                        value.'''.format(k, X.shape[0]))
+    if batch_size > X.shape[0]:
+        raise Exception('''batch_size value larger than num_rows in dataset
+                        (batch_size={}, rows={}). Lower batch_size to a
+                        smaller value.'''.format(batch_size, X.shape[0]))
+    if Y is None:
+        return create_knn_triplet_dataset(X, neighbour_matrix, batch_size=batch_size)
+    else:
+        return create_labeled_knn_triplet_dataset(X, Y, neighbour_matrix,
+                                                  batch_size=batch_size)
 
 
 def generator_from_index(X, Y, index_path, k, batch_size, search_k=-1,
@@ -38,14 +56,13 @@ def generator_from_index(X, Y, index_path, k, batch_size, search_k=-1,
 
             neighbour_matrix = extract_knn(X, index_path, k=k,
                                            search_k=search_k, verbose=verbose)
-            return KnnTripletGenerator(X, neighbour_matrix,
-                                       batch_size=batch_size)
+            return create_knn_triplet_dataset(X, neighbour_matrix,batch_size=batch_size)
         else:
             index = AnnoyIndex(X.shape[1], metric='angular')
             index.load(index_path)
-            return AnnoyTripletGenerator(X, index, k=k,
-                                         batch_size=batch_size,
-                                         search_k=search_k)
+            return create_annoy_triplet_dataset(X, index, k=k,
+                                                batch_size=batch_size,
+                                                search_k=search_k)
     else:
         if precompute:
             if verbose > 0:
@@ -53,15 +70,43 @@ def generator_from_index(X, Y, index_path, k, batch_size, search_k=-1,
 
             neighbour_matrix = extract_knn(X, index_path, k=k,
                                            search_k=search_k, verbose=verbose)
-            return LabeledKnnTripletGenerator(X, Y, neighbour_matrix,
-                                              batch_size=batch_size)
+            return create_labeled_knn_triplet_dataset(X, Y, neighbour_matrix,
+                                                    batch_size=batch_size)
         else:
             index = AnnoyIndex(X.shape[1], metric='angular')
             index.load(index_path)
-            return LabeledAnnoyTripletGenerator(X, Y, index,
-                                                k=k, batch_size=batch_size,
-                                                search_k=search_k)
+            return create_labeled_annoy_triplet_dataset(X, Y, index,
+                                                        k=k, batch_size=batch_size,
+                                                        search_k=search_k)
 
+def create_annoy_triplet_dataset(X, annoy_index, k=150, batch_size=32, search_k=-1):
+    knn_sequence = AnnoyTripletGenerator(X, annoy_index, k=k, batch_size=batch_size, search_k=search_k)
+
+    def get_triplets_by_index(index):
+        return knn_sequence[index][0]
+    
+    def tf_get_triplets_by_index(index):
+        anchors, positives, negatives = tf.py_function(
+            get_triplets_by_index, [index],
+            [tf.float32, tf.float32, tf.float32],
+        )
+        anchors.set_shape([None, X.shape[-1]])
+        positives.set_shape([None, X.shape[-1]])
+        negatives.set_shape([None, X.shape[-1]])
+        return anchors, positives, negatives
+    
+    index_dataset = tf.data.Dataset.from_tensor_slices([i for i in range(int(np.ceil(len(X) / batch_size)))])
+    index_dataset = index_dataset.shuffle(len(X))
+    index_dataset = index_dataset.repeat()
+
+    triplet_dataset = index_dataset.map(
+        tf_get_triplets_by_index,
+        num_parallel_calls=tf.data.experimental.AUTOTUNE)
+    triplet_dataset = tf.data.Dataset.zip(triplet_dataset)
+    label_dataset = tf.data.Dataset.from_tensor_slices([0 for i in range(batch_size)]).batch(batch_size).repeat()
+    dataset = tf.data.Dataset.zip((triplet_dataset, label_dataset))
+    dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
+    return dataset
 
 class AnnoyTripletGenerator(Sequence):
 
@@ -109,6 +154,36 @@ class AnnoyTripletGenerator(Sequence):
         return triplet
 
 
+def create_knn_triplet_dataset(X, neighbour_matrix, batch_size=32):
+    knn_sequence = KnnTripletGenerator(X, neighbour_matrix, batch_size=batch_size)
+
+    def get_triplets_by_index(index):
+        return knn_sequence[index][0]
+    
+    def tf_get_triplets_by_index(index):
+        anchors, positives, negatives = tf.py_function(
+            get_triplets_by_index, [index],
+            [tf.float32, tf.float32, tf.float32],
+        )
+        anchors.set_shape([None, X.shape[-1]])
+        positives.set_shape([None, X.shape[-1]])
+        negatives.set_shape([None, X.shape[-1]])
+        return anchors, positives, negatives
+    
+    index_dataset = tf.data.Dataset.from_tensor_slices([i for i in range(int(np.ceil(len(X) / batch_size)))])
+    index_dataset = index_dataset.shuffle(len(X))
+    index_dataset = index_dataset.repeat()
+
+    triplet_dataset = index_dataset.map(
+        tf_get_triplets_by_index,
+        num_parallel_calls=tf.data.experimental.AUTOTUNE)
+    triplet_dataset = tf.data.Dataset.zip(triplet_dataset)
+    label_dataset = tf.data.Dataset.from_tensor_slices([0 for i in range(batch_size)]).batch(batch_size).repeat()
+    dataset = tf.data.Dataset.zip((triplet_dataset, label_dataset))
+    dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
+    return dataset
+
+
 class KnnTripletGenerator(Sequence):
 
     def __init__(self, X, neighbour_matrix, batch_size=32):
@@ -149,6 +224,36 @@ class KnnTripletGenerator(Sequence):
         triplets += [self.X[row_index], self.X[neighbour_ind],
                      self.X[negative_ind]]
         return triplets
+
+
+def create_labeled_annoy_triplet_dataset(X, Y, annoy_index, k=150, batch_size=32, search_k=-1):
+    knn_sequence = LabeledAnnoyTripletGenerator(X, Y, annoy_index, k=k, batch_size=batch_size, search_k=search_k)
+
+    def get_triplets_by_index(index):
+        return knn_sequence[index][0]
+    
+    def tf_get_triplets_by_index(index):
+        anchors, positives, negatives = tf.py_function(
+            get_triplets_by_index, [index],
+            [tf.float32, tf.float32, tf.float32],
+        )
+        anchors.set_shape([None, X.shape[-1]])
+        positives.set_shape([None, X.shape[-1]])
+        negatives.set_shape([None, X.shape[-1]])
+        return anchors, positives, negatives
+    
+    index_dataset = tf.data.Dataset.from_tensor_slices([i for i in range(int(np.ceil(len(X) / batch_size)))])
+    index_dataset = index_dataset.shuffle(len(X))
+    index_dataset = index_dataset.repeat()
+
+    triplet_dataset = index_dataset.map(
+        tf_get_triplets_by_index,
+        num_parallel_calls=tf.data.experimental.AUTOTUNE)
+    triplet_dataset = tf.data.Dataset.zip(triplet_dataset)
+    label_dataset = tf.data.Dataset.from_tensor_slices([0 for i in range(batch_size)]).batch(batch_size).repeat()
+    dataset = tf.data.Dataset.zip((triplet_dataset, label_dataset))
+    dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
+    return dataset
 
 
 class LabeledAnnoyTripletGenerator(Sequence):
@@ -196,6 +301,36 @@ class LabeledAnnoyTripletGenerator(Sequence):
 
         triplet += [self.X[row_index], self.X[neighbour_ind], self.X[negative_ind]]
         return triplet
+
+
+def create_labeled_knn_triplet_dataset(X, Y, neighbour_matrix, batch_size=32):
+    knn_sequence = LabeledKnnTripletGenerator(X, Y, neighbour_matrix, batch_size=batch_size)
+
+    def get_triplets_by_index(index):
+        return knn_sequence[index][0]
+    
+    def tf_get_triplets_by_index(index):
+        anchors, positives, negatives = tf.py_function(
+            get_triplets_by_index, [index],
+            [tf.float32, tf.float32, tf.float32],
+        )
+        anchors.set_shape([None, X.shape[-1]])
+        positives.set_shape([None, X.shape[-1]])
+        negatives.set_shape([None, X.shape[-1]])
+        return anchors, positives, negatives
+    
+    index_dataset = tf.data.Dataset.from_tensor_slices([i for i in range(int(np.ceil(len(X) / batch_size)))])
+    index_dataset = index_dataset.shuffle(len(X))
+    index_dataset = index_dataset.repeat()
+
+    triplet_dataset = index_dataset.map(
+        tf_get_triplets_by_index,
+        num_parallel_calls=tf.data.experimental.AUTOTUNE)
+    triplet_dataset = tf.data.Dataset.zip(triplet_dataset)
+    label_dataset = tf.data.Dataset.from_tensor_slices([0 for i in range(batch_size)]).batch(batch_size).repeat()
+    dataset = tf.data.Dataset.zip((triplet_dataset, label_dataset))
+    dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
+    return dataset
 
 
 class LabeledKnnTripletGenerator(Sequence):

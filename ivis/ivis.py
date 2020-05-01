@@ -1,5 +1,5 @@
 """ scikit-learn wrapper class for the Ivis algorithm. """
-from .data.triplet_generators import generator_from_index
+from .data.triplet_generators import generator_from_index, generator_from_knn_matrix
 from .nn.network import triplet_network, base_network
 from .nn.callbacks import ModelCheckpoint
 from .nn.losses import triplet_loss, is_categorical, is_multiclass, is_hinge
@@ -83,15 +83,6 @@ class Ivis(BaseEstimator):
     :param list[keras.callbacks.Callback] callbacks: List of keras Callbacks to
         pass model during training, such as the TensorBoard callback. A set of
         ivis-specific callbacks are provided in the ivis.nn.callbacks module.
-<<<<<<< HEAD
-    :param bool eager_execution: Whether to use eager execution with TensorFlow.
-        Disabled by default, as training is much faster with this option off.
-    :param bool build_index_on_disk: Whether to build the annoy index directly
-        on disk. Building on disk should allow for bigger datasets to be indexed,
-        but may cause issues. If None, on-disk building will be enabled for Linux, 
-        but not Windows due to issues on Windows.
-=======
->>>>>>> 3b143aa (Remove eager execution parameter from the Ivis object, eager execution performance issues were addressed by switching to "fit" function over "fit_generator".)
     :param int verbose: Controls the volume of logging output the model
         produces when training. When set to 0, silences outputs, when above 0
         will print outputs.
@@ -104,12 +95,8 @@ class Ivis(BaseEstimator):
                  precompute=True, model='szubert',
                  supervision_metric='sparse_categorical_crossentropy',
                  supervision_weight=0.5, annoy_index_path=None,
-<<<<<<< HEAD
-                 callbacks=[], eager_execution=False,
-                 build_index_on_disk=None, verbose=1):
-=======
-                 callbacks=[], verbose=1):
->>>>>>> 3b143aa (Remove eager execution parameter from the Ivis object, eager execution performance issues were addressed by switching to "fit" function over "fit_generator".)
+                 callbacks=[], build_index_on_disk=None, 
+                 neighbour_matrix=None, verbose=1):
 
         self.embedding_dims = embedding_dims
         self.k = k
@@ -133,6 +120,12 @@ class Ivis(BaseEstimator):
         for callback in self.callbacks:
             if isinstance(callback, ModelCheckpoint):
                 callback = callback.register_ivis_model(self)
+        if build_index_on_disk is None:
+            self.build_index_on_disk = True if platform.system() != 'Windows' else False
+        else:
+            self.build_index_on_disk = build_index_on_disk
+        self.neighbour_matrix = neighbour_matrix
+        #TODO validate the dimensions of the neighbour matrix
         self.verbose = verbose
 
     def __getstate__(self):
@@ -149,26 +142,36 @@ class Ivis(BaseEstimator):
             state['callbacks'] = []
         if not isinstance(state['model_def'], str):
             state['model_def'] = None
+        if 'neighbour_matrix' in state:
+            state['neighbour_matrix'] = None
         return state
 
     def _fit(self, X, Y=None, shuffle_mode=True):
 
-        if self.annoy_index_path is None:
-            self.annoy_index_path = 'annoy.index'
-            if self.verbose > 0:
-                print('Building KNN index')
-            build_annoy_index(X, self.annoy_index_path,
-                              ntrees=self.ntrees,
-                              build_index_on_disk=self.build_index_on_disk,
-                              verbose=self.verbose)
+        if self.neighbour_matrix is not None:
+            datagen = generator_from_knn_matrix(X, Y,
+                                        neighbour_matrix=self.neighbour_matrix,
+                                        k=self.k,
+                                        batch_size=self.batch_size,
+                                        search_k=self.search_k,
+                                        verbose=self.verbose)
+        else:
+            if self.annoy_index_path is None:
+                self.annoy_index_path = 'annoy.index'
+                if self.verbose > 0:
+                    print('Building KNN index')
+                build_annoy_index(X, self.annoy_index_path,
+                                ntrees=self.ntrees,
+                                build_index_on_disk=self.build_index_on_disk,
+                                verbose=self.verbose)
 
-        datagen = generator_from_index(X, Y,
-                                       index_path=self.annoy_index_path,
-                                       k=self.k,
-                                       batch_size=self.batch_size,
-                                       search_k=self.search_k,
-                                       precompute=self.precompute,
-                                       verbose=self.verbose)
+            datagen = generator_from_index(X, Y,
+                                        index_path=self.annoy_index_path,
+                                        k=self.k,
+                                        batch_size=self.batch_size,
+                                        search_k=self.search_k,
+                                        precompute=self.precompute,
+                                        verbose=self.verbose)
 
         loss_monitor = 'loss'
         try:
@@ -269,7 +272,7 @@ class Ivis(BaseEstimator):
                       [EarlyStopping(monitor=loss_monitor,
                        patience=self.n_epochs_without_progress)],
             shuffle=shuffle_mode,
-            workers=multiprocessing.cpu_count(),
+            steps_per_epoch=int(np.ceil(X.shape[0] / self.batch_size)),
             verbose=self.verbose)
         self.loss_history_ += hist.history['loss']
 
