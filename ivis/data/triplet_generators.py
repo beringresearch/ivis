@@ -89,7 +89,7 @@ def create_annoy_triplet_dataset(X, annoy_index, k=150, batch_size=32, search_k=
     def tf_get_triplets_by_index(index):
         anchors, positives, negatives, labels = tf.py_function(
             get_triplets_by_index, [index],
-            [tf.float32, tf.float32, tf.float32, tf.int32],
+            [tf.float32, tf.float32, tf.float32, tf.float32],
         )
         anchors.set_shape([None, X.shape[-1]])
         positives.set_shape([None, X.shape[-1]])
@@ -163,7 +163,7 @@ def create_knn_triplet_dataset(X, neighbour_matrix, batch_size=32):
     def tf_get_triplets_by_index(index):
         anchors, positives, negatives, labels = tf.py_function(
             get_triplets_by_index, [index],
-            [tf.float32, tf.float32, tf.float32, tf.int32],
+            [tf.float32, tf.float32, tf.float32, tf.float32],
         )
         anchors.set_shape([None, X.shape[-1]])
         positives.set_shape([None, X.shape[-1]])
@@ -234,12 +234,15 @@ def create_labeled_annoy_triplet_dataset(X, Y, annoy_index, k=150, batch_size=32
     def tf_get_triplets_by_index(index):
         anchors, positives, negatives, labels = tf.py_function(
             get_triplets_by_index, [index],
-            [tf.float32, tf.float32, tf.float32, tf.int32],
+            [tf.float32, tf.float32, tf.float32, tf.float32],
         )
         anchors.set_shape([None, X.shape[-1]])
         positives.set_shape([None, X.shape[-1]])
         negatives.set_shape([None, X.shape[-1]])
-        labels.set_shape([None,])
+        if Y.ndim > 1:
+            labels.set_shape([None, Y.shape[-1]])
+        else:
+            labels.set_shape([None,])
         return tuple([anchors, positives, negatives]), tuple([labels, labels])
 
     index_dataset = tf.data.Dataset.from_tensor_slices([i for i in range(int(np.ceil(len(X) / batch_size)))])
@@ -310,12 +313,15 @@ def create_labeled_knn_triplet_dataset(X, Y, neighbour_matrix, batch_size=32):
     def tf_get_triplets_by_index(index):
         anchors, positives, negatives, labels = tf.py_function(
             get_triplets_by_index, [index],
-            [tf.float32, tf.float32, tf.float32, tf.int32],
+            [tf.float32, tf.float32, tf.float32, tf.float32],
         )
         anchors.set_shape([None, X.shape[-1]])
         positives.set_shape([None, X.shape[-1]])
         negatives.set_shape([None, X.shape[-1]])
-        labels.set_shape([None,])
+        if Y.ndim > 1:
+            labels.set_shape([None, Y.shape[-1]])
+        else:
+            labels.set_shape([None,])
         return tuple([anchors, positives, negatives]), tuple([labels, labels])
 
     index_dataset = tf.data.Dataset.from_tensor_slices([i for i in range(int(np.ceil(len(X) / batch_size)))])
