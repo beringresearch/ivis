@@ -83,6 +83,13 @@ class Ivis(BaseEstimator):
     :param list[keras.callbacks.Callback] callbacks: List of keras Callbacks to
         pass model during training, such as the TensorBoard callback. A set of
         ivis-specific callbacks are provided in the ivis.nn.callbacks module.
+    :param bool build_index_on_disk: Whether to build the annoy index directly
+        on disk. Building on disk should allow for bigger datasets to be indexed,
+        but may cause issues. If None, on-disk building will be enabled for Linux, 
+        but not Windows due to issues on Windows.
+    :param np.array neighbour_matrix: A pre-computed KNN matrix can be provided.
+        The KNNs can be retrieved using any method, and will cause Ivis to skip 
+        computing the Annoy KNN index.
     :param int verbose: Controls the volume of logging output the model
         produces when training. When set to 0, silences outputs, when above 0
         will print outputs.
