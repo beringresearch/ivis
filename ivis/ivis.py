@@ -87,6 +87,9 @@ class Ivis(BaseEstimator):
         on disk. Building on disk should allow for bigger datasets to be indexed,
         but may cause issues. If None, on-disk building will be enabled for Linux, 
         but not Windows due to issues on Windows.
+    :param np.array neighbour_matrix: A pre-computed KNN matrix can be provided.
+        The KNNs can be retrieved using any method, and will cause Ivis to skip 
+        computing the Annoy KNN index.
     :param int verbose: Controls the volume of logging output the model
         produces when training. When set to 0, silences outputs, when above 0
         will print outputs.
