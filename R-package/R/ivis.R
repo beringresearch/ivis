@@ -61,6 +61,9 @@
 #'                    on disk. Building on disk should allow for bigger datasets to be
 #'                    indexed, but may cause issues. If None, on-disk building will be
 #'                    enabled for Linux, but not Windows due to issues on Windows.
+#' @param neighbour_matrix: A pre-computed KNN matrix can be provided.
+#'                    The KNNs can be retrieved using any method, and will cause Ivis to skip
+#'                    computing the Annoy KNN index.
 #' @param verbose:    Controls the volume of logging output the model
 #'                    produces when training. When set to 0, silences
 #'                    outputs, when above 0 will print outputs.
@@ -80,10 +83,9 @@ ivis <- function(embedding_dims = 2L,
     supervision_metric = "sparse_categorical_crossentropy",
     supervision_weight = 0.5,
     annoy_index_path=NULL,
-    build_index_on_disk=NULL, verbose=1L){
+    build_index_on_disk=NULL,
+    neighbour_matrix=NULL, verbose=1L){
 
-
-    #X <- data.matrix(X)
     k <- as.integer(k)
     
     embedding_dims <- as.integer(embedding_dims)
@@ -92,6 +94,12 @@ ivis <- function(embedding_dims = 2L,
     n_epochs_without_progress = as.integer(n_epochs_without_progress)
     ntrees <- as.integer(ntrees)
     search_k <- as.integer(search_k)
+
+    if neighbour_matrix != NULL {
+      neighbour_matrix <- data.matrix(neighbour_matrix)
+    }
+
+
 
     model <- ivis_object$Ivis(embedding_dims=embedding_dims,
                               k=k, distance=distance, batch_size=batch_size,
@@ -104,6 +112,7 @@ ivis <- function(embedding_dims = 2L,
                               supervision_weight=supervision_weight,
                               annoy_index_path=annoy_index_path,
                               build_index_on_disk=build_index_on_disk,
+                              neighbour_matrix=neighbour_matrix,
                               verbose=verbose)
   
     return(model)
