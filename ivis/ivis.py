@@ -409,7 +409,6 @@ class Ivis(BaseEstimator):
                                  custom_objects={'tf': tf,
                                                  loss_function.__name__: loss_function })
         self.encoder = self.model_.layers[3]
-        self.encoder._make_predict_function()
 
         # If a supervised model exists, load it
         supervised_path = os.path.join(folder_path, 'supervised_model.h5')
