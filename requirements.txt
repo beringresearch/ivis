@@ -1,4 +1,4 @@
-tensorflow
+tensorflow>=1.13.1
 numpy
 scikit-learn>0.20.0
 tqdm
