@@ -12,21 +12,5 @@ matrix:
       python: 3.5
       os: linux
 
-before_install:
-  - deactivate
-  - sudo apt-get install python3-setuptools
-  - sudo apt-get install python3-pip
-  - python3 -m pip install --user --upgrade pip
-  - python3 -m pip install --user virtualenv 
-  - python3 -m pip install --user numpy
-  - sudo apt-get install -y r-base r-base-dev
-  - sudo apt-get install build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev
-
-install: 
-  - source ci_scripts/install.sh
-  - source ci_scripts/install-R.sh
-script: 
-  - bash ci_scripts/test.sh
-  - bash ci_scripts/test-R.sh
-after_success:
-  - Rscript -e 'library(covr); codecov("R-package/")'
+install: source ci_scripts/install.sh
+script: bash ci_scripts/test.sh
