@@ -1,2 +1,2 @@
-python3 -m pip install --user -e '.[cpu]'
-python3 -m pip install --user pytest
+python3 -m pip install -e '.[cpu]'
+python3 -m pip install pytest
