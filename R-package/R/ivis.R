@@ -95,7 +95,7 @@ ivis <- function(embedding_dims = 2L,
     ntrees <- as.integer(ntrees)
     search_k <- as.integer(search_k)
 
-    if neighbour_matrix != NULL {
+    if (!is.null(neighbour_matrix)) {
       neighbour_matrix <- data.matrix(neighbour_matrix)
     }
 
