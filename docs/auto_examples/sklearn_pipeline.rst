@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_auto_examples_sklearn_pipeline.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_auto_examples_sklearn_pipeline.py:
+        Click :ref:`here <sphx_glr_download_auto_examples_sklearn_pipeline.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_sklearn_pipeline.py:
 
 
 Integrating ivis with standard sklearn pipelines
@@ -59,13 +61,13 @@ Integrating ivis with standard sklearn pipelines
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: sklearn_pipeline.py <sklearn_pipeline.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: sklearn_pipeline.ipynb <sklearn_pipeline.ipynb>`
 

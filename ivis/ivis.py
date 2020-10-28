@@ -288,7 +288,7 @@ class Ivis(BaseEstimator):
 
         Parameters
         ----------
-        X : array, shape (n_samples, n_features)
+        X : n-dimensional array shape (n_samples, )
             Data to be embedded.
         Y : array, shape (n_samples)
             Optional array for supervised dimentionality reduction.

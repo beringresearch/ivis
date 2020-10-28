@@ -25,9 +25,10 @@ The latest development version is on `github <https://github.com/beringresearch/
   
    Python Package <python_package>
    R Package <r_package>
-   Hyperparameter Selection <hyperparameters>
+   Unsupervised Dimensionality Reduction <unsupervised>
    Supervised Dimensionality Reduction <supervised>
    Semi-supervised Dimensionality Reduction <semi_supervised>
+   Hyperparameter Selection <hyperparameters>
    Callbacks <callbacks>
    Examples <auto_examples/index>
 
