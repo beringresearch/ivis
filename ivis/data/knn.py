@@ -29,6 +29,8 @@ def build_annoy_index(X, path, ntrees=50, build_index_on_disk=True, verbose=1):
 
     """
 
+    X = X.reshape((X.shape[0], -1))
+
     index = AnnoyIndex(X.shape[1], metric='angular')
     if build_index_on_disk:
         index.on_disk_build(path)
@@ -57,6 +59,8 @@ def build_annoy_index(X, path, ntrees=50, build_index_on_disk=True, verbose=1):
 def extract_knn(X, index_filepath, k=150, search_k=-1, verbose=1):
     """ Starts multiple processes to retrieve nearest neighbours using
         an Annoy Index in parallel """
+
+    X = X.reshape((X.shape[0], -1))
 
     n_dims = X.shape[1]
 
