@@ -1,10 +1,12 @@
-.. note::
-    :class: sphx-glr-download-link-note
+.. only:: html
 
-    Click :ref:`here <sphx_glr_download_auto_examples_supervised_ivis.py>` to download the full example code
-.. rst-class:: sphx-glr-example-title
+    .. note::
+        :class: sphx-glr-download-link-note
 
-.. _sphx_glr_auto_examples_supervised_ivis.py:
+        Click :ref:`here <sphx_glr_download_auto_examples_supervised_ivis.py>`     to download the full example code
+    .. rst-class:: sphx-glr-example-title
+
+    .. _sphx_glr_auto_examples_supervised_ivis.py:
 
 
 Supervised Dimensionality Reduction with ivis
@@ -58,13 +60,13 @@ each integer corresponding to a class.
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
      :download:`Download Python source code: supervised_ivis.py <supervised_ivis.py>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
      :download:`Download Jupyter notebook: supervised_ivis.ipynb <supervised_ivis.ipynb>`
 
