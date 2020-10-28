@@ -91,9 +91,9 @@ def create_annoy_triplet_dataset(X, annoy_index, k=150, batch_size=32, search_k=
             get_triplets_by_index, [index],
             [tf.float32, tf.float32, tf.float32, tf.float32],
         )
-        anchors.set_shape([None, X.shape[-1]])
-        positives.set_shape([None, X.shape[-1]])
-        negatives.set_shape([None, X.shape[-1]])
+        anchors.set_shape([None, *X.shape[1:]])
+        positives.set_shape([None, *X.shape[1:]])
+        negatives.set_shape([None, *X.shape[1:]])
         labels.set_shape([None,])
         return tuple([anchors, positives, negatives]), labels
     
@@ -165,9 +165,9 @@ def create_knn_triplet_dataset(X, neighbour_matrix, batch_size=32):
             get_triplets_by_index, [index],
             [tf.float32, tf.float32, tf.float32, tf.float32],
         )
-        anchors.set_shape([None, X.shape[-1]])
-        positives.set_shape([None, X.shape[-1]])
-        negatives.set_shape([None, X.shape[-1]])
+        anchors.set_shape([None, *X.shape[1:]])
+        positives.set_shape([None, *X.shape[1:]])
+        negatives.set_shape([None, *X.shape[1:]])
         labels.set_shape([None,])
         return tuple([anchors, positives, negatives]), labels
 
@@ -236,9 +236,9 @@ def create_labeled_annoy_triplet_dataset(X, Y, annoy_index, k=150, batch_size=32
             get_triplets_by_index, [index],
             [tf.float32, tf.float32, tf.float32, tf.float32],
         )
-        anchors.set_shape([None, X.shape[-1]])
-        positives.set_shape([None, X.shape[-1]])
-        negatives.set_shape([None, X.shape[-1]])
+        anchors.set_shape([None, *X.shape[1:]])
+        positives.set_shape([None, *X.shape[1:]])
+        negatives.set_shape([None, *X.shape[1:]])
         if Y.ndim > 1:
             labels.set_shape([None, Y.shape[-1]])
         else:
@@ -315,9 +315,9 @@ def create_labeled_knn_triplet_dataset(X, Y, neighbour_matrix, batch_size=32):
             get_triplets_by_index, [index],
             [tf.float32, tf.float32, tf.float32, tf.float32],
         )
-        anchors.set_shape([None, X.shape[-1]])
-        positives.set_shape([None, X.shape[-1]])
-        negatives.set_shape([None, X.shape[-1]])
+        anchors.set_shape([None, *X.shape[1:]])
+        positives.set_shape([None, *X.shape[1:]])
+        negatives.set_shape([None, *X.shape[1:]])
         if Y.ndim > 1:
             labels.set_shape([None, Y.shape[-1]])
         else:
