@@ -128,7 +128,7 @@ class Ivis(BaseEstimator):
             if isinstance(callback, ModelCheckpoint):
                 callback = callback.register_ivis_model(self)
         if build_index_on_disk is None:
-            self.build_index_on_disk = True if platform.system() != 'Windows' else False
+            self.build_index_on_disk = build_index_on_disk
         else:
             self.build_index_on_disk = build_index_on_disk
         self.neighbour_matrix = neighbour_matrix
