@@ -17,9 +17,10 @@ Several examples of how ivis can be used in common machine learning tasks.
 
 .. only:: html
 
-    .. figure:: /auto_examples/images/thumb/sphx_glr_supervised_ivis_thumb.png
+ .. figure:: /auto_examples/images/thumb/sphx_glr_supervised_ivis_thumb.png
+     :alt: Supervised Dimensionality Reduction with ivis
 
-        :ref:`sphx_glr_auto_examples_supervised_ivis.py`
+     :ref:`sphx_glr_auto_examples_supervised_ivis.py`
 
 .. raw:: html
 
@@ -37,9 +38,10 @@ Several examples of how ivis can be used in common machine learning tasks.
 
 .. only:: html
 
-    .. figure:: /auto_examples/images/thumb/sphx_glr_mnist_thumb.png
+ .. figure:: /auto_examples/images/thumb/sphx_glr_mnist_thumb.png
+     :alt: Applying ivis to the MNIST Dataset
 
-        :ref:`sphx_glr_auto_examples_mnist.py`
+     :ref:`sphx_glr_auto_examples_mnist.py`
 
 .. raw:: html
 
@@ -57,9 +59,10 @@ Several examples of how ivis can be used in common machine learning tasks.
 
 .. only:: html
 
-    .. figure:: /auto_examples/images/thumb/sphx_glr_iris_thumb.png
+ .. figure:: /auto_examples/images/thumb/sphx_glr_iris_thumb.png
+     :alt: iris dataset
 
-        :ref:`sphx_glr_auto_examples_iris.py`
+     :ref:`sphx_glr_auto_examples_iris.py`
 
 .. raw:: html
 
@@ -77,9 +80,10 @@ Several examples of how ivis can be used in common machine learning tasks.
 
 .. only:: html
 
-    .. figure:: /auto_examples/images/thumb/sphx_glr_sklearn_pipeline_thumb.png
+ .. figure:: /auto_examples/images/thumb/sphx_glr_sklearn_pipeline_thumb.png
+     :alt: Integrating ivis with standard sklearn pipelines
 
-        :ref:`sphx_glr_auto_examples_sklearn_pipeline.py`
+     :ref:`sphx_glr_auto_examples_sklearn_pipeline.py`
 
 .. raw:: html
 
@@ -92,7 +96,7 @@ Several examples of how ivis can be used in common machine learning tasks.
    /auto_examples/sklearn_pipeline
 .. raw:: html
 
-    <div style='clear:both'></div>
+    <div class="sphx-glr-clear"></div>
 
 
 
@@ -102,15 +106,15 @@ Several examples of how ivis can be used in common machine learning tasks.
     :class: sphx-glr-footer-gallery
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
-    :download:`Download all examples in Python source code: auto_examples_python.zip <//Users/ignat/Documents/git/ivis/docs/auto_examples/auto_examples_python.zip>`
+    :download:`Download all examples in Python source code: auto_examples_python.zip </auto_examples/auto_examples_python.zip>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip <//Users/ignat/Documents/git/ivis/docs/auto_examples/auto_examples_jupyter.zip>`
+    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip </auto_examples/auto_examples_jupyter.zip>`
 
 
 .. only:: html
