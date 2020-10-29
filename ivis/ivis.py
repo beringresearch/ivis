@@ -99,7 +99,7 @@ class Ivis(BaseEstimator):
                  precompute=True, model='szubert',
                  supervision_metric='sparse_categorical_crossentropy',
                  supervision_weight=0.5, annoy_index_path=None,
-                 callbacks=[], build_index_on_disk=None, 
+                 callbacks=None, build_index_on_disk=None,
                  neighbour_matrix=None, verbose=1):
 
         self.embedding_dims = embedding_dims
@@ -120,14 +120,15 @@ class Ivis(BaseEstimator):
         self.supervised_model_ = None
         self.loss_history_ = []
         self.annoy_index_path = annoy_index_path
-        self.callbacks = callbacks
+
+        if callbacks is None:
+            self.callbacks = []
+        else:
+            self.callbacks = callbacks
         for callback in self.callbacks:
             if isinstance(callback, ModelCheckpoint):
                 callback = callback.register_ivis_model(self)
-        if build_index_on_disk is None:
-            self.build_index_on_disk = build_index_on_disk
-        else:
-            self.build_index_on_disk = build_index_on_disk
+        self.build_index_on_disk = build_index_on_disk
         self.neighbour_matrix = neighbour_matrix
         self.verbose = verbose
         self.n_classes = None
@@ -154,28 +155,28 @@ class Ivis(BaseEstimator):
 
         if self.neighbour_matrix is not None:
             datagen = generator_from_knn_matrix(X, Y,
-                                        neighbour_matrix=self.neighbour_matrix,
-                                        k=self.k,
-                                        batch_size=self.batch_size,
-                                        search_k=self.search_k,
-                                        verbose=self.verbose)
+                                                neighbour_matrix=self.neighbour_matrix,
+                                                k=self.k,
+                                                batch_size=self.batch_size,
+                                                search_k=self.search_k,
+                                                verbose=self.verbose)
         else:
             if self.annoy_index_path is None:
                 self.annoy_index_path = 'annoy.index'
                 if self.verbose > 0:
                     print('Building KNN index')
                 build_annoy_index(X, self.annoy_index_path,
-                                ntrees=self.ntrees,
-                                build_index_on_disk=self.build_index_on_disk,
-                                verbose=self.verbose)
+                                  ntrees=self.ntrees,
+                                  build_index_on_disk=self.build_index_on_disk,
+                                  verbose=self.verbose)
 
             datagen = generator_from_index(X, Y,
-                                        index_path=self.annoy_index_path,
-                                        k=self.k,
-                                        batch_size=self.batch_size,
-                                        search_k=self.search_k,
-                                        precompute=self.precompute,
-                                        verbose=self.verbose)
+                                           index_path=self.annoy_index_path,
+                                           k=self.k,
+                                           batch_size=self.batch_size,
+                                           search_k=self.search_k,
+                                           precompute=self.precompute,
+                                           verbose=self.verbose)
 
         loss_monitor = 'loss'
         try:
@@ -185,7 +186,7 @@ class Ivis(BaseEstimator):
             raise ValueError('Loss function `{}` not implemented.'.format(self.distance))
 
         if self.model_ is None:
-            if type(self.model_def) is str:
+            if isinstance(self.model_def, str):
                 input_size = (X.shape[-1],)
                 self.model_, anchor_embedding, _, _ = \
                     triplet_network(base_network(self.model_def, input_size),
@@ -252,7 +253,7 @@ class Ivis(BaseEstimator):
                     loss={
                         'stacked_triplets': triplet_loss_func,
                         'supervised': supervised_loss
-                         },
+                    },
                     loss_weights={
                         'stacked_triplets': 1 - self.supervision_weight,
                         'supervised': self.supervision_weight})
@@ -272,9 +273,8 @@ class Ivis(BaseEstimator):
         hist = self.model_.fit(
             datagen,
             epochs=self.epochs,
-            callbacks=[callback for callback in self.callbacks] +
-                      [EarlyStopping(monitor=loss_monitor,
-                       patience=self.n_epochs_without_progress)],
+            callbacks=self.callbacks + [EarlyStopping(monitor=loss_monitor,
+                                                      patience=self.n_epochs_without_progress)],
             shuffle=shuffle_mode,
             steps_per_epoch=int(np.ceil(X.shape[0] / self.batch_size)),
             verbose=self.verbose)
@@ -374,12 +374,22 @@ class Ivis(BaseEstimator):
             if os.path.exists(folder_path):
                 shutil.rmtree(folder_path)
         os.makedirs(folder_path)
+
         # serialize weights to HDF5
-        self.model_.save(os.path.join(folder_path, 'ivis_model.h5'))
+        self.model_.layers[3].save(os.path.join(folder_path, 'ivis_model.h5'))
         # Have to serialize supervised model separately
         if self.supervised_model_ is not None:
             self.supervised_model_.save(os.path.join(folder_path,
-                                        'supervised_model.h5'))
+                                                     'supervised_model.h5'))
+
+        # save optimizer structure and state separately.
+        # pickle preserves structure (but not correct values).
+        with open(os.path.join(folder_path, 'optimizer.pkl'), 'wb') as f:
+            pkl.dump(self.model_.optimizer, f)
+
+        # save optimizer state in numpy array
+        np.save(os.path.join(folder_path, 'optimizer_state.npy'),
+                self.model_.optimizer.get_weights())
 
         json.dump(self.__getstate__(),
                   open(os.path.join(folder_path, 'ivis_params.json'), 'w'))
@@ -402,9 +412,26 @@ class Ivis(BaseEstimator):
         self.__dict__ = ivis_config
 
         loss_function = triplet_loss(self.distance, self.margin)
-        self.model_ = load_model(os.path.join(folder_path, 'ivis_model.h5'),
-                                 custom_objects={'tf': tf,
-                                                 loss_function.__name__: loss_function })
+
+        # ivis models trained before version 1.8.3 won't have separate optimizer file
+        # maintain compatibility by falling back to old load behavior
+        if not os.path.exists(os.path.join(folder_path, 'optimizer.pkl')):
+            self.model_ = load_model(os.path.join(folder_path, 'ivis_model.h5'),
+                                     custom_objects={'tf': tf,
+                                                     loss_function.__name__: loss_function})
+        else:
+            base_model = load_model(os.path.join(folder_path, 'ivis_model.h5'))
+
+            with open(os.path.join(folder_path, 'optimizer.pkl'), 'rb') as f:
+                optimizer = pkl.load(f)
+
+            optimizer_state = np.load(os.path.join(folder_path, 'optimizer_state.npy'),
+                                      allow_pickle=True)
+            optimizer.set_weights(optimizer_state)
+
+            self.model_, _, _, _ = triplet_network(base_model, embedding_dims=None)
+            self.model_.compile(loss=loss_function, optimizer=optimizer)
+
         self.encoder = self.model_.layers[3]
 
         # If a supervised model exists, load it

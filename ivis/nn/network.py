@@ -32,8 +32,12 @@ def triplet_network(base_network, embedding_dims=2, embedding_l2=0.0):
     input_p = Input(shape=base_network.input_shape[1:])
     input_n = Input(shape=base_network.input_shape[1:])
 
-    embeddings = Dense(embedding_dims,
-                       kernel_regularizer=l2(embedding_l2))(base_network.output)
+    if embedding_dims is None:
+        embeddings = base_network.output
+    else:
+        embeddings = Dense(embedding_dims,
+                           kernel_regularizer=l2(embedding_l2))(base_network.output)
+
     network = Model(base_network.input, embeddings)
 
     processed_a = network(input_a)
