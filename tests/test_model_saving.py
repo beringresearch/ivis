@@ -1,7 +1,6 @@
 import pytest
 from ivis import Ivis
 import os
-import shutil
 from sklearn import datasets
 import numpy as np
 import tempfile
@@ -21,7 +20,7 @@ def test_ivis_model_saving(model_filepath):
     X = iris.data
 
     model.fit(X)
-    model.save_model(model_filepath)
+    model.save_model(model_filepath, overwrite=True)
 
     model_2 = Ivis()
     model_2.load_model(model_filepath)

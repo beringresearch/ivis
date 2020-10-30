@@ -1,6 +1,5 @@
 from ivis import Ivis
 from sklearn import datasets
-import numpy as np
 
 
 def test_iris_embedding():

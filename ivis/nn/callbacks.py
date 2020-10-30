@@ -1,18 +1,22 @@
+"""Collection of callbacks that can be passed to ivis to be called during training. 
+These provide utilities such as saving checkpoints during training (allowing for 
+resuming if interrupted), as well as periodic logging of plots and model embeddings."""
+
+import io
+import os
+import numpy as np
+import tensorflow as tf
 from tensorflow.keras.callbacks import Callback
 from sklearn.preprocessing import MinMaxScaler
-import numpy as np
-import io
-import tensorflow as tf
-import os
 
 # Matplotlib and seaborn are optional dependencies
 try:
     from matplotlib import pyplot as plt
-except:
+except ImportError:
     plt = None
 try:
     import seaborn as sns
-except:
+except ImportError:
     sns = None
 
 
@@ -51,6 +55,7 @@ class ModelCheckpoint(Callback):
         self.filename = filename
         self.epoch_interval = epoch_interval
         self.epochs_since_last_save = 0
+        self.ivis_model = None
 
     def on_epoch_end(self, epoch, logs=None):
         self.epochs_since_last_save += 1
@@ -104,6 +109,7 @@ class EmbeddingsLogging(Callback):
         self.filename = filename
         self.epoch_interval = epoch_interval
         self.epochs_since_last_save = 0
+        self.embeddings = None
 
     def on_epoch_end(self, epoch, logs=None):
         self.epochs_since_last_save += 1
@@ -163,6 +169,7 @@ class EmbeddingsImage(Callback):
         self.filename = filename
         self.epoch_interval = epoch_interval
         self.epochs_since_last_save = 0
+        self.embeddings = None
 
     def on_epoch_end(self, epoch, logs=None):
         self.epochs_since_last_save += 1
@@ -233,18 +240,19 @@ class TensorBoardEmbeddingsImage(Callback):
             self.labels = np.zeros(len(data))
         self.n_classes = len(np.unique(self.labels, axis=0))
         self.epochs_since_last_save = 0
+        self.epoch_interval = epoch_interval
+        self.embeddings = None
+        self.file_writer = tf.summary.create_file_writer(
+            os.path.join(log_dir, 'embeddings')
+        )
 
     def on_epoch_end(self, epoch, logs=None):
         self.epochs_since_last_save += 1
         if self.epochs_since_last_save >= self.epoch_interval:
             self.embeddings = self.model.layers[3].predict(self.data)
             image = self.plot_embeddings(self.embeddings)
-            summary = tf.summary.Summary(
-                value=[tf.Summary.Value(tag='Embeddings', image=image)])
-
-            writer = tf.summary.FileWriter(self.log_dir + '/embeddings')
-            writer.add_summary(summary, epoch)
-            writer.close()
+            with self.file_writer.as_default():
+                tf.summary.image("Embeddings", image, step=epoch)
 
     def plot_embeddings(self, embeddings):
         embeddings = MinMaxScaler((0, 1)).fit_transform(self.embeddings)
@@ -260,7 +268,8 @@ class TensorBoardEmbeddingsImage(Callback):
         plt.close(fig)
         buf.seek(0)
 
-        image = tf.Summary.Image(encoded_image_string=buf.getvalue())
+        image = tf.image.decode_png(buf.getvalue(), channels=4)
+        image = tf.expand_dims(image, 0)
         return image
 
 

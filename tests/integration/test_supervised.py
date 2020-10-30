@@ -1,10 +1,10 @@
+import pytest
 from tensorflow.keras.datasets import boston_housing
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras import losses
-from ivis import Ivis
-import numpy as np
-import pytest
 from sklearn import datasets
+import numpy as np
+from ivis import Ivis
 
 
 def test_1d_supervied_iris_embedding():

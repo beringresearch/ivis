@@ -1,6 +1,6 @@
-from ivis import Ivis
 import numpy as np
 import tensorflow as tf
+from ivis import Ivis
 
 
 def test_multidimensional_inputs():

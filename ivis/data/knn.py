@@ -1,14 +1,14 @@
 """ KNN retrieval using an Annoy index. """
 
-import numpy as np
-from scipy.sparse import issparse
-from annoy import AnnoyIndex
+import time
 from multiprocessing import Process, cpu_count, Queue
 from collections import namedtuple
 from operator import attrgetter
+from scipy.sparse import issparse
+from annoy import AnnoyIndex
 from tqdm import tqdm
 from tensorflow.keras.utils import HDF5Matrix
-import time
+import numpy as np
 
 
 def build_annoy_index(X, path, ntrees=50, build_index_on_disk=True, verbose=1):
@@ -39,18 +39,18 @@ def build_annoy_index(X, path, ntrees=50, build_index_on_disk=True, verbose=1):
 
     if issparse(X):
         for i in tqdm(range(X.shape[0]), disable=verbose < 1):
-            v = X[i].toarray()[0]
-            index.add_item(i, v)
+            vector = X[i].toarray()[0]
+            index.add_item(i, vector)
     else:
         for i in tqdm(range(X.shape[0]), disable=verbose < 1):
-            v = X[i]
-            index.add_item(i, v)
-    
+            vector = X[i]
+            index.add_item(i, vector)
+
     try:
         index.build(ntrees)
     except Exception:
         msg = ("Error building Annoy Index. Passing on_disk_build=False"
-                " may solve the issue, especially on Windows.")
+               " may solve the issue, especially on Windows.")
         raise IndexBuildingError(msg)
     else:
         if not build_index_on_disk:
@@ -75,12 +75,12 @@ def extract_knn(X, index_filepath, k=150, search_k=-1, verbose=1):
     # Split up the indices and assign processes for each chunk
     i = 0
     while (i + chunk_size) <= X.shape[0]:
-        process_pool.append(KNN_Worker(index_filepath, k, search_k, n_dims,
-                                       (i, i+chunk_size), results_queue))
+        process_pool.append(KnnWorker(index_filepath, k, search_k, n_dims,
+                                      (i, i+chunk_size), results_queue))
         i += chunk_size
     if remainder:
-        process_pool.append(KNN_Worker(index_filepath, k, search_k, n_dims,
-                                       (i, X.shape[0]), results_queue))
+        process_pool.append(KnnWorker(index_filepath, k, search_k, n_dims,
+                                      (i, X.shape[0]), results_queue))
 
     try:
         for process in process_pool:
@@ -105,7 +105,7 @@ def extract_knn(X, index_filepath, k=150, search_k=-1, verbose=1):
         neighbour_list = list(map(attrgetter('neighbour_list'), neighbour_list))
 
         return np.array(neighbour_list)
-    
+
     except:
         print('Halting KNN retrieval and cleaning up')
         for process in process_pool:
@@ -116,7 +116,7 @@ def extract_knn(X, index_filepath, k=150, search_k=-1, verbose=1):
 IndexNeighbours = namedtuple('IndexNeighbours', 'row_index neighbour_list')
 
 
-class KNN_Worker(Process):
+class KnnWorker(Process):
     """
     Upon construction, this worker process loads an annoy index from disk.
     When started, the neighbours of the data-points specified by `data_indices`
@@ -134,7 +134,7 @@ class KNN_Worker(Process):
         self.search_k = search_k
         self.data_indices = data_indices
         self.results_queue = results_queue
-        super(KNN_Worker, self).__init__()
+        super(KnnWorker, self).__init__()
 
     def run(self):
         try:
@@ -144,7 +144,7 @@ class KNN_Worker(Process):
                 neighbour_indexes = index.get_nns_by_item(
                     i, self.k, search_k=self.search_k, include_distances=False)
                 neighbour_indexes = np.array(neighbour_indexes,
-                                                dtype=np.uint32)
+                                             dtype=np.uint32)
                 self.results_queue.put(
                     IndexNeighbours(row_index=i,
                                     neighbour_list=neighbour_indexes))

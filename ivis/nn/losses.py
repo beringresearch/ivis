@@ -1,5 +1,6 @@
 """ Triplet loss functions for training a siamese network with three subnetworks.
-    All loss function variants are accessible through the `triplet_loss` function by specifying the distance as a string.
+    All loss function variants are accessible through the `triplet_loss` function
+    by specifying the distance as a string.
 """
 
 from tensorflow.keras import backend as K
@@ -9,7 +10,7 @@ import numpy as np
 
 
 def triplet_loss(distance='pn', margin=1):
-
+    """Returns a created triplet loss function using provided hyperparameters"""
     losses = get_loss_functions(margin=margin)
 
     loss_function = losses[distance]
@@ -132,13 +133,13 @@ def euclidean_loss(margin=1):
 
 def manhattan_loss(margin=1):
     def _manhattan_loss(y_true, y_pred):
-        anchor, positive, negative = tf.unstack(y_pred)        
+        anchor, positive, negative = tf.unstack(y_pred)
         return K.mean(K.maximum(_manhattan_distance(anchor, positive) - _manhattan_distance(anchor, negative) + margin, 0))
     return _manhattan_loss
 
 
 def manhattan_pn_loss(margin=1):
-    def _pn_loss(y_true, y_pred):    
+    def _pn_loss(y_true, y_pred):
         anchor, positive, negative = tf.unstack(y_pred)
 
         anchor_positive_distance = _manhattan_distance(anchor, positive)

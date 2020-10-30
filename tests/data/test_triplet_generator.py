@@ -3,6 +3,7 @@ import pytest
 
 from sklearn import datasets
 
+from annoy import AnnoyIndex
 from ivis.data.triplet_generators import generator_from_index
 from ivis.data.triplet_generators import KnnTripletGenerator
 from ivis.data.triplet_generators import AnnoyTripletGenerator
@@ -32,14 +33,15 @@ def test_KnnTripletGenerator():
 
 
 def test_AnnoyTripletGenerator():
-    neighbour_list = np.load('tests/data/test_knn_k4.npy')
-
     iris = datasets.load_iris()
     X = iris.data
     batch_size = 32
 
-    data_generator = KnnTripletGenerator(X, neighbour_list,
-                                         batch_size=batch_size)
+    annoy_index = AnnoyIndex(X.shape[1], metric='angular')
+    annoy_index.load('tests/data/.test-annoy-index.index')
+
+    data_generator = AnnoyTripletGenerator(X, annoy_index, k=3,
+                                           batch_size=batch_size)
 
     # Run generator thorugh one iteration of dataset and into the next
     for i in range((X.shape[0] // batch_size) + 1):
@@ -55,21 +57,33 @@ def test_AnnoyTripletGenerator():
 
 
 def test_generator_from_index():
-        # Test too large k raises exception
-        with pytest.raises(Exception):
-                generator_from_index(np.zeros(shape=(4, 5)), 
-                                     'placeholder_path.index',
-                                     k=10,
-                                     batch_size=2,
-                                     search_k=1,
-                                     precompute=False,
-                                     verbose=0)
-        # Test too large batch_size raises exception
-        with pytest.raises(Exception):
-                generator_from_index(np.zeros(shape=(4, 5)), 
-                                     'placeholder_path.index',
-                                     k=2,
-                                     batch_size=8,
-                                     search_k=1,
-                                     precompute=False,
-                                     verbose=0)
+    # Test too large k raises exception
+    with pytest.raises(Exception):
+        generator_from_index(np.zeros(shape=(4, 4)),
+                             np.zeros(shape=(4,)),
+                             'tests/data/.test-annoy-index.index',
+                             k=10,
+                             batch_size=2,
+                             search_k=1,
+                             precompute=False,
+                             verbose=0)
+    # Test too large batch_size raises exception
+    with pytest.raises(Exception):
+        generator_from_index(np.zeros(shape=(4, 4)),
+                             np.zeros(shape=(4,)),
+                             'tests/data/.test-annoy-index.index',
+                             k=2,
+                             batch_size=8,
+                             search_k=1,
+                             precompute=False,
+                             verbose=0)
+
+    # Test with valid hyperparameters
+    generator_from_index(np.zeros(shape=(4, 4)),
+                         np.zeros(shape=(4,)),
+                         'tests/data/.test-annoy-index.index',
+                         k=2,
+                         batch_size=2,
+                         search_k=1,
+                         precompute=False,
+                         verbose=0)
