@@ -1,37 +1,41 @@
-import sys
+import pandas as pd
+import numpy as np
 
 try:
-	import param
+    import param
 except ImportError:
-	param = None
+    raise ImportError(
+        'Failed to import param. You must run '
+        '`pip install param` to use vis_utils')
 
 try:
-	import panel as pn
+    import panel as pn
 except ImportError:
-	pn = None
+    pn = None
 
 try:
-	import holoviews as hv
-	from holoviews.operation.datashader import datashade
-	hv.extension('bokeh')
+    import holoviews as hv
+    from holoviews.operation.datashader import datashade, dynspread
+    hv.extension('bokeh')
 except ImportError:
-	hv = None
+    hv = None
 
 try:
-	import datashader as ds
+    import datashader as ds
+    from datashader.colors import Sets1to3
 except ImportError:
-	ds = None
+    ds = None
 
 def check_dependencies():
-	if hv is None:
-		return False
-	if ds is None:
-		return False
-	if param is None:
-		return False
-	if pn is None:
-		return False
-	return True
+    if hv is None:
+        return False
+    if ds is None:
+        return False
+    if param is None:
+        return False
+    if pn is None:
+        return False
+    return True
 
 
 class EmbeddingsExplorer(param.Parameterized):
@@ -41,9 +45,12 @@ class EmbeddingsExplorer(param.Parameterized):
         super(EmbeddingsExplorer, self).__init__()
         if not check_dependencies():
             message = (
-                'Failed to import dependencies. You must `pip install holoviews datashader` '
+                'Failed to import dependencies. You must '
+                '`pip install holoviews datashader bokeh` '
                 'for `EmbeddingsExplorer` to work.')
-            raise ImportError(message)            
+            raise ImportError(message)
+        self.embeddings = None
+        self.classes = None
 
     @param.depends('label_flag')
     def get_points(self):
@@ -55,18 +62,20 @@ class EmbeddingsExplorer(param.Parameterized):
             data['label'] = classes
             num_ks = len(np.unique(classes))
             color_key = list(enumerate(Sets1to3[0:num_ks]))
-            
-            embed = {k: hv.Points(data.values[classes==k,:], ['ivis 1', 'ivis 2'], 'k',
+
+            embed = {k: hv.Points(data.values[classes == k, :], ['ivis 1', 'ivis 2'], 'k',
                                   label=str(k)).opts(color=v, size=0) for k, v in color_key}
-            dse = dynspread(datashade(hv.NdOverlay(embed, kdims=['k']), aggregator=ds.by('k', ds.count())))
-            color_points = hv.NdOverlay({k: hv.Points([0,0]).opts(color=v, size=0) for k, v in color_key})
+            dse = dynspread(
+                datashade(hv.NdOverlay(embed, kdims=['k']), aggregator=ds.by('k', ds.count())))
+            color_points = hv.NdOverlay(
+                {k: hv.Points([0, 0]).opts(color=v, size=0) for k, v in color_key})
             points = color_points * dse
         else:
             points = datashade(hv.Points(embeddings))
-        
+
         points.opts(height=400, width=500, xaxis=None, yaxis=None)
         return points
-    
+
     def view(self, embeddings, classes=None):
         self.embeddings = embeddings
         self.classes = classes
