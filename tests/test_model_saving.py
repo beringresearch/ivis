@@ -1,7 +1,6 @@
 import pytest
 from ivis import Ivis
 import os
-import shutil
 from sklearn import datasets
 import numpy as np
 import tempfile

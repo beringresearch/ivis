@@ -1,26 +1,24 @@
 """ scikit-learn wrapper class for the Ivis algorithm. """
-from .data.triplet_generators import generator_from_index, generator_from_knn_matrix
-from .nn.network import triplet_network, base_network
-from .nn.callbacks import ModelCheckpoint
-from .nn.losses import triplet_loss, is_categorical, is_multiclass, is_hinge
-from .nn.losses import semi_supervised_loss, validate_sparse_labels
-from .data.knn import build_annoy_index
+import json
+import os
+import shutil
+import pickle as pkl
+import tensorflow as tf
+import numpy as np
 
 from tensorflow import keras
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.models import load_model, Model
 from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras import regularizers
-import numpy as np
-
 from sklearn.base import BaseEstimator
 
-import json
-import os
-import shutil
-import multiprocessing
-import tensorflow as tf
-import platform
+from .data.triplet_generators import generator_from_index, generator_from_knn_matrix
+from .nn.network import triplet_network, base_network
+from .nn.callbacks import ModelCheckpoint
+from .nn.losses import triplet_loss, is_categorical, is_multiclass, is_hinge
+from .nn.losses import semi_supervised_loss, validate_sparse_labels
+from .data.knn import build_annoy_index
 
 
 class Ivis(BaseEstimator):
@@ -85,10 +83,9 @@ class Ivis(BaseEstimator):
         ivis-specific callbacks are provided in the ivis.nn.callbacks module.
     :param bool build_index_on_disk: Whether to build the annoy index directly
         on disk. Building on disk should allow for bigger datasets to be indexed,
-        but may cause issues. If None, on-disk building will be enabled for Linux, 
-        but not Windows due to issues on Windows.
+        but may cause issues.
     :param np.array neighbour_matrix: A pre-computed KNN matrix can be provided.
-        The KNNs can be retrieved using any method, and will cause Ivis to skip 
+        The KNNs can be retrieved using any method, and will cause Ivis to skip
         computing the Annoy KNN index.
     :param int verbose: Controls the volume of logging output the model
         produces when training. When set to 0, silences outputs, when above 0
@@ -132,8 +129,8 @@ class Ivis(BaseEstimator):
         else:
             self.build_index_on_disk = build_index_on_disk
         self.neighbour_matrix = neighbour_matrix
-        #TODO validate the dimensions of the neighbour matrix
         self.verbose = verbose
+        self.n_classes = None
 
     def __getstate__(self):
         """ Return object serializable variable dict """
