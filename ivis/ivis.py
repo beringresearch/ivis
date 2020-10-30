@@ -157,9 +157,7 @@ class Ivis(BaseEstimator):
             datagen = generator_from_knn_matrix(X, Y,
                                                 neighbour_matrix=self.neighbour_matrix,
                                                 k=self.k,
-                                                batch_size=self.batch_size,
-                                                search_k=self.search_k,
-                                                verbose=self.verbose)
+                                                batch_size=self.batch_size)
         else:
             if self.annoy_index_path is None:
                 self.annoy_index_path = 'annoy.index'
