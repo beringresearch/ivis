@@ -83,7 +83,7 @@ def test_generator_from_index():
                          np.zeros(shape=(4,)),
                          'tests/data/.test-annoy-index.index',
                          k=2,
-                         batch_size=8,
+                         batch_size=2,
                          search_k=1,
                          precompute=False,
                          verbose=0)
