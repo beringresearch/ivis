@@ -1,7 +1,8 @@
-from ivis import Ivis
+import pytest
 from sklearn import datasets
 import numpy as np
-import pytest
+from ivis import Ivis
+
 
 def test_iris_embedding():
     iris = datasets.load_iris()
