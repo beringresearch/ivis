@@ -1,12 +1,10 @@
-import h5py
-from ivis import Ivis
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.utils import HDF5Matrix
-import numpy as np
-import pytest
 import os
 import tempfile
+import h5py
+import numpy as np
+import pytest
+from tensorflow.keras.utils import HDF5Matrix
+from ivis import Ivis
 
 
 @pytest.fixture(scope='function')

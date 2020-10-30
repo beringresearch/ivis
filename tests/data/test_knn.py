@@ -1,13 +1,12 @@
-from ivis.data.knn import build_annoy_index, extract_knn
-
+import tempfile
+import os
+import pytest
 from annoy import AnnoyIndex
-import numpy as np
 from scipy.sparse import csr_matrix
 from sklearn import datasets
-import tempfile
-import pytest
-import os
+import numpy as np
 
+from ivis.data.knn import build_annoy_index, extract_knn
 
 @pytest.fixture(scope='function')
 def annoy_index_file():
