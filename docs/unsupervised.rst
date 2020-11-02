@@ -78,7 +78,7 @@ We now define the custom neural network that will be used as a feature extractor
         return model
 
     in_shape = x_train.shape[1:]
-    base_model = maaten_base_network(in_shape)
+    base_model = get_base_network(in_shape)
 
 Once the network is set up, all we have to do is let ``Ivis`` know that we will be using a custom network rather than the pre-built one.
 
