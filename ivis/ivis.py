@@ -16,7 +16,7 @@ from sklearn.base import BaseEstimator
 from .data.triplet_generators import generator_from_index, generator_from_knn_matrix
 from .nn.network import triplet_network, base_network
 from .nn.callbacks import ModelCheckpoint
-from .nn.losses import triplet_loss, is_categorical, is_multiclass, is_hinge
+from .nn.losses import triplet_loss, is_categorical, is_multiclass, is_hinge, register_loss_fn
 from .nn.losses import semi_supervised_loss, validate_sparse_labels
 from .data.knn import build_annoy_index
 
@@ -32,10 +32,10 @@ class Ivis(BaseEstimator):
     :param int embedding_dims: Number of dimensions in the embedding space
     :param int k: The number of neighbours to retrieve for each point.
         Must be less than one minus the number of rows in the dataset.
-    :param str distance: The loss function used to train the neural network.
-        One of "pn", "euclidean", "manhattan_pn", "manhattan", "chebyshev",
-        "chebyshev_pn", "softmax_ratio_pn", "softmax_ratio", "cosine",
-        "cosine_pn".
+    :param Union[str, Callable] distance: The loss function used to train 
+        the neural network. If string: one of "pn", "euclidean", "manhattan_pn",
+        "manhattan", "chebyshev","chebyshev_pn", "softmax_ratio_pn", 
+        "softmax_ratio", "cosine", "cosine_pn".
     :param int batch_size: The size of mini-batches used during gradient
         descent while training the neural network. Must be less than the
         num_rows in the dataset.
@@ -104,7 +104,11 @@ class Ivis(BaseEstimator):
 
         self.embedding_dims = embedding_dims
         self.k = k
-        self.distance = distance
+        if callable(distance):
+            register_loss_fn(distance)
+            self.distance = distance.__name__
+        else:
+            self.distance = distance
         self.batch_size = batch_size
         self.epochs = epochs
         self.n_epochs_without_progress = n_epochs_without_progress

@@ -9,33 +9,36 @@ from tensorflow import keras
 import numpy as np
 
 
+loss_fn_builder_dict = {}
+def register_loss_fn(loss_fn):
+    """Registers a function as a ivis loss function builder. This builder function
+    should return a loss function capable of dealing with triplet Tensors batches.
+
+    This function allows users to register their own custom loss functions with ivis.
+
+    Builder functions should have a parameter accepting keyword arguments **kwargs.
+    The builder function should return a loss function with two parameters, (y_true, y_pred)
+    which calculates the loss for a batch of triplet inputs.
+
+    y_pred is expected to be of shape: (3, batch_size, embedding_dims)."""
+
+    loss_fn_builder_dict[loss_fn.__qualname__] = loss_fn
+    return loss_fn
+
+
 def triplet_loss(distance='pn', margin=1):
     """Returns a created triplet loss function using provided hyperparameters"""
-    losses = get_loss_functions(margin=margin)
-
-    loss_function = losses[distance]
-    loss_function.__name__ = distance
-
-    return loss_function
-
-
-def get_loss_functions(margin=1):
-    losses = {
-        'pn': pn_loss(margin=margin),
-        'euclidean': euclidean_loss(margin=margin),
-        'softmax_ratio': softmax_ratio,
-        'softmax_ratio_pn': softmax_ratio_pn,
-        'manhattan': manhattan_loss(margin=margin),
-        'manhattan_pn': manhattan_pn_loss(margin=margin),
-        'chebyshev': chebyshev_loss(margin=margin),
-        'chebyshev_pn': chebyshev_pn_loss(margin=margin),
-        'cosine': cosine_loss(margin=margin),
-        'cosine_pn': cosine_pn_loss(margin=margin)
-    }
-    return losses
+    loss_fn = loss_fn_builder_dict[distance](margin=margin)
+    return loss_fn
 
 
 def semi_supervised_loss(loss_function):
+    """Wraps the provided ivis supervised loss function to deal with the partially
+    labeled data. Returns a new 'semi-supervised' loss function that masks the
+    loss on examples where label information is missing.
+
+    Missing labels are assumed to be marked with -1."""
+
     def new_loss_function(y_true, y_pred):
         mask = tf.cast(~tf.math.equal(y_true, -1), tf.float32)
         y_true_pos = tf.nn.relu(y_true)
@@ -108,9 +111,9 @@ def _cosine_distance(x, y):
     return tf.math.reduce_sum(tf.nn.l2_normalize(x, axis=1) * tf.nn.l2_normalize(y, axis=1))
 
 
-
-def pn_loss(margin=1):
-    def _pn_loss(y_true, y_pred):    
+@register_loss_fn
+def pn(margin=1):
+    def _pn(y_true, y_pred):
         anchor, positive, negative = tf.unstack(y_pred)
 
         anchor_positive_distance = _euclidean_distance(anchor, positive)
@@ -121,25 +124,25 @@ def pn_loss(margin=1):
 
         return K.mean(K.maximum(anchor_positive_distance - minimum_distance + margin, 0))
 
-    return _pn_loss
+    return _pn
 
-
-def euclidean_loss(margin=1):
-    def _euclidean_loss(y_true, y_pred):
+@register_loss_fn
+def euclidean(margin=1):
+    def _euclidean(y_true, y_pred):
         anchor, positive, negative = tf.unstack(y_pred)        
         return K.mean(K.maximum(_euclidean_distance(anchor, positive) - _euclidean_distance(anchor, negative) + margin, 0))
-    return _euclidean_loss
+    return _euclidean
 
-
-def manhattan_loss(margin=1):
-    def _manhattan_loss(y_true, y_pred):
+@register_loss_fn
+def manhattan(margin=1):
+    def _manhattan(y_true, y_pred):
         anchor, positive, negative = tf.unstack(y_pred)
         return K.mean(K.maximum(_manhattan_distance(anchor, positive) - _manhattan_distance(anchor, negative) + margin, 0))
-    return _manhattan_loss
+    return _manhattan
 
-
-def manhattan_pn_loss(margin=1):
-    def _pn_loss(y_true, y_pred):
+@register_loss_fn
+def manhattan_pn(margin=1):
+    def _pn(y_true, y_pred):
         anchor, positive, negative = tf.unstack(y_pred)
 
         anchor_positive_distance = _manhattan_distance(anchor, positive)
@@ -150,18 +153,18 @@ def manhattan_pn_loss(margin=1):
 
         return K.mean(K.maximum(anchor_positive_distance - minimum_distance + margin, 0))
 
-    return _pn_loss
+    return _pn
 
-
-def chebyshev_loss(margin=1):
-    def _chebyshev_loss(y_true, y_pred):
+@register_loss_fn
+def chebyshev(margin=1):
+    def _chebyshev(y_true, y_pred):
         anchor, positive, negative = tf.unstack(y_pred)  
         return K.mean(K.maximum(_chebyshev_distance(anchor, positive) - _chebyshev_distance(anchor, negative) + margin, 0))
-    return _chebyshev_loss
+    return _chebyshev
 
-
-def chebyshev_pn_loss(margin=1):
-    def _pn_loss(y_true, y_pred):
+@register_loss_fn
+def chebyshev_pn(margin=1):
+    def _pn(y_true, y_pred):
         anchor, positive, negative = tf.unstack(y_pred)
 
         anchor_positive_distance = _chebyshev_distance(anchor, positive)
@@ -172,18 +175,18 @@ def chebyshev_pn_loss(margin=1):
 
         return K.mean(K.maximum(anchor_positive_distance - minimum_distance + margin, 0))
 
-    return _pn_loss
+    return _pn
 
-
-def cosine_loss(margin=1):
-    def _cosine_loss(y_true, y_pred):
+@register_loss_fn
+def cosine(margin=1):
+    def _cosine(y_true, y_pred):
         anchor, positive, negative = tf.unstack(y_pred)        
         return K.mean(K.maximum(_cosine_distance(anchor, positive) - _cosine_distance(anchor, negative) + margin, 0))
-    return _cosine_loss
+    return _cosine
 
-
-def cosine_pn_loss(margin=1):
-    def _pn_loss(y_true, y_pred):
+@register_loss_fn
+def cosine_pn(margin=1):
+    def _pn(y_true, y_pred):
         anchor, positive, negative = tf.unstack(y_pred)
 
         anchor_positive_distance = _cosine_distance(anchor, positive)
@@ -194,32 +197,38 @@ def cosine_pn_loss(margin=1):
 
         return K.mean(K.maximum(anchor_positive_distance - minimum_distance + margin, 0))
 
-    return _pn_loss
+    return _pn
 
+@register_loss_fn
+def softmax_ratio(**_):
+    def _softmax_ratio(y_true, y_pred):
+        anchor, positive, negative = tf.unstack(y_pred)
 
-def softmax_ratio(y_true, y_pred):
-    anchor, positive, negative = tf.unstack(y_pred)
+        positive_distance = _euclidean_distance(anchor, positive)
+        negative_distance = _euclidean_distance(anchor, negative)
 
-    positive_distance = _euclidean_distance(anchor, positive)
-    negative_distance = _euclidean_distance(anchor, negative)
+        softmax = K.softmax(K.concatenate([positive_distance, negative_distance]))
+        ideal_distance = K.variable([0, 1])
+        return K.mean(K.maximum(softmax - ideal_distance, 0))
 
-    softmax = K.softmax(K.concatenate([positive_distance, negative_distance]))
-    ideal_distance = K.variable([0, 1])
-    return K.mean(K.maximum(softmax - ideal_distance, 0))
+    return _softmax_ratio
 
+@register_loss_fn
+def softmax_ratio_pn(**_):
+    def _softmax_ratio_pn(y_true, y_pred):
+        anchor, positive, negative = tf.unstack(y_pred)
 
-def softmax_ratio_pn(y_true, y_pred):
-    anchor, positive, negative = tf.unstack(y_pred)
+        anchor_positive_distance = _euclidean_distance(anchor, positive)
+        anchor_negative_distance = _euclidean_distance(anchor, negative)
+        positive_negative_distance = _euclidean_distance(positive, negative)
 
-    anchor_positive_distance = _euclidean_distance(anchor, positive)
-    anchor_negative_distance = _euclidean_distance(anchor, negative)
-    positive_negative_distance = _euclidean_distance(positive, negative)
+        minimum_distance = K.min(K.concatenate([anchor_negative_distance, positive_negative_distance]), axis=-1, keepdims=True)
 
-    minimum_distance = K.min(K.concatenate([anchor_negative_distance, positive_negative_distance]), axis=-1, keepdims=True)
+        softmax = K.softmax(K.concatenate([anchor_positive_distance, minimum_distance]))
+        ideal_distance = K.variable([0, 1])
+        return K.mean(K.maximum(softmax - ideal_distance, 0))
 
-    softmax = K.softmax(K.concatenate([anchor_positive_distance, minimum_distance]))
-    ideal_distance = K.variable([0, 1])
-    return K.mean(K.maximum(softmax - ideal_distance, 0))
+    return _softmax_ratio_pn
 
 
 def validate_sparse_labels(Y):
