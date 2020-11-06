@@ -16,7 +16,7 @@ from sklearn.base import BaseEstimator
 from .data.triplet_generators import generator_from_index, generator_from_knn_matrix
 from .nn.network import triplet_network, base_network
 from .nn.callbacks import ModelCheckpoint
-from .nn.losses import triplet_loss, is_categorical, is_multiclass, is_hinge, register_loss
+from .nn.losses import triplet_loss, is_categorical, is_multiclass, is_hinge
 from .nn.losses import semi_supervised_loss, validate_sparse_labels
 from .data.knn import build_annoy_index
 
@@ -104,11 +104,7 @@ class Ivis(BaseEstimator):
 
         self.embedding_dims = embedding_dims
         self.k = k
-        if callable(distance):
-            register_loss(distance)
-            self.distance = distance.__name__
-        else:
-            self.distance = distance
+        self.distance = distance
         self.batch_size = batch_size
         self.epochs = epochs
         self.n_epochs_without_progress = n_epochs_without_progress
@@ -153,6 +149,8 @@ class Ivis(BaseEstimator):
             state['model'] = None
         if 'neighbour_matrix' in state:
             state['neighbour_matrix'] = None
+        if callable(state['distance']):
+            state['distance'] = state['distance'].__name__
         return state
 
     def _fit(self, X, Y=None, shuffle_mode=True):
@@ -410,6 +408,8 @@ class Ivis(BaseEstimator):
 
         ivis_config = json.load(open(os.path.join(folder_path,
                                                   'ivis_params.json'), 'r'))
+        if callable(self.distance):
+            ivis_config['distance'] = self.distance
         self.__dict__ = ivis_config
 
         loss_function = triplet_loss(self.distance)
