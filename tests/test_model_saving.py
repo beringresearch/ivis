@@ -1,10 +1,10 @@
-import pytest
-from ivis import Ivis
 import os
+import tempfile
+import pytest
 from sklearn import datasets
 import numpy as np
-import tempfile
 import tensorflow as tf
+from ivis import Ivis
 
 
 @pytest.fixture(scope='function')
