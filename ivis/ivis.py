@@ -16,7 +16,7 @@ from sklearn.base import BaseEstimator
 from .data.triplet_generators import generator_from_index, generator_from_knn_matrix
 from .nn.network import triplet_network, base_network
 from .nn.callbacks import ModelCheckpoint
-from .nn.losses import triplet_loss, is_categorical, is_multiclass, is_hinge, register_loss_fn
+from .nn.losses import triplet_loss, is_categorical, is_multiclass, is_hinge, register_loss
 from .nn.losses import semi_supervised_loss, validate_sparse_labels
 from .data.knn import build_annoy_index
 
@@ -105,7 +105,7 @@ class Ivis(BaseEstimator):
         self.embedding_dims = embedding_dims
         self.k = k
         if callable(distance):
-            register_loss_fn(distance)
+            register_loss(distance)
             self.distance = distance.__name__
         else:
             self.distance = distance
@@ -116,7 +116,7 @@ class Ivis(BaseEstimator):
         self.ntrees = ntrees
         self.search_k = search_k
         self.precompute = precompute
-        self.model_def = model
+        self.model = model
         self.model_ = None
         self.encoder = None
         self.supervision_metric = supervision_metric
@@ -149,8 +149,8 @@ class Ivis(BaseEstimator):
             state['supervised_model_'] = None
         if 'callbacks' in state:
             state['callbacks'] = []
-        if not isinstance(state['model_def'], str):
-            state['model_def'] = None
+        if not isinstance(state['model'], str):
+            state['model'] = None
         if 'neighbour_matrix' in state:
             state['neighbour_matrix'] = None
         return state
@@ -182,20 +182,19 @@ class Ivis(BaseEstimator):
 
         loss_monitor = 'loss'
         try:
-            triplet_loss_func = triplet_loss(distance=self.distance,
-                                             margin=self.margin)
+            triplet_loss_func = triplet_loss(distance=self.distance)
         except KeyError:
             raise ValueError('Loss function `{}` not implemented.'.format(self.distance))
 
         if self.model_ is None:
-            if isinstance(self.model_def, str):
+            if isinstance(self.model, str):
                 input_size = (X.shape[-1],)
                 self.model_, anchor_embedding, _, _ = \
-                    triplet_network(base_network(self.model_def, input_size),
+                    triplet_network(base_network(self.model, input_size),
                                     embedding_dims=self.embedding_dims)
             else:
                 self.model_, anchor_embedding, _, _ = \
-                    triplet_network(self.model_def,
+                    triplet_network(self.model,
                                     embedding_dims=self.embedding_dims)
 
             if Y is None:
@@ -413,7 +412,7 @@ class Ivis(BaseEstimator):
                                                   'ivis_params.json'), 'r'))
         self.__dict__ = ivis_config
 
-        loss_function = triplet_loss(self.distance, self.margin)
+        loss_function = triplet_loss(self.distance)
 
         # ivis models trained before version 1.8.3 won't have separate optimizer file
         # maintain compatibility by falling back to old load behavior
