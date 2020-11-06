@@ -32,10 +32,17 @@ class Ivis(BaseEstimator):
     :param int embedding_dims: Number of dimensions in the embedding space
     :param int k: The number of neighbours to retrieve for each point.
         Must be less than one minus the number of rows in the dataset.
-    :param Union[str, Callable] distance: The loss function used to train 
-        the neural network. If string: one of "pn", "euclidean", "manhattan_pn",
-        "manhattan", "chebyshev","chebyshev_pn", "softmax_ratio_pn", 
-        "softmax_ratio", "cosine", "cosine_pn".
+    :param Union[str,Callable] distance: The loss function used to train
+        the neural network.
+
+        *   If string: one of "pn", "euclidean", "manhattan_pn",
+            "manhattan", "chebyshev","chebyshev_pn", "softmax_ratio_pn",
+            "softmax_ratio", "cosine", "cosine_pn".
+        *   If Callable, must have two parameters, (y_true, y_pred).
+            y_pred denotes the batch of triplets, and y_true are any corresponding labels.
+            y_pred is expected to be of shape: (3, batch_size, embedding_dims).
+                * When loading model loaded with a custom loss, provide the loss to the
+                  constructor of the new Ivis instance before loading the saved model.
     :param int batch_size: The size of mini-batches used during gradient
         descent while training the neural network. Must be less than the
         num_rows in the dataset.
@@ -55,15 +62,17 @@ class Ivis(BaseEstimator):
     :param bool precompute: Whether to pre-compute the nearest neighbours.
         Pre-computing is a little faster, but requires more memory. If memory
         is limited, try setting this to False.
-    :param str model: str or keras.models.Model. The keras model to train using
-        triplet loss. If a model object is provided, an embedding layer of size
-        'embedding_dims' will be appended to the end of the network.
-        If a string, a pre-defined network by that name will be used. Possible
-        options are: 'szubert', 'hinton', 'maaten'. By default the 'szubert'
-        network will be created, which is a selu network composed of 3 dense
-        layers of 128 neurons each, followed by an embedding layer of size
-        'embedding_dims'.
-    :param str supervision_metric: str or function. The supervision metric to
+    :param Union[str,tf.keras.models.Model] model: The keras model to train using
+        triplet loss.
+
+        *   If a model object is provided, an embedding layer of size
+            'embedding_dims' will be appended to the end of the network.
+        *   If a string, a pre-defined network by that name will be used. Possible
+            options are: 'szubert', 'hinton', 'maaten'. By default the 'szubert'
+            network will be created, which is a selu network composed of 3 dense
+            layers of 128 neurons each, followed by an embedding layer of size
+            'embedding_dims'.
+    :param str supervision_metric: The supervision metric to
         optimize when training keras in supervised mode. Supports all of the
         classification or regression losses included with keras, so long as
         the labels are provided in the correct format. A list of keras' loss
@@ -76,7 +85,7 @@ class Ivis(BaseEstimator):
         saved on disk. If provided, the annoy index file will be used.
         Otherwise, a new index will be generated and saved to disk in the
         current directory as 'annoy.index'.
-    :param list[keras.callbacks.Callback] callbacks: List of keras Callbacks to
+    :param [keras.callbacks.Callback] callbacks: List of keras Callbacks to
         pass model during training, such as the TensorBoard callback. A set of
         ivis-specific callbacks are provided in the ivis.nn.callbacks module.
     :param bool build_index_on_disk: Whether to build the annoy index directly
