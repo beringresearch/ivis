@@ -44,8 +44,6 @@ class Ivis(BaseEstimator):
         once.
     :param int n_epochs_without_progress: After n number of epochs without an
         improvement to the loss, terminate training early.
-    :param float margin: The distance that is enforced between points by the
-        triplet loss functions.
     :param int ntrees: The number of random projections trees built by Annoy to
         approximate KNN. The more trees the higher the memory usage, but the
         better the accuracy of results.
@@ -94,8 +92,7 @@ class Ivis(BaseEstimator):
     """
 
     def __init__(self, embedding_dims=2, k=150, distance='pn', batch_size=128,
-                 epochs=1000, n_epochs_without_progress=20,
-                 margin=1, ntrees=50, search_k=-1,
+                 epochs=1000, n_epochs_without_progress=20, ntrees=50, search_k=-1,
                  precompute=True, model='szubert',
                  supervision_metric='sparse_categorical_crossentropy',
                  supervision_weight=0.5, annoy_index_path=None,
@@ -108,7 +105,6 @@ class Ivis(BaseEstimator):
         self.batch_size = batch_size
         self.epochs = epochs
         self.n_epochs_without_progress = n_epochs_without_progress
-        self.margin = margin
         self.ntrees = ntrees
         self.search_k = search_k
         self.precompute = precompute
