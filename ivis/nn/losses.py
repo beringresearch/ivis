@@ -15,8 +15,12 @@ from .distances import euclidean_distance, manhattan_distance, chebyshev_distanc
 loss_dict = {}
 def register_loss(loss_fn=None, *, name=None):
     """Registers a class definition or class instance as a ivis loss function.
-    If a class definition is provided, an instance will be created with default parameters,
-    (with no arguments).
+    A mapping will be created between the name and the loss function passed.
+    If a class definition is provided, an instance will be created, passing the name
+    as an argument.
+
+    If no name is provided to this function, the name of the passed function will be used
+    as a key.
 
     The loss function must have two parameters, (y_true, y_pred)
     and calculates the loss for a batch of triplet inputs (y_pred).
@@ -34,7 +38,10 @@ def register_loss(loss_fn=None, *, name=None):
 
 
 def triplet_loss(distance='pn'):
-    """Returns a created triplet loss function using provided hyperparameters"""
+    """Returns a created triplet loss function using provided hyperparameters.
+    If passed a callable, just returns it."""
+    if callable(distance):
+        return distance
     try:
         loss_fn = loss_dict[distance]
         return loss_fn
