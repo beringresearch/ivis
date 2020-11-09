@@ -28,6 +28,7 @@ def test_custom_loss_fn_registration():
         return y_pred - y_true
     assert custom_loss_fn.__name__ in losses.loss_dict
     assert custom_loss_fn is losses.loss_dict[custom_loss_fn.__name__]
+    assert losses.triplet_loss(distance=custom_loss_fn.__name__) is custom_loss_fn
 
 def test_custom_loss_ivis(model_filepath):
     iris = datasets.load_iris()
