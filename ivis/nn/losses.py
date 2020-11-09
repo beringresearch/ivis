@@ -14,7 +14,7 @@ from .distances import euclidean_distance, manhattan_distance, chebyshev_distanc
 
 loss_dict = {}
 def register_loss(loss_fn=None, *, name=None):
-    """Registers a class definition or class instance as a ivis loss function.
+    """Registers a class definition or Callable as an ivis loss function.
     A mapping will be created between the name and the loss function passed.
     If a class definition is provided, an instance will be created, passing the name
     as an argument.
@@ -24,7 +24,15 @@ def register_loss(loss_fn=None, *, name=None):
 
     The loss function must have two parameters, (y_true, y_pred)
     and calculates the loss for a batch of triplet inputs (y_pred).
-    y_pred is expected to be of shape: (3, batch_size, embedding_dims)."""
+    y_pred is expected to be of shape: (3, batch_size, embedding_dims).
+
+    Usage:
+        .. code-block:: python
+
+            @register_loss
+            def custom_loss(y_true, y_pred):
+                pass
+            model = Ivis(distance='custom_loss')"""
 
     if loss_fn is None:
         return functools.partial(register_loss, name=name)
@@ -38,8 +46,8 @@ def register_loss(loss_fn=None, *, name=None):
 
 
 def triplet_loss(distance='pn'):
-    """Returns a created triplet loss function using provided hyperparameters.
-    If passed a callable, just returns it."""
+    """Returns a previously registered triplet loss function associated
+    with the string 'distance'. If passed a callable, just returns it."""
     if callable(distance):
         return distance
     try:
@@ -51,6 +59,8 @@ def triplet_loss(distance='pn'):
 
 @register_loss(name='pn')
 class EuclideanPnLoss:
+    """Calculates the pn loss (a variant of triplet loss) between anchor, positive and negative
+    examples in a triplet based on euclidean distance."""
     def __init__(self, margin=1, name=None):
         self.margin = margin
         name = name or self.__class__.__name__
@@ -70,6 +80,8 @@ class EuclideanPnLoss:
 
 @register_loss(name='euclidean')
 class EuclideanTripletLoss:
+    """Calculates the standard triplet loss between anchor, positive and negative
+    examples in a triplet based on euclidean distance."""
     def __init__(self, margin=1, name=None):
         self.margin = margin
         name = name or self.__class__.__name__
@@ -79,19 +91,10 @@ class EuclideanTripletLoss:
         return K.mean(K.maximum(euclidean_distance(anchor, positive) - euclidean_distance(anchor, negative) + self.margin, 0))
 
 
-@register_loss(name='manhattan')
-class ManhattanTripletLoss:
-    def __init__(self, margin=1, name=None):
-        self.margin = margin
-        name = name or self.__class__.__name__
-        self.__name__ = name
-    def __call__(self, y_true, y_pred):
-        anchor, positive, negative = tf.unstack(y_pred)
-        return K.mean(K.maximum(manhattan_distance(anchor, positive) - manhattan_distance(anchor, negative) + self.margin, 0))
-
-
 @register_loss(name='manhattan_pn')
 class ManhattanPnLoss:
+    """Calculates the pn loss (a variant of triplet loss) between anchor, positive and negative
+    examples in a triplet based on manhattan distance."""
     def __init__(self, margin=1, name=None):
         self.margin = margin
         name = name or self.__class__.__name__
@@ -109,19 +112,23 @@ class ManhattanPnLoss:
         return K.mean(K.maximum(anchor_positive_distance - minimum_distance + self.margin, 0))
 
 
-@register_loss(name='chebyshev')
-class ChebyshevTripletLoss:
+@register_loss(name='manhattan')
+class ManhattanTripletLoss:
+    """Calculates the standard triplet loss between anchor, positive and negative
+    examples in a triplet based on manhattan distance."""
     def __init__(self, margin=1, name=None):
         self.margin = margin
         name = name or self.__class__.__name__
         self.__name__ = name
     def __call__(self, y_true, y_pred):
         anchor, positive, negative = tf.unstack(y_pred)
-        return K.mean(K.maximum(chebyshev_distance(anchor, positive) - chebyshev_distance(anchor, negative) + self.margin, 0))
+        return K.mean(K.maximum(manhattan_distance(anchor, positive) - manhattan_distance(anchor, negative) + self.margin, 0))
 
 
 @register_loss(name='chebyshev_pn')
 class ChebyshevPnLoss:
+    """Calculates the pn loss (a variant of triplet loss) between anchor, positive and negative
+    examples in a triplet based on chebyshev distance."""
     def __init__(self, margin=1, name=None):
         self.margin = margin
         name = name or self.__class__.__name__
@@ -138,19 +145,23 @@ class ChebyshevPnLoss:
         return K.mean(K.maximum(anchor_positive_distance - minimum_distance + self.margin, 0))
 
 
-@register_loss(name='cosine')
-class CosineTripletLoss:
+@register_loss(name='chebyshev')
+class ChebyshevTripletLoss:
+    """Calculates the standard triplet loss between anchor, positive and negative
+    examples in a triplet based on chebyshev distance."""
     def __init__(self, margin=1, name=None):
         self.margin = margin
         name = name or self.__class__.__name__
         self.__name__ = name
     def __call__(self, y_true, y_pred):
         anchor, positive, negative = tf.unstack(y_pred)
-        return K.mean(K.maximum(cosine_distance(anchor, positive) - cosine_distance(anchor, negative) + self.margin, 0))
+        return K.mean(K.maximum(chebyshev_distance(anchor, positive) - chebyshev_distance(anchor, negative) + self.margin, 0))
 
 
 @register_loss(name='cosine_pn')
 class CosinePnLoss:
+    """Calculates the pn loss (a variant of triplet loss) between anchor, positive and negative
+    examples in a triplet based on cosine distance."""
     def __init__(self, margin=1, name=None):
         self.margin = margin
         name = name or self.__class__.__name__
@@ -167,27 +178,24 @@ class CosinePnLoss:
         return K.mean(K.maximum(anchor_positive_distance - minimum_distance + self.margin, 0))
 
 
-
-@register_loss(name='softmax_ratio')
-class EuclideanSoftmaxRatioLoss:
+@register_loss(name='cosine')
+class CosineTripletLoss:
+    """Calculates the standard triplet loss between anchor, positive and negative
+    examples in a triplet based on cosine distance."""
     def __init__(self, margin=1, name=None):
         self.margin = margin
         name = name or self.__class__.__name__
         self.__name__ = name
     def __call__(self, y_true, y_pred):
         anchor, positive, negative = tf.unstack(y_pred)
-        positive_distance = euclidean_distance(anchor, positive)
-        negative_distance = euclidean_distance(anchor, negative)
-
-        softmax = K.softmax(K.concatenate([positive_distance, negative_distance]))
-        ideal_distance = K.variable([0, 1])
-        return K.mean(K.maximum(softmax - ideal_distance, 0))
+        return K.mean(K.maximum(cosine_distance(anchor, positive) - cosine_distance(anchor, negative) + self.margin, 0))
 
 
 @register_loss(name='softmax_ratio_pn')
 class EuclideanSoftmaxRatioPnLoss:
-    def __init__(self, margin=1, name=None):
-        self.margin = margin
+    """Calculates a pn variant of the softmax ratio between anchor, positive
+    and negative examples in a triplet based on euclidean distance."""
+    def __init__(self, name=None):
         name = name or self.__class__.__name__
         self.__name__ = name
     def __call__(self, y_true, y_pred):
@@ -201,6 +209,23 @@ class EuclideanSoftmaxRatioPnLoss:
             [anchor_negative_distance, positive_negative_distance], axis=-1, keepdims=True)
 
         softmax = K.softmax(K.concatenate([anchor_positive_distance, minimum_distance]))
+        ideal_distance = K.variable([0, 1])
+        return K.mean(K.maximum(softmax - ideal_distance, 0))
+
+
+@register_loss(name='softmax_ratio')
+class EuclideanSoftmaxRatioLoss:
+    """Calculates the standard softmax ratio between anchor, positive and negative
+    examples in a triplet based on euclidean distance."""
+    def __init__(self, name=None):
+        name = name or self.__class__.__name__
+        self.__name__ = name
+    def __call__(self, y_true, y_pred):
+        anchor, positive, negative = tf.unstack(y_pred)
+        positive_distance = euclidean_distance(anchor, positive)
+        negative_distance = euclidean_distance(anchor, negative)
+
+        softmax = K.softmax(K.concatenate([positive_distance, negative_distance]))
         ideal_distance = K.variable([0, 1])
         return K.mean(K.maximum(softmax - ideal_distance, 0))
 
@@ -270,7 +295,7 @@ def is_multiclass(supervised_loss):
 def validate_sparse_labels(Y):
     if not zero_indexed(Y):
         raise ValueError('Ensure that your labels are zero-indexed')
-    if not consecutive_indexed(Y):
+    if not _consecutive_indexed(Y):
         raise ValueError('Ensure that your labels are indexed consecutively')
 
 
@@ -280,7 +305,7 @@ def zero_indexed(Y):
     return True
 
 
-def consecutive_indexed(Y):
+def _consecutive_indexed(Y):
     """ Assumes that Y is zero-indexed. """
     n_classes = len(np.unique(Y[Y != np.array(-1)]))
     if max(Y) >= n_classes:

@@ -22,8 +22,7 @@ def build_annoy_index(X, path, ntrees=50, build_index_on_disk=True, verbose=1):
         better the accuracy of results.
     :param bool build_index_on_disk: Whether to build the annoy index directly
         on disk. Building on disk should allow for bigger datasets to be indexed,
-        but may cause issues. If None, on-disk building will be enabled for Linux, 
-        but not Windows due to issues on Windows.
+        but may cause issues.
     :param int verbose: Controls the volume of logging output the model
         produces when training. When set to 0, silences outputs, when above 0
         will print outputs.

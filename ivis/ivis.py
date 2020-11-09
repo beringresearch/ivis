@@ -35,9 +35,9 @@ class Ivis(BaseEstimator):
     :param Union[str,Callable] distance: The loss function used to train
         the neural network.
 
-        *   If string: one of "pn", "euclidean", "manhattan_pn",
-            "manhattan", "chebyshev","chebyshev_pn", "softmax_ratio_pn",
-            "softmax_ratio", "cosine", "cosine_pn".
+        *   If string: a registered loss function name. Predefined losses are:
+            "pn", "euclidean", "manhattan_pn", "manhattan", "chebyshev",
+            "chebyshev_pn", "softmax_ratio_pn", "softmax_ratio", "cosine", "cosine_pn".
         *   If Callable, must have two parameters, (y_true, y_pred).
             y_pred denotes the batch of triplets, and y_true are any corresponding labels.
             y_pred is expected to be of shape: (3, batch_size, embedding_dims).
