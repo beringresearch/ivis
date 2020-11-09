@@ -16,3 +16,9 @@ ivis.data.knn
 
 .. automodule:: ivis.data.knn
 	:members: build_annoy_index
+
+ivis.nn.losses
+==============
+
+.. automodule:: ivis.nn.losses
+	:members:
