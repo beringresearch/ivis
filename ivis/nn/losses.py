@@ -54,7 +54,7 @@ def triplet_loss(distance='pn'):
         loss_fn = loss_dict[distance]
         return loss_fn
     except KeyError:
-        raise ValueError(f"Loss function {distance} not registered with ivis")
+        raise ValueError("Loss function {} not registered with ivis".format(distance))
 
 
 @register_loss(name='pn')
