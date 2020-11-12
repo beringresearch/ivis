@@ -32,10 +32,17 @@ class Ivis(BaseEstimator):
     :param int embedding_dims: Number of dimensions in the embedding space
     :param int k: The number of neighbours to retrieve for each point.
         Must be less than one minus the number of rows in the dataset.
-    :param str distance: The loss function used to train the neural network.
-        One of "pn", "euclidean", "manhattan_pn", "manhattan", "chebyshev",
-        "chebyshev_pn", "softmax_ratio_pn", "softmax_ratio", "cosine",
-        "cosine_pn".
+    :param Union[str,Callable] distance: The loss function used to train
+        the neural network.
+
+        *   If string: a registered loss function name. Predefined losses are:
+            "pn", "euclidean", "manhattan_pn", "manhattan", "chebyshev",
+            "chebyshev_pn", "softmax_ratio_pn", "softmax_ratio", "cosine", "cosine_pn".
+        *   If Callable, must have two parameters, (y_true, y_pred).
+            y_pred denotes the batch of triplets, and y_true are any corresponding labels.
+            y_pred is expected to be of shape: (3, batch_size, embedding_dims).
+                * When loading model loaded with a custom loss, provide the loss to the
+                  constructor of the new Ivis instance before loading the saved model.
     :param int batch_size: The size of mini-batches used during gradient
         descent while training the neural network. Must be less than the
         num_rows in the dataset.
@@ -44,8 +51,6 @@ class Ivis(BaseEstimator):
         once.
     :param int n_epochs_without_progress: After n number of epochs without an
         improvement to the loss, terminate training early.
-    :param float margin: The distance that is enforced between points by the
-        triplet loss functions.
     :param int ntrees: The number of random projections trees built by Annoy to
         approximate KNN. The more trees the higher the memory usage, but the
         better the accuracy of results.
@@ -57,15 +62,17 @@ class Ivis(BaseEstimator):
     :param bool precompute: Whether to pre-compute the nearest neighbours.
         Pre-computing is a little faster, but requires more memory. If memory
         is limited, try setting this to False.
-    :param str model: str or keras.models.Model. The keras model to train using
-        triplet loss. If a model object is provided, an embedding layer of size
-        'embedding_dims' will be appended to the end of the network.
-        If a string, a pre-defined network by that name will be used. Possible
-        options are: 'szubert', 'hinton', 'maaten'. By default the 'szubert'
-        network will be created, which is a selu network composed of 3 dense
-        layers of 128 neurons each, followed by an embedding layer of size
-        'embedding_dims'.
-    :param str supervision_metric: str or function. The supervision metric to
+    :param Union[str,tf.keras.models.Model] model: The keras model to train using
+        triplet loss.
+
+        *   If a model object is provided, an embedding layer of size
+            'embedding_dims' will be appended to the end of the network.
+        *   If a string, a pre-defined network by that name will be used. Possible
+            options are: 'szubert', 'hinton', 'maaten'. By default the 'szubert'
+            network will be created, which is a selu network composed of 3 dense
+            layers of 128 neurons each, followed by an embedding layer of size
+            'embedding_dims'.
+    :param str supervision_metric: The supervision metric to
         optimize when training keras in supervised mode. Supports all of the
         classification or regression losses included with keras, so long as
         the labels are provided in the correct format. A list of keras' loss
@@ -78,7 +85,7 @@ class Ivis(BaseEstimator):
         saved on disk. If provided, the annoy index file will be used.
         Otherwise, a new index will be generated and saved to disk in the
         current directory as 'annoy.index'.
-    :param list[keras.callbacks.Callback] callbacks: List of keras Callbacks to
+    :param [keras.callbacks.Callback] callbacks: List of keras Callbacks to
         pass model during training, such as the TensorBoard callback. A set of
         ivis-specific callbacks are provided in the ivis.nn.callbacks module.
     :param bool build_index_on_disk: Whether to build the annoy index directly
@@ -94,8 +101,7 @@ class Ivis(BaseEstimator):
     """
 
     def __init__(self, embedding_dims=2, k=150, distance='pn', batch_size=128,
-                 epochs=1000, n_epochs_without_progress=20,
-                 margin=1, ntrees=50, search_k=-1,
+                 epochs=1000, n_epochs_without_progress=20, ntrees=50, search_k=-1,
                  precompute=True, model='szubert',
                  supervision_metric='sparse_categorical_crossentropy',
                  supervision_weight=0.5, annoy_index_path=None,
@@ -108,11 +114,10 @@ class Ivis(BaseEstimator):
         self.batch_size = batch_size
         self.epochs = epochs
         self.n_epochs_without_progress = n_epochs_without_progress
-        self.margin = margin
         self.ntrees = ntrees
         self.search_k = search_k
         self.precompute = precompute
-        self.model_def = model
+        self.model = model
         self.model_ = None
         self.encoder = None
         self.supervision_metric = supervision_metric
@@ -145,10 +150,12 @@ class Ivis(BaseEstimator):
             state['supervised_model_'] = None
         if 'callbacks' in state:
             state['callbacks'] = []
-        if not isinstance(state['model_def'], str):
-            state['model_def'] = None
+        if not isinstance(state['model'], str):
+            state['model'] = None
         if 'neighbour_matrix' in state:
             state['neighbour_matrix'] = None
+        if callable(state['distance']):
+            state['distance'] = state['distance'].__name__
         return state
 
     def _fit(self, X, Y=None, shuffle_mode=True):
@@ -178,20 +185,19 @@ class Ivis(BaseEstimator):
 
         loss_monitor = 'loss'
         try:
-            triplet_loss_func = triplet_loss(distance=self.distance,
-                                             margin=self.margin)
+            triplet_loss_func = triplet_loss(distance=self.distance)
         except KeyError:
             raise ValueError('Loss function `{}` not implemented.'.format(self.distance))
 
         if self.model_ is None:
-            if isinstance(self.model_def, str):
+            if isinstance(self.model, str):
                 input_size = (X.shape[-1],)
                 self.model_, anchor_embedding, _, _ = \
-                    triplet_network(base_network(self.model_def, input_size),
+                    triplet_network(base_network(self.model, input_size),
                                     embedding_dims=self.embedding_dims)
             else:
                 self.model_, anchor_embedding, _, _ = \
-                    triplet_network(self.model_def,
+                    triplet_network(self.model,
                                     embedding_dims=self.embedding_dims)
 
             if Y is None:
@@ -407,9 +413,11 @@ class Ivis(BaseEstimator):
 
         ivis_config = json.load(open(os.path.join(folder_path,
                                                   'ivis_params.json'), 'r'))
+        if callable(self.distance):
+            ivis_config['distance'] = self.distance
         self.__dict__ = ivis_config
 
-        loss_function = triplet_loss(self.distance, self.margin)
+        loss_function = triplet_loss(self.distance)
 
         # ivis models trained before version 1.8.3 won't have separate optimizer file
         # maintain compatibility by falling back to old load behavior
