@@ -13,12 +13,12 @@ from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras import regularizers
 from sklearn.base import BaseEstimator
 
-from .data.triplet_generators import generator_from_index, generator_from_knn_matrix
+from .data.triplet_generators import generator_from_neighbour_matrix
 from .nn.network import triplet_network, base_network
 from .nn.callbacks import ModelCheckpoint
 from .nn.losses import triplet_loss, is_categorical, is_multiclass, is_hinge
 from .nn.losses import semi_supervised_loss, validate_sparse_labels
-from .data.knn import build_annoy_index
+from .data.knn import AnnoyKnnIndices
 
 
 class Ivis(BaseEstimator):
@@ -160,28 +160,23 @@ class Ivis(BaseEstimator):
 
     def _fit(self, X, Y=None, shuffle_mode=True):
 
-        if self.neighbour_matrix is not None:
-            datagen = generator_from_knn_matrix(X, Y,
-                                                neighbour_matrix=self.neighbour_matrix,
-                                                k=self.k,
-                                                batch_size=self.batch_size)
-        else:
+        if self.neighbour_matrix is None:
             if self.annoy_index_path is None:
                 self.annoy_index_path = 'annoy.index'
-                if self.verbose > 0:
-                    print('Building KNN index')
-                build_annoy_index(X, self.annoy_index_path,
-                                  ntrees=self.ntrees,
-                                  build_index_on_disk=self.build_index_on_disk,
-                                  verbose=self.verbose)
+                self.neighbour_matrix = AnnoyKnnIndices.build(X, path=self.annoy_index_path,
+                                                              k=self.k, search_k=self.search_k,
+                                                              include_distances=False, ntrees=self.ntrees,
+                                                              build_index_on_disk=self.build_index_on_disk,
+                                                              precompute=self.precompute, verbose=self.verbose)
+            else:
+                self.neighbour_matrix = AnnoyKnnIndices.load(self.annoy_index_path, X.shape,
+                                                             self.k,
+                                                             self.search_k, False, self.precompute,
+                                                             self.verbose)
 
-            datagen = generator_from_index(X, Y,
-                                           index_path=self.annoy_index_path,
-                                           k=self.k,
-                                           batch_size=self.batch_size,
-                                           search_k=self.search_k,
-                                           precompute=self.precompute,
-                                           verbose=self.verbose)
+        datagen = generator_from_neighbour_matrix(X, Y,
+                                                  neighbour_matrix=self.neighbour_matrix,
+                                                  batch_size=self.batch_size)
 
         loss_monitor = 'loss'
         try:
