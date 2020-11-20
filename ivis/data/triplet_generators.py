@@ -15,72 +15,30 @@ a concern, dynamically generated triplets can be useful.
 
 from abc import ABC, abstractmethod
 import numpy as np
-from annoy import AnnoyIndex
 from tensorflow.keras.utils import Sequence
 from scipy.sparse import issparse
-from .knn import extract_knn
 
 
-def generator_from_knn_matrix(X, Y, neighbour_matrix, k, batch_size):
-    if k >= X.shape[0] - 1:
-        raise Exception('''k value greater than or equal to (num_rows - 1)
-                        (k={}, rows={}). Lower k to a smaller
-                        value.'''.format(k, X.shape[0]))
+def generator_from_neighbour_matrix(X, Y, neighbour_matrix, batch_size):
     if batch_size > X.shape[0]:
         raise Exception('''batch_size value larger than num_rows in dataset
                         (batch_size={}, rows={}). Lower batch_size to a
                         smaller value.'''.format(batch_size, X.shape[0]))
     if Y is None:
-        return KnnTripletGenerator(X, neighbour_matrix, batch_size=batch_size)
+        return UnsupervisedTripletGenerator(X, neighbour_matrix, batch_size=batch_size)
 
-    return LabeledKnnTripletGenerator(X, Y, neighbour_matrix, batch_size=batch_size)
-
-
-def generator_from_index(X, Y, index_path, k, batch_size, search_k=-1,
-                         precompute=True, verbose=1):
-    if k >= X.shape[0] - 1:
-        raise Exception('''k value greater than or equal to (num_rows - 1)
-                        (k={}, rows={}). Lower k to a smaller
-                        value.'''.format(k, X.shape[0]))
-    if batch_size > X.shape[0]:
-        raise Exception('''batch_size value larger than num_rows in dataset
-                        (batch_size={}, rows={}). Lower batch_size to a
-                        smaller value.'''.format(batch_size, X.shape[0]))
-
-    if Y is None:
-        if precompute:
-            if verbose > 0:
-                print('Extracting KNN from index')
-
-            neighbour_matrix = extract_knn(X, index_path, k=k,
-                                           search_k=search_k, verbose=verbose)
-            return KnnTripletGenerator(X, neighbour_matrix, batch_size=batch_size)
-
-        index = AnnoyIndex(X.shape[1], metric='angular')
-        index.load(index_path)
-        return AnnoyTripletGenerator(
-            X, index, k=k, batch_size=batch_size, search_k=search_k)
-    else:
-        if precompute:
-            if verbose > 0:
-                print('Extracting KNN from index')
-
-            neighbour_matrix = extract_knn(X, index_path, k=k,
-                                           search_k=search_k, verbose=verbose)
-            return LabeledKnnTripletGenerator(X, Y, neighbour_matrix, batch_size=batch_size)
-
-        index = AnnoyIndex(X.shape[1], metric='angular')
-        index.load(index_path)
-        return LabeledAnnoyTripletGenerator(
-            X, Y, index, k=k, batch_size=batch_size, search_k=search_k)
+    return SupervisedTripletGenerator(X, Y, neighbour_matrix, batch_size=batch_size)
 
 
 class TripletGenerator(Sequence, ABC):
-    def __init__(self, X, batch_size=32):
+    def __init__(self, X, neighbour_matrix, batch_size=32):
         self.X = X
+        self.neighbour_matrix = neighbour_matrix
         self.batch_size = batch_size
+
     def __len__(self):
         return int(np.ceil(self.X.shape[0] / float(self.batch_size)))
+
     def __getitem__(self, idx):
         batch_indices = range(idx * self.batch_size,
                               min((idx + 1) * self.batch_size, self.X.shape[0]))
@@ -95,6 +53,7 @@ class TripletGenerator(Sequence, ABC):
         triplet_batch = np.array(triplet_batch)
 
         return self.output_triplets(triplet_batch, label_batch)
+
     def get_triplet(self, idx):
         triplet = []
         neighbour_list = self.get_neighbours(idx)
@@ -111,72 +70,39 @@ class TripletGenerator(Sequence, ABC):
 
         triplet += [self.X[idx], self.X[neighbour_ind], self.X[negative_ind]]
         return triplet
+
+    def get_neighbours(self, idx):
+        return self.neighbour_matrix[idx]
+
     @abstractmethod
     def get_labels(self, batch_indices):
         raise NotImplementedError("Override this method with a concrete implementation")
-    @abstractmethod
-    def get_neighbours(self, idx):
-        raise NotImplementedError("Override this method with a concrete implementation")
+
     @abstractmethod
     def output_triplets(self, triplet_batch, label_batch):
         raise NotImplementedError("Override this method with a concrete implementation")
 
 
-class UnsupervisedTripletGenerator(TripletGenerator, ABC):
-    def __init__(self, X, batch_size=32):
-        super().__init__(X, batch_size)
+class UnsupervisedTripletGenerator(TripletGenerator):
+    def __init__(self, X, neighbour_matrix, batch_size=32):
+        super().__init__(X, neighbour_matrix, batch_size)
         self.placeholder_labels = np.empty(batch_size, dtype=np.uint8)
+
     def get_labels(self, batch_indices):
         return self.placeholder_labels[:len(batch_indices)]
+
     def output_triplets(self, triplet_batch, label_batch):
         return tuple([triplet_batch[:, 0], triplet_batch[:, 1], triplet_batch[:, 2]]), label_batch
 
-class SupervisedTripletGenerator(TripletGenerator, ABC):
-    def __init__(self, X, Y, batch_size=32):
-        super().__init__(X, batch_size)
+
+class SupervisedTripletGenerator(TripletGenerator):
+    def __init__(self, X, Y, neighbour_matrix, batch_size=32):
+        super().__init__(X, neighbour_matrix, batch_size)
         self.Y = Y
+
     def get_labels(self, batch_indices):
         return self.Y[batch_indices]
+
     def output_triplets(self, triplet_batch, label_batch):
         label_batch = np.array(label_batch)
         return tuple([triplet_batch[:, 0], triplet_batch[:, 1], triplet_batch[:, 2]]), tuple([label_batch, label_batch])
-
-
-class AnnoyTripletGenerator(UnsupervisedTripletGenerator):
-    def __init__(self, X, annoy_index, k=150, batch_size=32, search_k=-1):
-        super().__init__(X, batch_size)
-        self.annoy_index = annoy_index
-        self.k = k
-        self.search_k = search_k
-
-    def get_neighbours(self, idx):
-        return self.annoy_index.get_nns_by_item(
-            idx, self.k + 1, search_k=self.search_k, include_distances=False)
-
-class KnnTripletGenerator(UnsupervisedTripletGenerator):
-    def __init__(self, X, neighbour_matrix, batch_size=32):
-        super().__init__(X, batch_size)
-        self.neighbour_matrix = neighbour_matrix
-
-    def get_neighbours(self, idx):
-        return self.neighbour_matrix[idx]
-
-class LabeledAnnoyTripletGenerator(SupervisedTripletGenerator):
-    def __init__(self, X, Y, annoy_index, k=150, batch_size=32, search_k=-1):
-        super().__init__(X, Y, batch_size)
-        self.annoy_index = annoy_index
-        self.k = k
-        self.batch_size = batch_size
-        self.search_k = search_k
-
-    def get_neighbours(self, idx):
-        return self.annoy_index.get_nns_by_item(
-            idx, self.k + 1, search_k=self.search_k, include_distances=False)
-
-class LabeledKnnTripletGenerator(SupervisedTripletGenerator):
-    def __init__(self, X, Y, neighbour_matrix, batch_size=32):
-        super().__init__(X, Y, batch_size)
-        self.neighbour_matrix = neighbour_matrix
-
-    def get_neighbours(self, idx):
-        return self.neighbour_matrix[idx]
