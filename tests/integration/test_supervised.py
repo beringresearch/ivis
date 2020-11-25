@@ -50,7 +50,7 @@ def test_score_samples():
 
     # Check that loss function and activation are correct
     loss_name = ivis_iris.model_.loss['supervised'].__name__
-    assert losses.get(loss_name).__name__  == losses.get(supervision_metric).__name__
+    assert losses.get(loss_name).__name__ == losses.get(supervision_metric).__name__
     assert ivis_iris.model_.layers[-1].activation.__name__ == 'softmax'
 
 
