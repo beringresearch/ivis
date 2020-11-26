@@ -3,12 +3,81 @@
 import time
 from multiprocessing import Process, cpu_count, Queue
 from collections import namedtuple
+from collections.abc import Sequence
 from operator import attrgetter
-from abc import ABC, abstractmethod
 from scipy.sparse import issparse
 from annoy import AnnoyIndex
 from tqdm import tqdm
 import numpy as np
+
+
+class AnnoyKnnMatrix(Sequence):
+    r"""A matrix |A_ij| where i is the row index of the data point and j
+    refers to the index of the neigbouring point. Neighbouring points
+    are KNN retrieved using an Annoy Index.
+
+    .. |A_ij| replace:: A\ :subscript:`ij`"""
+
+    def __init__(self, index, shape, index_path='annoy.index', k=150, search_k=-1,
+                 precompute=False, include_distances=False, verbose=False):
+        if k >= shape[0] - 1:
+            raise ValueError('''k value greater than or equal to (num_rows - 1)
+                             (k={}, rows={}). Lower k to a smaller
+                             value.'''.format(k, shape[0]))
+        self.index = index
+        self.shape = shape
+        self.index_path = index_path
+        self.k = k
+        self.search_k = search_k
+        self.include_distances = include_distances
+        self.verbose = verbose
+        self.precomputed_neighbours = None
+        if precompute:
+            self.precomputed_neighbours = self.get_neighbour_indices()
+
+    @classmethod
+    def build(cls, X, path, k=150, metric='angular', search_k=-1, include_distances=False,
+              ntrees=50, build_index_on_disk=True, precompute=False, verbose=1):
+        """Builds a new Annoy Index on input data *X*, then constructs and returns an
+        AnnoyKnnMatrix object using the newly-built index."""
+
+        index = build_annoy_index(X, path, metric, ntrees, build_index_on_disk, verbose)
+        return cls(index, X.shape, path, k, search_k, precompute, include_distances, verbose)
+
+    @classmethod
+    def load(cls, index_path, shape, k=150, search_k=-1, include_distances=False,
+             precompute=False, verbose=1):
+        """Constructs and returns an AnnoyKnnMatrix object from an existing Annoy Index on disk."""
+
+        index = AnnoyIndex(shape[1], metric='angular')
+        index.load(index_path)
+        return cls(index, shape, index_path, k, search_k, precompute, include_distances, verbose)
+
+    def __len__(self):
+        return self.shape[0]
+
+    def __getitem__(self, idx):
+        if isinstance(idx, slice):
+            start, stop, step = idx.indices(len(self))
+            return [self[i] for i in range(start, stop, step)]
+        if idx < 0:
+            idx += len(self)
+        if self.precomputed_neighbours is not None:
+            return self.precomputed_neighbours[idx]
+        return self.index.get_nns_by_item(
+            idx, self.k + 1, search_k=self.search_k, include_distances=self.include_distances)
+
+    def get_neighbour_indices(self):
+        """Retrieves neighbours for every row in parallel"""
+        if self.precomputed_neighbours is not None:
+            return self.precomputed_neighbours
+        return extract_knn(
+            self.shape, k=self.k,
+            index_builder=self.load,
+            verbose=self.verbose,
+            index_path=self.index_path,
+            search_k=self.search_k,
+            include_distances=self.include_distances)
 
 
 def build_annoy_index(X, path, metric='angular', ntrees=50, build_index_on_disk=True, verbose=1):
@@ -61,87 +130,8 @@ def build_annoy_index(X, path, metric='angular', ntrees=50, build_index_on_disk=
             index.save(path)
         return index
 
-
-class NeighbourMatrix(ABC):
-    r"""A matrix |A_ij| where i is the row index of the data point and j
-    refers to the index of the neigbouring point.
-
-    .. |A_ij| replace:: A\ :subscript:`ij`"""
-    @abstractmethod
-    def __len__(self):
-        raise NotImplementedError
-    @abstractmethod
-    def __getitem__(self, idx):
-        raise NotImplementedError
-    def get_neighbour_indices(self):
-        """Retrieves all neighbours for all points"""
-        return [self.__getitem__(i) for i in self.__len__()]
-
-
-class AnnoyKnnMatrix(NeighbourMatrix):
-    r"""A matrix |A_ij| where i is the row index of the data point and j
-    refers to the index of the neigbouring point. Neighbouring points
-    are KNN retrieved using an Annoy Index.
-
-    .. |A_ij| replace:: A\ :subscript:`ij`"""
-
-    def __init__(self, index, shape, index_path='annoy.index', k=150, search_k=-1,
-                 precompute=False, include_distances=False, verbose=False):
-        if k >= shape[0] - 1:
-            raise ValueError('''k value greater than or equal to (num_rows - 1)
-                             (k={}, rows={}). Lower k to a smaller
-                             value.'''.format(k, shape[0]))
-        self.index = index
-        self.shape = shape
-        self.index_path = index_path
-        self.k = k
-        self.search_k = search_k
-        self.include_distances = include_distances
-        self.verbose = verbose
-        self.precomputed_neighbours = None
-        if precompute:
-            self.precomputed_neighbours = self.get_neighbour_indices()
-
-    @classmethod
-    def build(cls, X, path, k=150, metric='angular', search_k=-1, include_distances=False,
-              ntrees=50, build_index_on_disk=True, precompute=False, verbose=1):
-        """Builds a new Annoy Index on input data *X*, then constructs and returns an
-        AnnoyKnnMatrix object using the newly-built index."""
-
-        index = build_annoy_index(X, path, metric, ntrees, build_index_on_disk, verbose)
-        return cls(index, X.shape, path, k, search_k, precompute, include_distances, verbose)
-
-    @classmethod
-    def load(cls, index_path, shape, k=150, search_k=-1, include_distances=False,
-             precompute=False, verbose=1):
-        """Constructs and returns an AnnoyKnnMatrix object from an existing Annoy Index on disk."""
-
-        index = AnnoyIndex(shape[1], metric='angular')
-        index.load(index_path)
-        return cls(index, shape, index_path, k, search_k, precompute, include_distances, verbose)
-
-    def __len__(self):
-        return self.shape[0]
-
-    def __getitem__(self, idx):
-        if self.precomputed_neighbours is not None:
-            return self.precomputed_neighbours[idx]
-        return self.index.get_nns_by_item(
-            idx, self.k + 1, search_k=self.search_k, include_distances=self.include_distances)
-
-    def get_neighbour_indices(self):
-        if self.precomputed_neighbours is not None:
-            return self.precomputed_neighbours
-        return extract_knn(
-            self.shape, k=self.k,
-            index_builder=self.load,
-            verbose=self.verbose,
-            index_path=self.index_path,
-            search_k=self.search_k,
-            include_distances=self.include_distances)
-
-
 IndexNeighbours = namedtuple('IndexNeighbours', ['row_index', 'neighbour_list'])
+
 def extract_knn(data_shape, index_builder=AnnoyKnnMatrix.load, verbose=1, **kwargs):
     """Starts multiple processes to retrieve nearest neighbours from a built index in parallel.
 
