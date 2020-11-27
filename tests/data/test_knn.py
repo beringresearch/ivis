@@ -7,6 +7,7 @@ from sklearn import datasets
 import numpy as np
 
 from ivis.data.knn import build_annoy_index, extract_knn
+from ivis.data.knn import AnnoyKnnMatrix
 
 @pytest.fixture(scope='function')
 def annoy_index_file():
@@ -51,14 +52,28 @@ def test_dense_annoy_index(annoy_index_file):
 
 def test_knn_retrieval():
     annoy_index_filepath = 'tests/data/.test-annoy-index.index'
-    expected_neighbour_list = np.load('tests/data/test_knn_k4.npy')
+    expected_neighbour_list = np.load('tests/data/test_knn_k3.npy')
 
     iris = datasets.load_iris()
     X = iris.data
 
-    k = 4
+    k = 3
     search_k = -1
-    neighbour_list = extract_knn(X, annoy_index_filepath,
+    neighbour_list = extract_knn(X.shape, index_path=annoy_index_filepath,
                                  k=k, search_k=search_k)
 
     assert np.all(expected_neighbour_list == neighbour_list)
+
+
+def test_knn_matrix_construction_params(annoy_index_file):
+    # Test too large k raises exception
+    with pytest.raises(Exception):
+        AnnoyKnnMatrix.build(np.zeros(shape=(4, 4)), annoy_index_file, k=4)
+    with pytest.raises(Exception):
+        AnnoyKnnMatrix.load(annoy_index_file, (4, 4), k=4)
+
+    index = AnnoyKnnMatrix.build(np.zeros(shape=(4, 4)), annoy_index_file, k=2)
+    loaded_index = AnnoyKnnMatrix.load(annoy_index_file, (4, 4), k=2)
+
+    for original_row, loaded_row in zip(index, loaded_index):
+        assert(original_row == loaded_row)
