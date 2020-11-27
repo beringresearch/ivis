@@ -13,12 +13,12 @@ from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras import regularizers
 from sklearn.base import BaseEstimator
 
-from .data.triplet_generators import generator_from_index, generator_from_knn_matrix
+from .data.triplet_generators import generator_from_neighbour_matrix
 from .nn.network import triplet_network, base_network
 from .nn.callbacks import ModelCheckpoint
 from .nn.losses import triplet_loss, is_categorical, is_multiclass, is_hinge
 from .nn.losses import semi_supervised_loss, validate_sparse_labels
-from .data.knn import build_annoy_index
+from .data.knn import AnnoyKnnMatrix
 
 
 class Ivis(BaseEstimator):
@@ -101,11 +101,12 @@ class Ivis(BaseEstimator):
     """
 
     def __init__(self, embedding_dims=2, k=150, distance='pn', batch_size=128,
-                 epochs=1000, n_epochs_without_progress=20, ntrees=50, search_k=-1,
+                 epochs=1000, n_epochs_without_progress=20, ntrees=50,
+                 knn_distance_metric='angular', search_k=-1,
                  precompute=True, model='szubert',
                  supervision_metric='sparse_categorical_crossentropy',
                  supervision_weight=0.5, annoy_index_path=None,
-                 callbacks=None, build_index_on_disk=None,
+                 callbacks=None, build_index_on_disk=True,
                  neighbour_matrix=None, verbose=1):
 
         self.embedding_dims = embedding_dims
@@ -114,6 +115,7 @@ class Ivis(BaseEstimator):
         self.batch_size = batch_size
         self.epochs = epochs
         self.n_epochs_without_progress = n_epochs_without_progress
+        self.knn_distance_metric = knn_distance_metric
         self.ntrees = ntrees
         self.search_k = search_k
         self.precompute = precompute
@@ -160,28 +162,24 @@ class Ivis(BaseEstimator):
 
     def _fit(self, X, Y=None, shuffle_mode=True):
 
-        if self.neighbour_matrix is not None:
-            datagen = generator_from_knn_matrix(X, Y,
-                                                neighbour_matrix=self.neighbour_matrix,
-                                                k=self.k,
-                                                batch_size=self.batch_size)
-        else:
+        if self.neighbour_matrix is None:
             if self.annoy_index_path is None:
                 self.annoy_index_path = 'annoy.index'
-                if self.verbose > 0:
-                    print('Building KNN index')
-                build_annoy_index(X, self.annoy_index_path,
-                                  ntrees=self.ntrees,
-                                  build_index_on_disk=self.build_index_on_disk,
-                                  verbose=self.verbose)
+                self.neighbour_matrix = AnnoyKnnMatrix.build(X, path=self.annoy_index_path,
+                                                             k=self.k, metric=self.knn_distance_metric,
+                                                             search_k=self.search_k,
+                                                             include_distances=False, ntrees=self.ntrees,
+                                                             build_index_on_disk=self.build_index_on_disk,
+                                                             precompute=self.precompute, verbose=self.verbose)
+            else:
+                self.neighbour_matrix = AnnoyKnnMatrix.load(self.annoy_index_path, X.shape,
+                                                            k=self.k, search_k=self.search_k, 
+                                                            include_distances=False, precompute=self.precompute,
+                                                            verbose=self.verbose)
 
-            datagen = generator_from_index(X, Y,
-                                           index_path=self.annoy_index_path,
-                                           k=self.k,
-                                           batch_size=self.batch_size,
-                                           search_k=self.search_k,
-                                           precompute=self.precompute,
-                                           verbose=self.verbose)
+        datagen = generator_from_neighbour_matrix(X, Y,
+                                                  neighbour_matrix=self.neighbour_matrix,
+                                                  batch_size=self.batch_size)
 
         loss_monitor = 'loss'
         try:
