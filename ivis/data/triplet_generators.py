@@ -20,10 +20,6 @@ from scipy.sparse import issparse
 
 
 def generator_from_neighbour_matrix(X, Y, neighbour_matrix, batch_size):
-    if batch_size > X.shape[0]:
-        raise Exception('''batch_size value larger than num_rows in dataset
-                        (batch_size={}, rows={}). Lower batch_size to a
-                        smaller value.'''.format(batch_size, X.shape[0]))
     if Y is None:
         return UnsupervisedTripletGenerator(X, neighbour_matrix, batch_size=batch_size)
 
@@ -32,6 +28,10 @@ def generator_from_neighbour_matrix(X, Y, neighbour_matrix, batch_size):
 
 class TripletGenerator(Sequence, ABC):
     def __init__(self, X, neighbour_matrix, batch_size=32):
+        if batch_size > X.shape[0]:
+            raise Exception('''batch_size value larger than num_rows in dataset
+                            (batch_size={}, rows={}). Lower batch_size to a
+                            smaller value.'''.format(batch_size, X.shape[0]))
         self.X = X
         self.neighbour_matrix = neighbour_matrix
         self.batch_size = batch_size
