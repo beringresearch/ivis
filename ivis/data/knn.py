@@ -1,5 +1,6 @@
 """ KNN retrieval using an Annoy index. """
 
+import functools
 import time
 from multiprocessing import Process, cpu_count, Queue
 from collections import namedtuple
@@ -16,14 +17,23 @@ class AnnoyKnnMatrix(Sequence):
     refers to the index of the neigbouring point. Neighbouring points
     are KNN retrieved using an Annoy Index.
 
-    .. |A_ij| replace:: A\ :subscript:`ij`"""
+    .. |A_ij| replace:: A\ :subscript:`ij`
+
+    :param AnnoyIndex index: AnnoyIndex instance to use when retrieving KNN
+    :param tuple shape: Shape of the KNN matrix (height, width)
+    :param string index_path: Location of the AnnoyIndex file on disk
+    :param int k: The number of neighbours to retrieve for each point
+    :param int search_k: Controls the number of nodes searched - higher is more
+    expensive but more accurate. Default of -1 defaults to n_trees * k
+    :param boolean precompute: Whether to precompute the KNN index and store the matrix in memory.
+    Much faster when training, but consumes more memory.
+    :param boolean include_distances: Whether to return the distances along with the indexes of
+    the neighbouring points
+    :param boolean verbose: Controls verbosity of output to console when building index. If
+    False, nothing will be printed to the terminal."""
 
     def __init__(self, index, shape, index_path='annoy.index', k=150, search_k=-1,
                  precompute=False, include_distances=False, verbose=False):
-        if k >= shape[0] - 1:
-            raise ValueError('''k value greater than or equal to (num_rows - 1)
-                             (k={}, rows={}). Lower k to a smaller
-                             value.'''.format(k, shape[0]))
         self.index = index
         self.shape = shape
         self.index_path = index_path
@@ -41,6 +51,7 @@ class AnnoyKnnMatrix(Sequence):
         """Builds a new Annoy Index on input data *X*, then constructs and returns an
         AnnoyKnnMatrix object using the newly-built index."""
 
+        _validate_knn_shape(X.shape, k)
         index = build_annoy_index(X, path, metric, ntrees, build_index_on_disk, verbose)
         return cls(index, X.shape, path, k, search_k, precompute, include_distances, verbose)
 
@@ -49,6 +60,7 @@ class AnnoyKnnMatrix(Sequence):
              precompute=False, verbose=1):
         """Constructs and returns an AnnoyKnnMatrix object from an existing Annoy Index on disk."""
 
+        _validate_knn_shape(shape, k)
         index = AnnoyIndex(shape[1], metric='angular')
         index.load(index_path)
         return cls(index, shape, index_path, k, search_k, precompute, include_distances, verbose)
@@ -80,6 +92,12 @@ class AnnoyKnnMatrix(Sequence):
             include_distances=self.include_distances)
 
 
+def _validate_knn_shape(shape, k):
+    if k >= shape[0] - 1:
+        raise ValueError('''k value greater than or equal to (num_rows - 1)
+                            (k={}, rows={}). Lower k to a smaller
+                            value.'''.format(k, shape[0]))
+
 def build_annoy_index(X, path, metric='angular', ntrees=50, build_index_on_disk=True, verbose=1):
     """ Build a standalone annoy index.
 
@@ -103,8 +121,11 @@ def build_annoy_index(X, path, metric='angular', ntrees=50, build_index_on_disk=
     if verbose:
         print("Building KNN index")
 
-    if "reshape" in dir(X):
-        X = X.reshape((X.shape[0], -1))
+    if len(X.shape) > 2:
+        if "reshape" in dir(X):
+            if verbose:
+                print('Flattening multidimensional input before building KNN index using Annoy')
+            X = X.reshape((X.shape[0], -1))
 
     index = AnnoyIndex(X.shape[1], metric=metric)
     if build_index_on_disk:
@@ -142,6 +163,11 @@ def extract_knn(data_shape, index_builder=AnnoyKnnMatrix.load, verbose=1, **kwar
 
     if verbose:
         print("Extracting KNN neighbours")
+
+    if len(data_shape) > 2:
+        if verbose:
+            print('Flattening data before retrieving KNN from index')
+        data_shape = (data_shape[0], functools.reduce(lambda x, y: x*y, data_shape[1:]))
 
     chunk_size = data_shape[0] // cpu_count()
     process_pool = []
