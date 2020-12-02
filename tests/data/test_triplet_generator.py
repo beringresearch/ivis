@@ -3,8 +3,8 @@ import pytest
 
 from sklearn import datasets
 
-from ivis.data.triplet_generators import generator_from_neighbour_matrix
-from ivis.data.triplet_generators import UnsupervisedTripletGenerator
+from ivis.data.generators import generator_from_neighbour_matrix
+from ivis.data.generators import UnsupervisedTripletGenerator
 
 
 def test_UnsupervisedTripletGenerator():
