@@ -45,6 +45,9 @@ class AnnoyKnnMatrix(Sequence):
         if precompute:
             self.precomputed_neighbours = self.get_neighbour_indices()
 
+    def __del__(self):
+        self.index.unload()
+
     @classmethod
     def build(cls, X, path, k=150, metric='angular', search_k=-1, include_distances=False,
               ntrees=50, build_index_on_disk=True, precompute=False, verbose=1):
@@ -126,6 +129,10 @@ def build_annoy_index(X, path, metric='angular', ntrees=50, build_index_on_disk=
             if verbose:
                 print('Flattening multidimensional input before building KNN index using Annoy')
             X = X.reshape((X.shape[0], -1))
+        else:
+            raise ValueError("Attempting to build AnnoyIndex on multi-dimensional data"
+                             " without providing a reshape method. AnnoyIndexes require"
+                             " 2D data - rows and columns.")
 
     index = AnnoyIndex(X.shape[1], metric=metric)
     if build_index_on_disk:
