@@ -6,8 +6,9 @@ from scipy.sparse import csr_matrix
 from sklearn import datasets
 import numpy as np
 
-from ivis.data.knn import build_annoy_index, extract_knn
-from ivis.data.knn import AnnoyKnnMatrix
+from ivis.data.neighbour_retrieval import AnnoyKnnMatrix
+from ivis.data.neighbour_retrieval.knn import build_annoy_index, extract_knn
+
 
 @pytest.fixture(scope='function')
 def annoy_index_file():
