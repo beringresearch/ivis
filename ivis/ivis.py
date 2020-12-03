@@ -13,7 +13,7 @@ from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras import regularizers
 from sklearn.base import BaseEstimator
 
-from .data.triplet_generators import generator_from_neighbour_matrix
+from .data.triplet_generators import generator_from_neighbour_matrix, KerasSequence
 from .nn.network import triplet_network, base_network
 from .nn.callbacks import ModelCheckpoint
 from .nn.losses import triplet_loss, is_categorical, is_multiclass, is_hinge
@@ -338,7 +338,7 @@ class Ivis(BaseEstimator):
             Embedding of the new data in low-dimensional space.
         """
 
-        embedding = self.encoder.predict(X, verbose=self.verbose)
+        embedding = self.encoder.predict(KerasSequence(X), verbose=self.verbose)
         return embedding
 
     def score_samples(self, X):

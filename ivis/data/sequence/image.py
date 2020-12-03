@@ -1,6 +1,5 @@
 """Custom datasets that load images from disk."""
 
-from math import prod
 import numpy as np
 import tensorflow as tf
 
@@ -87,7 +86,7 @@ class FlattenedImageDataset(ImageDataset):
                  dtype=tf.uint8, preprocessing_function=None):
         super().__init__(filepath_list, img_shape, color_mode, resize_method,
                          preserve_aspect_ratio, dtype, preprocessing_function)
-        self.shape = (self.shape[0], prod(self.shape[1:]))
+        self.shape = (self.shape[0], np.prod(self.shape[1:]))
 
     def __getitem__(self, idx):
         return super().__getitem__(idx).flatten()
