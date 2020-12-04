@@ -24,16 +24,17 @@ class AnnoyKnnMatrix(Sequence):
     :param string index_path: Location of the AnnoyIndex file on disk
     :param int k: The number of neighbours to retrieve for each point
     :param int search_k: Controls the number of nodes searched - higher is more
-    expensive but more accurate. Default of -1 defaults to n_trees * k
+        expensive but more accurate. Default of -1 defaults to n_trees * k
     :param boolean precompute: Whether to precompute the KNN index and store the matrix in memory.
-    Much faster when training, but consumes more memory.
+        Much faster when training, but consumes more memory.
     :param boolean include_distances: Whether to return the distances along with the indexes of
-    the neighbouring points
+        the neighbouring points
     :param boolean verbose: Controls verbosity of output to console when building index. If
-    False, nothing will be printed to the terminal."""
+        False, nothing will be printed to the terminal."""
 
     def __init__(self, index, shape, index_path='annoy.index', k=150, search_k=-1,
                  precompute=False, include_distances=False, verbose=False):
+        """Constructs an AnnoyKnnMatrix instance from an AnnoyIndex object with given parameters"""
         self.index = index
         self.shape = shape
         self.index_path = index_path
@@ -44,6 +45,9 @@ class AnnoyKnnMatrix(Sequence):
         self.precomputed_neighbours = None
         if precompute:
             self.precomputed_neighbours = self.get_neighbour_indices()
+
+    def __del__(self):
+        self.index.unload()
 
     @classmethod
     def build(cls, X, path, k=150, metric='angular', search_k=-1, include_distances=False,
@@ -66,9 +70,12 @@ class AnnoyKnnMatrix(Sequence):
         return cls(index, shape, index_path, k, search_k, precompute, include_distances, verbose)
 
     def __len__(self):
+        """Number of rows in neighbour matrix"""
         return self.shape[0]
 
     def __getitem__(self, idx):
+        """Returns neighbours list for the specified index.
+        Supports both integer and slice indices."""
         if isinstance(idx, slice):
             start, stop, step = idx.indices(len(self))
             return [self[i] for i in range(start, stop, step)]
@@ -126,6 +133,10 @@ def build_annoy_index(X, path, metric='angular', ntrees=50, build_index_on_disk=
             if verbose:
                 print('Flattening multidimensional input before building KNN index using Annoy')
             X = X.reshape((X.shape[0], -1))
+        else:
+            raise ValueError("Attempting to build AnnoyIndex on multi-dimensional data"
+                             " without providing a reshape method. AnnoyIndexes require"
+                             " 2D data - rows and columns.")
 
     index = AnnoyIndex(X.shape[1], metric=metric)
     if build_index_on_disk:

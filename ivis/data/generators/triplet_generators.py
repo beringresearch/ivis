@@ -3,14 +3,8 @@ Triplet generators.
 
 Functions for creating generators that will yield batches of triplets.
 
-Triplets will be created using KNNs, which can either be precomputed or
+Triplets will be created using neighbour matrices, which can either be precomputed or
 dynamically generated.
-- generate_knn_triplets_from_neighbour_list will precompute KNNs
-- generate_knn_triplets_from_annoy_index will dynamically generate KNNs
-
-Where possible, precomputed KNNs are advised for speed, but where memory is
-a concern, dynamically generated triplets can be useful.
-
 """
 
 from abc import ABC, abstractmethod
