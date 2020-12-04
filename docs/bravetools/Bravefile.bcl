@@ -1,0 +1,26 @@
+// ivis base environment for standalone testing and documentation
+base {
+	image: 		"ubuntu/bionic/amd64"
+	location: "public"
+}
+
+system {
+    apt: 		["bash", "python3", "python3-pip", "python3-sphinx", "git"]
+}
+
+run {
+	python3: 		"-m pip install --upgrade pip"
+  python3:    "-m pip install tensorflow sphinx sphinx_gallery sphinx_rtd_theme" 
+}
+
+service {
+	docker: "no"
+	image:	"ivis-build-env-1.0"
+	name:		"ivis-build-env"
+	version:	"1.0"
+resources {
+		ram: 	"4GB"
+		cpu: 	2
+		gpu:	"no"
+	}
+}

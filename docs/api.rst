@@ -1,7 +1,7 @@
 .. _api:
 
-ivis.Ivis
-=========
+Ivis
+====
 
 .. currentmodule:: ivis
 
@@ -11,8 +11,8 @@ ivis.Ivis
   :inherited-members:
   :show-inheritance:
 
-ivis.data.neighbour_retrieval.knn
-=================================
+KNN Retrieval
+=============
 
 .. autoclass:: ivis.data.neighbour_retrieval.knn.AnnoyKnnMatrix
   :members:
@@ -20,16 +20,14 @@ ivis.data.neighbour_retrieval.knn
   :special-members:
   :exclude-members: __weakref__
 
-ivis.data.sequence.ImageDataset
-===============================
+Indexable Datasets
+==================
 .. autoclass:: ivis.data.sequence.ImageDataset
   :members:
   :show-inheritance:
   :special-members:
   :exclude-members: __weakref__
 
-ivis.data.sequence.FlattenedImageDataset
-========================================
 .. autoclass:: ivis.data.sequence.FlattenedImageDataset
   :members:
   :show-inheritance:
@@ -37,8 +35,15 @@ ivis.data.sequence.FlattenedImageDataset
   :exclude-members: __weakref__
 
 
-ivis.nn.losses
-==============
+Losses
+======
 
 .. automodule:: ivis.nn.losses
-	:members:
+  :members:
+
+Callbacks
+=========
+
+.. automodule:: ivis.nn.callbacks
+  :members:
+

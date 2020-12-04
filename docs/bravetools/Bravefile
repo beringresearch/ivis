@@ -1,0 +1,39 @@
+base:
+  image: ubuntu/bionic/amd64
+  location: public
+packages:
+  manager: apt
+  system:
+  - bash
+  - python3
+  - python3-pip
+  - python3-sphinx
+  - git
+run:
+- command: python3
+  args:
+  - -m
+  - pip
+  - install
+  - --upgrade
+  - pip
+- command: python3
+  args:
+  - -m
+  - pip
+  - install
+  - tensorflow
+  - sphinx
+  - sphinx_gallery
+  - sphinx_rtd_theme
+service:
+  image: ivis-build-env-1.0
+  name: ivis-build-env
+  docker: "no"
+  version: "1.0"
+  ip: ""
+  ports: []
+  resources:
+    ram: 4GB
+    cpu: 2
+    gpu: "no"
