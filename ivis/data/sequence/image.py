@@ -21,7 +21,7 @@ class ImageDataset(IndexableDataset):
         "area", "bicubic", "bilinear", "gaussian", "lanczos3", "lanczos5", "mitchellcubic", "nearest".
     :param preserve_aspect_ratio boolean: Whether to preserve the aspect ratio when resizing images.
         If True, will maintain aspect ratio by padding the image.
-    :param dtype tf.dtypes.DType. The dtype to read the image into. One of tf.uint8 or tf.uint16.
+    :param dtype tf.dtypes.DType: The dtype to read the image into. One of tf.uint8 or tf.uint16.
     :param preprocessing_function Callable: A function to apply to every image. Will be called
         at the end of the pipeline, after image reading and resizing.
         If None (default), no function will be applied."""

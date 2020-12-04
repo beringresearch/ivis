@@ -42,6 +42,7 @@ class Ivis(BaseEstimator):
         *   If Callable, must have two parameters, (y_true, y_pred).
             y_pred denotes the batch of triplets, and y_true are any corresponding labels.
             y_pred is expected to be of shape: (3, batch_size, embedding_dims).
+
                 * When loading model loaded with a custom loss, provide the loss to the
                   constructor of the new Ivis instance before loading the saved model.
     :param int batch_size: The size of mini-batches used during gradient
@@ -297,7 +298,8 @@ class Ivis(BaseEstimator):
 
         Returns
         -------
-        returns an instance of self
+        self: ivis.Ivis object
+            Returns estimator instance.
         """
 
         self._fit(X, Y, shuffle_mode)
@@ -309,7 +311,7 @@ class Ivis(BaseEstimator):
         Parameters
         ----------
         X : array, shape (n_samples, n_features)
-            Data to be embedded.
+            Data to train on and then embedded.
         Y : array, shape (n_samples)
             Optional array for supervised dimentionality reduction.
             If Y contains -1 labels, and 'sparse_categorical_crossentropy'
@@ -317,8 +319,8 @@ class Ivis(BaseEstimator):
 
         Returns
         -------
-        X_new : transformed array, shape (n_samples, embedding_dims)
-            Embedding of the new data in low-dimensional space.
+        X_new : array, shape (n_samples, embedding_dims)
+            Embedding of the data in low-dimensional space.
         """
 
         self.fit(X, Y, shuffle_mode)
@@ -331,12 +333,12 @@ class Ivis(BaseEstimator):
         Parameters
         ----------
         X : array, shape (n_samples, n_features)
-            New data to be transformed.
+            Data to be transformed.
 
         Returns
         -------
         X_new : array, shape (n_samples, embedding_dims)
-            Embedding of the new data in low-dimensional space.
+            Embedding of the data in low-dimensional space.
         """
 
         embedding = self.encoder.predict(KerasSequence(X), verbose=self.verbose)
@@ -407,7 +409,8 @@ class Ivis(BaseEstimator):
 
         Returns
         -------
-        returns an ivis instance
+        self: ivis.Ivis object
+            Returns estimator instance.
         """
 
         ivis_config = json.load(open(os.path.join(folder_path,

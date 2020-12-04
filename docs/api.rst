@@ -11,10 +11,16 @@ ivis.Ivis
   :inherited-members:
   :show-inheritance:
 
-ivis.data.neighbour_retrieval.knn
+ivis.data.neighbour_retrieval
 =================================
 
-.. autoclass:: ivis.data.neighbour_retrieval.knn.AnnoyKnnMatrix
+.. autoclass:: ivis.data.neighbour_retrieval.AnnoyKnnMatrix
+  :members:
+  :show-inheritance:
+  :special-members:
+  :exclude-members: __weakref__
+
+.. autoclass:: ivis.data.neighbour_retrieval.LabeledNeighbourMap
   :members:
   :show-inheritance:
   :special-members:
