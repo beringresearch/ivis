@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-ivis: structure preserving dimensionality reduction
-===================================================
+ivis dimensionality reduction
+=============================
 
 |fig1| |fig2|
 
@@ -14,17 +14,22 @@ ivis: structure preserving dimensionality reduction
 .. |fig2| image:: _static/ivis_retinal_bipolar_cells.png
   :width: 49 %
 
-``ivis`` is a machine learning algorithm for reducing dimensionality of very large datasets. ``ivis`` preserves global data structures in a low-dimensional space, adds new data points to existing embeddings using a parametric mapping function, and scales linearly to millions of observations. The algorithm is described in detail in `Structure-preserving visualisation of high dimensional single-cell datasets <https://www.nature.com/articles/s41598-019-45301-0>`_.
+``ivis`` is a machine learning library for reducing dimensionality of very large datasets. ``ivis`` preserves global data structures in a low-dimensional space, adds new data points to existing embeddings using a parametric mapping function, and scales linearly to millions of observations. The algorithm is described in detail in `Structure-preserving visualisation of high dimensional single-cell datasets <https://www.nature.com/articles/s41598-019-45301-0>`_.
 
 The latest development version is on `github <https://github.com/beringresearch/ivis>`_.
 
 
 .. toctree::
    :maxdepth: 2
-   :caption: User Guide:
+   :caption: Get Started
   
    Python Package <python_package>
    R Package <r_package>
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Using ivis
+
    Unsupervised Dimensionality Reduction <unsupervised>
    Supervised Dimensionality Reduction <supervised>
    Semi-supervised Dimensionality Reduction <semi_supervised>
@@ -34,7 +39,7 @@ The latest development version is on `github <https://github.com/beringresearch/
 
 .. toctree::
    :maxdepth: 2
-   :caption: Applications:
+   :caption: Applications
   
    Visualising Single Cell Experiments <scanpy_singlecell> 
    Dimensionality Reduction <comparisons>
@@ -43,13 +48,13 @@ The latest development version is on `github <https://github.com/beringresearch/
 
 .. toctree::
    :maxdepth: 2
-   :caption: Benchmarks:
+   :caption: Benchmarks
 
    Speed of Execution <timings_benchmarks>
    Distance Preservation <embeddings_benchmarks>
 
 .. toctree::
    :maxdepth: 2
-   :caption: API Reference:
+   :caption: API Reference
 
    API Guide <api>

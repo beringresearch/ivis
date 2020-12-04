@@ -86,7 +86,7 @@ pygments_style = None
 #
 #html_theme = 'alabaster'
 html_theme = "sphinx_rtd_theme"
-html_theme_path = ["_themes", ]
+#html_theme_path = ["_themes", ]
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -186,3 +186,6 @@ epub_exclude_files = ['search.html']
 
 
 # -- Extension configuration -------------------------------------------------
+def setup(app):
+    app.add_css_file('css/bering.css')
+    app.add_js_file('js/bering.js')
