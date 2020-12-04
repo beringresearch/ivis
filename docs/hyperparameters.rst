@@ -134,10 +134,11 @@ randomly initialized with the LeCun normal distribution. The embedding
 layers use a linear activation and have their weights initialized using
 Glorot’s uniform distribution.
 
+
 Let's examine each architectural option in greater detail:
 
 
-.. code:: ipython3
+.. code:: python
 
     architecture = ['szubert', 'hinton', 'maaten']
     embeddings = {}
@@ -146,7 +147,7 @@ Let's examine each architectural option in greater detail:
         embeddings[a] = ivis.transform(X_poly)
 
 
-.. code:: ipython3
+.. code:: python
 
     fig, axs = plt.subplots(1, 3, figsize=(15, 4), facecolor='w', edgecolor='k')
     fig.subplots_adjust(hspace = 0.3, wspace = 0.2)
@@ -170,3 +171,17 @@ in our own experiments is to use the **szubert** network for
 computationally-intensive processing on large datasets (>1 million
 observations) and select **maaten** architecture for smaller real-world
 datasets.
+
+
+Custom backbone
+~~~~~~~~~~~~~~~
+Ivis also supports construction of arbitrary headless models, which can be
+helpful when dealing with multi-dimensional datasets such as images or text.
+
+.. code:: python
+
+    from tf.keras.applications.inception_v3 import InceptionV3
+
+    base_model = InceptionV3(include_top=False, pooling='avg')
+    ivis = Ivis(model=base_model)
+    ivis.fit()

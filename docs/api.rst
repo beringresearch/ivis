@@ -21,7 +21,7 @@ ivis.data.neighbour_retrieval.knn
   :exclude-members: __weakref__
 
 ivis.data.sequence.ImageDataset
-=================================
+===============================
 .. autoclass:: ivis.data.sequence.ImageDataset
   :members:
   :show-inheritance:
@@ -29,7 +29,7 @@ ivis.data.sequence.ImageDataset
   :exclude-members: __weakref__
 
 ivis.data.sequence.FlattenedImageDataset
-=================================
+========================================
 .. autoclass:: ivis.data.sequence.FlattenedImageDataset
   :members:
   :show-inheritance:
