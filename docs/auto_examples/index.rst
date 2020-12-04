@@ -55,7 +55,7 @@ Several examples of how ivis can be used in common machine learning tasks.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Example of reducing dimensionality of the iris dataset using ivis.">
+    <div class="sphx-glr-thumbcontainer" tooltip="Example of reducing dimensionality of the iris dataset using ivis. ">
 
 .. only:: html
 

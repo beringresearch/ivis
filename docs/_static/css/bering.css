@@ -1,0 +1,75 @@
+/* The research field on top of the toc tree */
+.wy-side-nav-search{
+    padding-top: 0;
+    background-color: #0c1531;
+}
+
+/* The toc tree */
+.wy-nav-side{
+    background-color: #0b224f;
+}
+
+/* The section headers in the toc tree */
+.wy-menu-vertical p.caption{
+    background-color: #0c2557;
+    line-height: 40px;
+}
+
+/* Top-level hover on sidebar. */
+.wy-menu-vertical li a:hover{
+    background-color: #0c2557;
+}
+
+/* The selected items in the toc tree */
+.wy-menu-vertical li.current{
+    background-color: #404c84;
+}
+
+/* When a list item that does belong to the selected block from the toc tree is hovered */
+.wy-menu-vertical li.current a:hover{
+    background-color: #0c2557;
+    color: white;
+}
+
+/* The color inside the selected toc tree block */
+.wy-menu-vertical li.toctree-l2 a, .wy-menu-vertical li.toctree-l3 a, .wy-menu-vertical li.toctree-l4 a {
+    color: white;
+}
+
+/* Inside the depth-2 selected toc tree block */
+.wy-menu-vertical li.toctree-l2.current>a {
+    background-color: #0c1531
+}
+.wy-menu-vertical li.toctree-l2.current li.toctree-l3>a {
+    background-color: #0c1531
+}
+
+/* Inside the depth-3 selected toc tree block */
+.wy-menu-vertical li.toctree-l3.current li.toctree-l4>a{
+    background-color: #0c1531
+}
+
+/* Max window size */
+.wy-nav-content{
+    max-width: 1200px;
+}
+
+/* Links */
+a {
+    color: #0b224f;
+}
+
+/* FONTS */
+body{
+    font-family: Calibre, sans-serif;
+    font-size: 14px;
+}
+
+h1 {
+    font-family: Calibre, sans-serif;
+    font-size: 50px;
+}
+
+h2, .rst-content .toctree-wrapper p.caption, h3, h4, h5, h6, legend{
+    font-family: Calibre, sans-serif;
+}
