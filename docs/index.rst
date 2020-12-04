@@ -1,8 +1,3 @@
-.. ivis documentation master file, created by
-   sphinx-quickstart on Sun May 19 17:35:22 2019.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 ivis dimensionality reduction
 =============================
 
@@ -14,10 +9,28 @@ ivis dimensionality reduction
 .. |fig2| image:: _static/ivis_retinal_bipolar_cells.png
   :width: 49 %
 
-``ivis`` is a machine learning library for reducing dimensionality of very large datasets. ``ivis`` preserves global data structures in a low-dimensional space, adds new data points to existing embeddings using a parametric mapping function, and scales linearly to millions of observations. The algorithm is described in detail in `Structure-preserving visualisation of high dimensional single-cell datasets <https://www.nature.com/articles/s41598-019-45301-0>`_.
+``ivis`` is a machine learning library for reducing dimensionality of very large datasets using Siamese Neural Networks. ``ivis`` preserves global data structures in a low-dimensional space, adds new data points to existing embeddings using a parametric mapping function, and scales linearly to millions of observations. The algorithm is described in detail in `Structure-preserving visualisation of high dimensional single-cell datasets <https://www.nature.com/articles/s41598-019-45301-0>`_.
+
+
+Features
+--------
+
+* Unsupervised, semi-supervised, and fully supervised dimensionality reduction
+
+* Support for arbitrary datasets
+   
+   * N-dimensional numpy arrays
+   * Sparse matrices
+   * Image files on disk
+   * Custom data connectors
+
+* In- and out-of-memory data processing
+* Arbitrary neural network backbones 
+* Callbacks and Tensorboard integration
+
+
 
 The latest development version is on `github <https://github.com/beringresearch/ivis>`_.
-
 
 .. toctree::
    :maxdepth: 2
