@@ -45,8 +45,8 @@ After ``ivis`` is installed, **restart your R session**.
 		export KERAS_BACKEND=tensorflow
 
 
-Example
--------
+Quickstart
+----------
 
 .. code-block:: R
 	
