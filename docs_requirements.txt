@@ -1,2 +1,3 @@
+Cython
 sphinx
 sphinx_gallery
