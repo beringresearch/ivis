@@ -1,5 +1,5 @@
-"""Collection of callbacks that can be passed to ivis to be called during training. 
-These provide utilities such as saving checkpoints during training (allowing for 
+"""Collection of callbacks that can be passed to ivis to be called during training.
+These provide utilities such as saving checkpoints during training (allowing for
 resuming if interrupted), as well as periodic logging of plots and model embeddings."""
 
 import io
@@ -36,6 +36,7 @@ class ModelCheckpoint(Callback):
 
     Example usage:
     ::
+
         from ivis.nn.callbacks import ModelCheckpoint
         from ivis import Ivis
 
@@ -82,6 +83,7 @@ class EmbeddingsLogging(Callback):
 
     Example usage:
     ::
+
         from ivis.nn.callbacks import EmbeddingsLogging
         from ivis import Ivis
         from tensorflow.keras.datasets import mnsit
@@ -135,6 +137,7 @@ class EmbeddingsImage(Callback):
 
     Example usage:
     ::
+
         from ivis.nn.callbacks import EmbeddingsImage
         from ivis import Ivis
         from tensorflow.keras.datasets import mnsit
@@ -209,6 +212,7 @@ class TensorBoardEmbeddingsImage(Callback):
 
     Example usage:
     ::
+
         from ivis.nn.callbacks import TensorBoardEmbeddingsImage
         from ivis import Ivis
         from tensorflow.keras.datasets import mnsit

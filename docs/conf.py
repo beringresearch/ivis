@@ -42,7 +42,8 @@ release = ''
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
-    'sphinx_gallery.gen_gallery'
+    'sphinx_gallery.gen_gallery',
+    'sphinx.ext.napoleon'
 ]
 
 sphinx_gallery_conf = {
