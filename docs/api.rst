@@ -12,7 +12,7 @@ Ivis
   :show-inheritance:
 
 Neighbour Retrieval
-=============
+===================
 .. autoclass:: ivis.data.neighbour_retrieval.AnnoyKnnMatrix
   :members:
   :show-inheritance:
