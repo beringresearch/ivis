@@ -92,9 +92,18 @@ class Ivis(BaseEstimator):
     :param bool build_index_on_disk: Whether to build the annoy index directly
         on disk. Building on disk should allow for bigger datasets to be indexed,
         but may cause issues.
-    :param np.array neighbour_matrix: A pre-computed KNN matrix can be provided.
-        The KNNs can be retrieved using any method, and will cause Ivis to skip
-        computing the Annoy KNN index.
+    :param Union[np.array,collections.abc.Sequence] neighbour_matrix:
+        Providing a neighbour matrix will cause Ivis to skip computing the Annoy KNN index
+        and instead use the provided neighbour_matrix.
+
+        - A pre-computed neighbour matrix can be provided as a numpy array. Indexing the array
+          should retrieve a list of neighbours for the data point associated with that index.
+
+        - Alternatively, dynamic computation of neighbours can be done by providing a
+          class than implements the collections.abc.Sequence class, specifically the
+          `__getitem__` and `__len__` methods.
+
+            - See See the ivis.data.neighbour_retrieval.AnnoyKnnMatrix class for an example.
     :param int verbose: Controls the volume of logging output the model
         produces when training. When set to 0, silences outputs, when above 0
         will print outputs.
@@ -174,7 +183,7 @@ class Ivis(BaseEstimator):
                                                              precompute=self.precompute, verbose=self.verbose)
             else:
                 self.neighbour_matrix = AnnoyKnnMatrix.load(self.annoy_index_path, X.shape,
-                                                            k=self.k, search_k=self.search_k, 
+                                                            k=self.k, search_k=self.search_k,
                                                             include_distances=False, precompute=self.precompute,
                                                             verbose=self.verbose)
 
@@ -288,8 +297,8 @@ class Ivis(BaseEstimator):
 
         Parameters
         ----------
-        X : n-dimensional array shape (n_samples, )
-            Data to be embedded.
+        X : np.array, ivis.data.sequence.IndexableDataset, tensorflow.keras.utils.HDF5Matrix
+            Data to be embedded. Needs to have a `.shape` attribute and a `__getitem__` method.
         Y : array, shape (n_samples)
             Optional array for supervised dimentionality reduction.
             If Y contains -1 labels, and 'sparse_categorical_crossentropy'
@@ -309,8 +318,9 @@ class Ivis(BaseEstimator):
 
         Parameters
         ----------
-        X : array, shape (n_samples, n_features)
+        X : np.array, ivis.data.sequence.IndexableDataset, tensorflow.keras.utils.HDF5Matrix
             Data to train on and then embedded.
+            Needs to have a `.shape` attribute and a `__getitem__` method.
         Y : array, shape (n_samples)
             Optional array for supervised dimentionality reduction.
             If Y contains -1 labels, and 'sparse_categorical_crossentropy'
@@ -331,8 +341,8 @@ class Ivis(BaseEstimator):
 
         Parameters
         ----------
-        X : array, shape (n_samples, n_features)
-            Data to be transformed.
+        X : np.array, ivis.data.sequence.IndexableDataset, tensorflow.keras.utils.HDF5Matrix
+            Data to be transformed. Needs to have a `.shape` attribute and a `__getitem__` method.
 
         Returns
         -------
@@ -350,8 +360,9 @@ class Ivis(BaseEstimator):
 
         Parameters
         ----------
-        X : array, shape (n_samples, n_features)
+        X : np.array, ivis.data.sequence.IndexableDataset, tensorflow.keras.utils.HDF5Matrix
             Data to be passed through classification network.
+            Needs to have a `.shape` attribute and a `__getitem__` method.
 
         Returns
         -------
