@@ -19,13 +19,14 @@ Features
 
 * Support for arbitrary datasets
    
-   * N-dimensional numpy arrays
-   * Sparse matrices
+   * N-dimensional arrays
    * Image files on disk
    * Custom data connectors
 
 * In- and out-of-memory data processing
-* Arbitrary neural network backbones 
+* Resumable training
+* Arbitrary neural network backbones
+* Customizable neighbour retrieval
 * Callbacks and Tensorboard integration
 
 
