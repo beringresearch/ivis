@@ -47,7 +47,6 @@ The latest development version is on `github <https://github.com/beringresearch/
    Supervised Dimensionality Reduction <supervised>
    Semi-supervised Dimensionality Reduction <semi_supervised>
    Hyperparameter Selection <hyperparameters>
-   Callbacks <callbacks>
    Examples <auto_examples/index>
 
 .. toctree::

@@ -52,4 +52,8 @@ Callbacks
 
 .. automodule:: ivis.nn.callbacks
   :members:
+  :show-inheritance:
 
+.. raw:: html
+
+    <video controls loop="true" autoplay="autoplay" width="560" height="315" src="_static/tensorboard_embeddings_plots.mp4"></video>

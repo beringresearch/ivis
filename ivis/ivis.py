@@ -103,7 +103,7 @@ class Ivis(BaseEstimator):
           class than implements the collections.abc.Sequence class, specifically the
           `__getitem__` and `__len__` methods.
 
-            - See See the ivis.data.neighbour_retrieval.AnnoyKnnMatrix class for an example.
+            - See the ivis.data.neighbour_retrieval.AnnoyKnnMatrix class for an example.
     :param int verbose: Controls the volume of logging output the model
         produces when training. When set to 0, silences outputs, when above 0
         will print outputs.

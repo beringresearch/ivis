@@ -1,6 +1,16 @@
-"""Collection of callbacks that can be passed to ivis to be called during training. 
-These provide utilities such as saving checkpoints during training (allowing for 
-resuming if interrupted), as well as periodic logging of plots and model embeddings."""
+"""A collection of callbacks that can be passed to ivis to be called during training.
+These provide utilities such as saving checkpoints during training (allowing for
+resuming if interrupted), as well as periodic logging of plots and model embeddings.
+With this information, you may decide to terminate a training session early
+due to a lack of improvements to the visualizations, for example.
+
+To use a callback during training, simply pass a list of callback objects
+to the Ivis object when creating it using the callbacks keyword argument.
+The ivis.nn.callbacks module contains a set of callbacks provided for use with ivis models,
+but any `tf.keras.callbacks.Callbacks` object can be passed and will be used during training:
+for example, `tf.keras.callbacks.TensorBoard`. This means it's also possible to write your own
+callbacks for ivis to use.
+"""
 
 import io
 import os
