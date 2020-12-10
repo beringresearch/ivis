@@ -51,7 +51,7 @@ on the HDF5Matrix object using the ``fit`` method. We will train
 ``ivis`` in unsupervised mode for 5 epochs to speed up training;
 other hyperparameters are left at their default values.
 
-.. note:: When training on a h5 dataset, we recommend to use the ``shuffle_mode='batch'`` option in the ``fit`` method. This will speed up the training process by pulling a batch of data from disk and shuffling tethat batch, rather than shuffling across the whole dataset.
+.. note:: When training on a h5 dataset, we recommend to use the ``shuffle_mode='batch'`` option in the ``fit`` method. This will speed up the training process by shuffling batches of data, rather than shuffling across the whole dataset.
 
 .. code:: python
 
@@ -61,7 +61,7 @@ other hyperparameters are left at their default values.
     y = HDF5Matrix(h5_filepath, 'labels')
 
     model = Ivis(epochs=5)
-    model.fit(X, shuffle_mode='batch') # Shuffle within batches when using h5 files
+    model.fit(X, shuffle_mode='batch') # Shuffle batches when using h5 files
 
     y_pred = model.transform(X)
 
