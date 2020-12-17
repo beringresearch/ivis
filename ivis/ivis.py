@@ -350,7 +350,8 @@ class Ivis(BaseEstimator):
             Embedding of the data in low-dimensional space.
         """
 
-        embedding = self.encoder.predict(KerasSequence(X), verbose=self.verbose)
+        embedding = self.encoder.predict(KerasSequence(X, batch_size=self.batch_size),
+                                         verbose=self.verbose)
         return embedding
 
     def score_samples(self, X):
