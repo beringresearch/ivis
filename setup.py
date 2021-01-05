@@ -23,7 +23,8 @@ setup(name='ivis',
           'numpy',
           'scikit-learn>0.20.0',
           'annoy>=1.15.2',
-          'tqdm'
+          'tqdm',
+          'dill'
       ],
       extras_require={
           'tests': ['pytest'],
