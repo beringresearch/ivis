@@ -406,7 +406,7 @@ class Ivis(BaseEstimator):
 
         # save optimizer state in numpy array
         np.save(os.path.join(folder_path, 'optimizer_state.npy'),
-                self.model_.optimizer.get_weights())
+                np.array(self.model_.optimizer.get_weights(), dtype=object))
 
         json.dump(self.__getstate__(),
                   open(os.path.join(folder_path, 'ivis_params.json'), 'w'))
