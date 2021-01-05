@@ -2,7 +2,7 @@
 import json
 import os
 import shutil
-import pickle as pkl
+import dill as pkl
 import tensorflow as tf
 import numpy as np
 
