@@ -70,4 +70,4 @@ model = Ivis(embedding_dims=2, k=15)
 embeddings = model.fit_transform(X_scaled)
 ```
 
-Copyright 2020 Bering Limited
+Copyright 2021 Bering Limited
