@@ -21,7 +21,7 @@ autodoc_mock_imports = ['tensorflow']
 # -- Project information -----------------------------------------------------
 
 project = 'ivis'
-copyright = '2020, Bering Limited'
+copyright = '2021, Bering Limited'
 author = 'Bering Limited'
 
 # The short X.Y version
