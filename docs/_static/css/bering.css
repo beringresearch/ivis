@@ -73,3 +73,21 @@ h1 {
 h2, .rst-content .toctree-wrapper p.caption, h3, h4, h5, h6, legend{
     font-family: Calibre, sans-serif;
 }
+
+/* It would be better for table to be visible without horizontal scrolling */
+.wy-table-responsive table td, .wy-table-responsive table th{
+    white-space: normal;
+}
+
+.footer {
+    margin-top: 20px;
+}
+
+.footer__Social {
+    display: flex;
+    flex-direction: row;
+}
+
+.footer__CustomImage {
+    margin: 2px 5px 0 0;
+}

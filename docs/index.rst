@@ -48,7 +48,12 @@ The latest development version is on `github <https://github.com/beringresearch/
    Supervised Dimensionality Reduction <supervised>
    Semi-supervised Dimensionality Reduction <semi_supervised>
    Hyperparameter Selection <hyperparameters>
-   Examples <auto_examples/index>
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Examples
+
+   Ivis Notebooks <examples>
 
 .. toctree::
    :maxdepth: 2
