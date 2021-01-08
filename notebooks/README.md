@@ -4,6 +4,6 @@ You can find here a list of notebooks demonstrating key Ivis functionalities. Al
 
 ## Ivis Examples
 
-| Notebook | Description|-|
+| Notebook | Description| |
 |----------|------------|-|
-|  How to reduce dimensionality of image data | Reduce dimensionality of image data using Ivis algorithm and a custom convolutional neural network | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/beringresearch/ivis/blob/notebook-examples/notebooks/ivis_cnn_backbone_fashion_mnist.ipynb)|
+| [How to reduce dimensionality of image data](https://github.com/beringresearch/ivis/blob/master/notebooks/ivis_cnn_backbone_fashion_mnist.ipynb) | Reduce dimensionality of image data using Ivis algorithm and a custom convolutional neural network | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/beringresearch/ivis/blob/master/notebooks/ivis_cnn_backbone_fashion_mnist.ipynb)|
