@@ -28,6 +28,12 @@ Neighbour Retrieval
 
 Indexable Datasets
 ==================
+.. autoclass:: ivis.data.sequence.IndexableDataset
+  :members:
+  :show-inheritance:
+  :special-members:
+  :exclude-members: __weakref__
+
 .. autoclass:: ivis.data.sequence.ImageDataset
   :members:
   :show-inheritance:
