@@ -23,7 +23,7 @@ You can find here a list of notebooks demonstrating key Ivis functionalities. Al
 
    * - `Using callbacks to assess model training <https://github.com/beringresearch/ivis/blob/master/notebooks/using_callbacks_with_ivis.ipynb>`_
      - Apply callbacks during ivis training to log and assess intermediate model states.
-     - |using_callbacks_with_ivis|_
+     - |using_callbacks_with_ivis_colab|_
 
 .. |ivis_introduction_colab| image:: https://colab.research.google.com/assets/colab-badge.svg
 .. _ivis_introduction_colab: https://colab.research.google.com/github/beringresearch/ivis/blob/master/notebooks/introduction_to_dimensionality_reduction_using_ivis.ipynb
