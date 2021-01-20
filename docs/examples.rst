@@ -21,9 +21,15 @@ You can find here a list of notebooks demonstrating key Ivis functionalities. Al
      - Reduce dimensionality of image data using Ivis algorithm and a custom convolutional neural network
      - |ivis_cnn_backbone_fashion_mnist_colab|_
 
+   * - `Using callbacks to assess model training <https://github.com/beringresearch/ivis/blob/master/notebooks/using_callbacks_with_ivis.ipynb>`_
+     - Apply callbacks during ivis training to log and assess intermediate model states.
+     - |using_callbacks_with_ivis|_
 
 .. |ivis_introduction_colab| image:: https://colab.research.google.com/assets/colab-badge.svg
 .. _ivis_introduction_colab: https://colab.research.google.com/github/beringresearch/ivis/blob/master/notebooks/introduction_to_dimensionality_reduction_using_ivis.ipynb
 
 .. |ivis_cnn_backbone_fashion_mnist_colab| image:: https://colab.research.google.com/assets/colab-badge.svg
 .. _ivis_cnn_backbone_fashion_mnist_colab: https://colab.research.google.com/github/beringresearch/ivis/blob/master/notebooks/ivis_cnn_backbone_fashion_mnist.ipynb
+
+.. |using_callbacks_with_ivis_colab| image:: https://colab.research.google.com/assets/colab-badge.svg
+.. _using_callbacks_with_ivis_colab: https://colab.research.google.com/github/beringresearch/ivis/blob/master/notebooks/using_callbacks_with_ivis.ipynb.ipynb
