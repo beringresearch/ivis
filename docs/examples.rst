@@ -32,4 +32,4 @@ You can find here a list of notebooks demonstrating key Ivis functionalities. Al
 .. _ivis_cnn_backbone_fashion_mnist_colab: https://colab.research.google.com/github/beringresearch/ivis/blob/master/notebooks/ivis_cnn_backbone_fashion_mnist.ipynb
 
 .. |using_callbacks_with_ivis_colab| image:: https://colab.research.google.com/assets/colab-badge.svg
-.. _using_callbacks_with_ivis_colab: https://colab.research.google.com/github/beringresearch/ivis/blob/master/notebooks/using_callbacks_with_ivis.ipynb.ipynb
+.. _using_callbacks_with_ivis_colab: https://colab.research.google.com/github/beringresearch/ivis/blob/master/notebooks/using_callbacks_with_ivis.ipynb
