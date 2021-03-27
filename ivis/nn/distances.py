@@ -14,4 +14,4 @@ def chebyshev_distance(x, y):
 
 
 def cosine_distance(x, y):
-    return tf.math.reduce_sum(tf.nn.l2_normalize(x, axis=1) * tf.nn.l2_normalize(y, axis=1))
+    return K.sum(tf.nn.relu(1 + tf.keras.losses.cosine_similarity(x, y)))
