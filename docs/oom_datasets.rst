@@ -45,20 +45,20 @@ the dataset has already been preprocessed and converted to .h5 format.
 Dimensionality Reduction
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-To train on a h5 file that exists on disk, we can use a Keras utility
-class, the ``HDF5Matrix`` class. This will allow us to run ``ivis``
-on the HDF5Matrix object using the ``fit`` method. We will train
-``ivis`` in unsupervised mode for 5 epochs to speed up training;
+To train on a h5 file that exists on disk you need the ``h5py`` package. 
+A HDF5 dataset stored inside a file can be directly passed to an Ivis object's ``fit`` and ``transform`` methods. 
+We will train ``ivis`` in unsupervised mode for 5 epochs to speed up training;
 other hyperparameters are left at their default values.
 
 .. note:: When training on a h5 dataset, we recommend to use the ``shuffle_mode='batch'`` option in the ``fit`` method. This will speed up the training process by shuffling batches of data, rather than shuffling across the whole dataset.
 
 .. code:: python
 
-    from tensorflow.keras.utils import HDF5Matrix
+    import h5py
 
-    X = HDF5Matrix(h5_filepath, 'data')
-    y = HDF5Matrix(h5_filepath, 'labels')
+    with h5py.File(h5_filepath, 'r') as f:
+        X = f['data']
+        y = f['labels']
 
     model = Ivis(epochs=5)
     model.fit(X, shuffle_mode='batch') # Shuffle batches when using h5 files
@@ -87,3 +87,15 @@ Conclusions
 is able to scale and deal with the massive, out-of-memory datasets
 found in the real world by training directly on h5 files. Additionally, it can effectively learn
 embeddings in an unbalanced dataset without labels.
+
+
+Advanced: Custom dataset loaders
+--------------------------------
+
+In addition to h5 files, ivis is also able to train on arbitrary out-of-memory datasets using custom classes that
+implement the `ivis.data.sequence.IndexableDataset` class methods. For example, the `ivis.data.sequence.ImageDataset`
+inherits from the `IndexableDataset` and reads in images from disk when indexed, allowing for training on image datasets
+of any size. The instance of `ImageDataset` is simply provided to ivis as the argument to the `fit` or `transform` methods.
+
+By writing a custom class tailored to your specific scenario you can use ivis with whatever data storage you are using.
+For example, it's possible to have ivis train directly on data stored within a database with just a few lines of code.
