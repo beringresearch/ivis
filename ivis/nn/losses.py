@@ -169,9 +169,9 @@ class CosinePnLoss:
     def __call__(self, y_true, y_pred):
         anchor, positive, negative = tf.unstack(y_pred)
 
-        anchor_positive_distance = chebyshev_distance(anchor, positive)
-        anchor_negative_distance = chebyshev_distance(anchor, negative)
-        positive_negative_distance = chebyshev_distance(positive, negative)
+        anchor_positive_distance = cosine_distance(anchor, positive)
+        anchor_negative_distance = cosine_distance(anchor, negative)
+        positive_negative_distance = cosine_distance(positive, negative)
 
         minimum_distance = K.min(tf.stack([anchor_negative_distance, positive_negative_distance]), axis=0, keepdims=True)
 
