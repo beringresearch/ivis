@@ -56,6 +56,9 @@ class Ivis(BaseEstimator):
     :param int ntrees: The number of random projections trees built by Annoy to
         approximate KNN. The more trees the higher the memory usage, but the
         better the accuracy of results.
+    :param str knn_distance_metric: The distance metric used to retrieve nearest
+        neighbours. Supports "angular" (default), "euclidean", "manhattan",
+        "hamming", or "dot".
     :param int search_k: The maximum number of nodes inspected during a nearest
         neighbour query by Annoy. The higher, the more computation time
         required, but the higher the accuracy. The default is n_trees * k,
