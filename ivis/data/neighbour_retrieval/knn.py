@@ -180,7 +180,7 @@ def extract_knn(data_shape, index_builder=AnnoyKnnMatrix.load, verbose=1, **kwar
             print('Flattening data before retrieving KNN from index')
         data_shape = (data_shape[0], functools.reduce(lambda x, y: x*y, data_shape[1:]))
 
-    chunk_size = data_shape[0] // cpu_count()
+    chunk_size = max(1, data_shape[0] // cpu_count())
     process_pool = []
     results_queue = Queue()
     error_queue = Queue()
