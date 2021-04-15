@@ -72,10 +72,9 @@ class EuclideanPnLoss:
         anchor_negative_distance = euclidean_distance(anchor, negative)
         positive_negative_distance = euclidean_distance(positive, negative)
 
-        minimum_distance = K.min(
-            [anchor_negative_distance, positive_negative_distance], axis=-1, keepdims=True)
+        stacked_an_pn_distance = [anchor_negative_distance, positive_negative_distance]
 
-        return K.mean(K.maximum(anchor_positive_distance - minimum_distance + self.margin, 0))
+        return K.mean(K.maximum(anchor_positive_distance - stacked_an_pn_distance + self.margin, 0))
 
 
 @register_loss(name='euclidean')
@@ -106,10 +105,9 @@ class ManhattanPnLoss:
         anchor_negative_distance = manhattan_distance(anchor, negative)
         positive_negative_distance = manhattan_distance(positive, negative)
 
-        minimum_distance = K.min(
-            [anchor_negative_distance, positive_negative_distance], axis=-1, keepdims=True)
+        stacked_an_pn_distance = [anchor_negative_distance, positive_negative_distance]
 
-        return K.mean(K.maximum(anchor_positive_distance - minimum_distance + self.margin, 0))
+        return K.mean(K.maximum(anchor_positive_distance - stacked_an_pn_distance + self.margin, 0))
 
 
 @register_loss(name='manhattan')
@@ -140,9 +138,9 @@ class ChebyshevPnLoss:
         anchor_negative_distance = chebyshev_distance(anchor, negative)
         positive_negative_distance = chebyshev_distance(positive, negative)
 
-        minimum_distance = K.min(K.concatenate([anchor_negative_distance, positive_negative_distance]), axis=-1, keepdims=True)
+        stacked_an_pn_distance = [anchor_negative_distance, positive_negative_distance]
 
-        return K.mean(K.maximum(anchor_positive_distance - minimum_distance + self.margin, 0))
+        return K.mean(K.maximum(anchor_positive_distance - stacked_an_pn_distance + self.margin, 0))
 
 
 @register_loss(name='chebyshev')
@@ -173,9 +171,9 @@ class CosinePnLoss:
         anchor_negative_distance = cosine_distance(anchor, negative)
         positive_negative_distance = cosine_distance(positive, negative)
 
-        minimum_distance = K.min(tf.stack([anchor_negative_distance, positive_negative_distance]), axis=0, keepdims=True)
+        stacked_an_pn_distance = [anchor_negative_distance, positive_negative_distance]
 
-        return K.mean(K.maximum(anchor_positive_distance - minimum_distance + self.margin, 0))
+        return K.mean(K.maximum(anchor_positive_distance - stacked_an_pn_distance + self.margin, 0))
 
 
 @register_loss(name='cosine')
@@ -205,12 +203,11 @@ class EuclideanSoftmaxRatioPnLoss:
         anchor_negative_distance = euclidean_distance(anchor, negative)
         positive_negative_distance = euclidean_distance(positive, negative)
 
-        minimum_distance = K.min(
-            [anchor_negative_distance, positive_negative_distance], axis=-1, keepdims=True)
+        ideal_distance = K.constant([0., 1.])
+        minimum_distance = K.min([anchor_negative_distance, positive_negative_distance], axis=0)
 
         softmax = K.softmax(K.concatenate([anchor_positive_distance, minimum_distance]))
-        ideal_distance = K.variable([0, 1])
-        return K.mean(K.maximum(softmax - ideal_distance, 0))
+        return K.mean(K.abs(ideal_distance - softmax))
 
 
 @register_loss(name='softmax_ratio')
@@ -222,12 +219,12 @@ class EuclideanSoftmaxRatioLoss:
         self.__name__ = name
     def __call__(self, y_true, y_pred):
         anchor, positive, negative = tf.unstack(y_pred)
-        positive_distance = euclidean_distance(anchor, positive)
-        negative_distance = euclidean_distance(anchor, negative)
+        anchor_positive_distance = euclidean_distance(anchor, positive)
+        anchor_negative_distance = euclidean_distance(anchor, negative)
 
-        softmax = K.softmax(K.concatenate([positive_distance, negative_distance]))
-        ideal_distance = K.variable([0, 1])
-        return K.mean(K.maximum(softmax - ideal_distance, 0))
+        softmax = K.softmax(K.concatenate([anchor_positive_distance, anchor_negative_distance]))
+        ideal_distance = K.constant([0., 1.])
+        return K.mean(K.abs(ideal_distance - softmax))
 
 
 def semi_supervised_loss(loss_function):
