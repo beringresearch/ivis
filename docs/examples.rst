@@ -25,6 +25,10 @@ You can find here a list of notebooks demonstrating key Ivis functionalities. Al
      - Apply callbacks during ivis training to log and assess intermediate model states.
      - |using_callbacks_with_ivis_colab|_
 
+   * - `Concept drift detection on image data <https://github.com/beringresearch/ivis/blob/master/notebooks/ivis_concept_drift_detection.ipynb>`_
+     - Detect Concept Drift in image datasets using Ivis.
+     - |ivis_concept_drift_detetion_colab|_
+
 .. |ivis_introduction_colab| image:: https://colab.research.google.com/assets/colab-badge.svg
 .. _ivis_introduction_colab: https://colab.research.google.com/github/beringresearch/ivis/blob/master/notebooks/introduction_to_dimensionality_reduction_using_ivis.ipynb
 
@@ -33,3 +37,6 @@ You can find here a list of notebooks demonstrating key Ivis functionalities. Al
 
 .. |using_callbacks_with_ivis_colab| image:: https://colab.research.google.com/assets/colab-badge.svg
 .. _using_callbacks_with_ivis_colab: https://colab.research.google.com/github/beringresearch/ivis/blob/master/notebooks/using_callbacks_with_ivis.ipynb
+
+.. |ivis_concept_drift_detetion_colab| image:: https://colab.research.google.com/assets/colab-badge.svg
+.. _ivis_concept_drift_detetion_colab: https://colab.research.google.com/github/beringresearch/ivis/blob/master/notebooks/ivis_concept_drift_detection.ipynb
