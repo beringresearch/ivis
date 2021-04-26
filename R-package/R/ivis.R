@@ -16,8 +16,6 @@
 #'                    data-point once.
 #' @param n_epochs_without_progress: After n number of epochs without an
 #'                    improvement to the loss, terminate training early.
-#' @param margin:     The distance that is enforced between points by the
-#'                    triplet loss functions.
 #' @param ntrees:     The number of random projections trees built by Annoy to
 #'                    approximate KNN. The more trees the higher the memory
 #'                    usage, but the better the accuracy of results.
@@ -75,7 +73,6 @@ ivis <- function(embedding_dims = 2L,
     batch_size = 128L,
     epochs = 1000L,
     n_epochs_without_progress = 20L,
-    margin = 1,
     ntrees = 50L,
     search_k = -1L,
     precompute = TRUE,
@@ -105,7 +102,7 @@ ivis <- function(embedding_dims = 2L,
                               k=k, distance=distance, batch_size=batch_size,
                               epochs=epochs,
                               n_epochs_without_progress=n_epochs_without_progress,
-                              margin=margin, ntrees=ntrees,
+                              ntrees=ntrees,
                               search_k=search_k,
                               precompute=precompute, model=model,
                               supervision_metric=supervision_metric,
