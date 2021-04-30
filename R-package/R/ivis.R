@@ -19,6 +19,9 @@
 #' @param ntrees:     The number of random projections trees built by Annoy to
 #'                    approximate KNN. The more trees the higher the memory
 #'                    usage, but the better the accuracy of results.
+#' @param knn_distance_metric: The distance metric used to retrieve nearest
+#'                    neighbours. Supports "angular" (default), "euclidean",
+#'                    "manhattan", "hamming", or "dot".
 #' @param search_k:   The maximum number of nodes inspected during a nearest
 #'                    neighbour query by Annoy. The higher, the more
 #'                    computation time required, but the higher the accuracy.
@@ -74,6 +77,7 @@ ivis <- function(embedding_dims = 2L,
     epochs = 1000L,
     n_epochs_without_progress = 20L,
     ntrees = 50L,
+    knn_distance_metric='angular',
     search_k = -1L,
     precompute = TRUE,
     model = "szubert",
@@ -103,6 +107,7 @@ ivis <- function(embedding_dims = 2L,
                               epochs=epochs,
                               n_epochs_without_progress=n_epochs_without_progress,
                               ntrees=ntrees,
+                              knn_distance_metric='angular',
                               search_k=search_k,
                               precompute=precompute, model=model,
                               supervision_metric=supervision_metric,
