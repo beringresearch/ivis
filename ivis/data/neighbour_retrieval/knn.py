@@ -2,8 +2,7 @@
 
 import functools
 import time
-from multiprocessing import Process, cpu_count, Queue
-from collections import namedtuple
+from multiprocessing import Array, Process, Value, cpu_count, Queue
 from collections.abc import Sequence
 from operator import attrgetter
 from scipy.sparse import issparse
@@ -84,7 +83,7 @@ class AnnoyKnnMatrix(Sequence):
         if self.precomputed_neighbours is not None:
             return self.precomputed_neighbours[idx]
         return self.index.get_nns_by_item(
-            idx, self.k + 1, search_k=self.search_k, include_distances=self.include_distances)
+            idx, self.k, search_k=self.search_k, include_distances=self.include_distances)
 
     def get_neighbour_indices(self):
         """Retrieves neighbours for every row in parallel"""
@@ -100,8 +99,8 @@ class AnnoyKnnMatrix(Sequence):
 
 
 def _validate_knn_shape(shape, k):
-    if k >= shape[0] - 1:
-        raise ValueError('''k value greater than or equal to (num_rows - 1)
+    if k >= shape[0]:
+        raise ValueError('''k value greater than or equal to num_rows
                             (k={}, rows={}). Lower k to a smaller
                             value.'''.format(k, shape[0]))
 
@@ -129,14 +128,13 @@ def build_annoy_index(X, path, metric='angular', ntrees=50, build_index_on_disk=
         print("Building KNN index")
 
     if len(X.shape) > 2:
-        if "reshape" in dir(X):
-            if verbose:
-                print('Flattening multidimensional input before building KNN index using Annoy')
-            X = X.reshape((X.shape[0], -1))
-        else:
+        if not "reshape" in dir(X):
             raise ValueError("Attempting to build AnnoyIndex on multi-dimensional data"
                              " without providing a reshape method. AnnoyIndexes require"
                              " 2D data - rows and columns.")
+        if verbose:
+            print('Flattening multidimensional input before building KNN index using Annoy')
+        X = X.reshape((X.shape[0], -1))
 
     index = AnnoyIndex(X.shape[1], metric=metric)
     if build_index_on_disk:
@@ -157,19 +155,18 @@ def build_annoy_index(X, path, metric='angular', ntrees=50, build_index_on_disk=
         msg = ("Error building Annoy Index. Passing on_disk_build=False"
                " may solve the issue, especially on Windows.")
         raise Exception(msg) from e
-    else:
-        if not build_index_on_disk:
-            index.save(path)
-        return index
 
-IndexNeighbours = namedtuple('IndexNeighbours', ['row_index', 'neighbour_list'])
+    if not build_index_on_disk:
+        index.save(path)
+    return index
 
-def extract_knn(data_shape, index_builder=AnnoyKnnMatrix.load, verbose=1, **kwargs):
+def extract_knn(data_shape, k, index_builder=AnnoyKnnMatrix.load, verbose=1, **kwargs):
     """Starts multiple processes to retrieve nearest neighbours from a built index in parallel.
 
+    :param int k: Number of neighbours to retrieve. Passed as a kwarg to index builder function.
     :param tuple data_shape: The shape of the data that the index was built on.
-    :param index_builder Callable: Called within each worker process to load the index.
-    :param verbose int: Controls verbosity of output.
+    :param Callable index_builder: Called within each worker process to load the index.
+    :param int verbose: Controls verbosity of output.
     :param kwargs: keyword arguments to pass to the index_builder function."""
 
     if verbose:
@@ -180,48 +177,39 @@ def extract_knn(data_shape, index_builder=AnnoyKnnMatrix.load, verbose=1, **kwar
             print('Flattening data before retrieving KNN from index')
         data_shape = (data_shape[0], functools.reduce(lambda x, y: x*y, data_shape[1:]))
 
+    array_ctype = _get_uint_ctype(data_shape[0])
+    neighbours_array = Array(array_ctype, data_shape[0] * k, lock=False)
+
     chunk_size = max(1, data_shape[0] // cpu_count())
     process_pool = []
-    results_queue = Queue()
+    progress_counters = []
     error_queue = Queue()
 
     # Split up the indices and assign processes for each chunk
     for i in range(0, data_shape[0], chunk_size):
-        process_pool.append(KnnWorker(results_queue, (i, min(i+chunk_size, data_shape[0])),
-                                      index_builder, shape=data_shape,
-                                      error_queue=error_queue, **kwargs))
+        counter = Value(array_ctype, 0, lock=False)
+        process_pool.append(KnnWorker(neighbours_array, (i, min(i+chunk_size, data_shape[0])),
+                                      index_builder, k=k, shape=data_shape, error_queue=error_queue,
+                                      progress_counter=counter, **kwargs))
+        progress_counters.append(counter)
     try:
         for process in process_pool:
             process.start()
 
-        neighbour_list = []
-        neighbour_list_length = len(neighbour_list)
-
+        # Poll for progress updates
         with tqdm(total=data_shape[0], disable=verbose < 1) as pbar:
-            # Read from queue constantly to prevent it from becoming full
-            while any(process.is_alive() for process in process_pool):
-                # Check for errors in worker processes
+            while pbar.n < data_shape[0]:
+                # Raise worker errors
                 if not error_queue.empty():
                     raise error_queue.get()
-                while not results_queue.empty():
-                    neighbour_list.append(results_queue.get())
-                progress = len(neighbour_list) - neighbour_list_length
-                pbar.update(progress)
-                neighbour_list_length = len(neighbour_list)
+
+                num_processed = sum([num.value for num in progress_counters])
+                pbar.update(num_processed - pbar.n)
                 time.sleep(0.1)
 
-            # Read any remaining results
-            while not results_queue.empty():
-                neighbour_list.append(results_queue.get())
-
-        # Final check for errors in worker processes
-        if not error_queue.empty():
-            raise error_queue.get()
-
-        neighbour_list = sorted(neighbour_list, key=attrgetter('row_index'))
-        neighbour_list = list(map(attrgetter('neighbour_list'), neighbour_list))
-
-        return np.array(neighbour_list)
+        neighbour_matrix = np.ndarray((data_shape[0], k), buffer=neighbours_array,
+                                      dtype=array_ctype)
+        return neighbour_matrix
 
     except:
         print('Halting KNN retrieval and cleaning up')
@@ -233,40 +221,53 @@ def extract_knn(data_shape, index_builder=AnnoyKnnMatrix.load, verbose=1, **kwar
 class KnnWorker(Process):
     """When run, this worker process loads an index from disk using the provided
     'knn_init' function, passing all additional 'kwargs' to this initializer function.
-    When started, the neighbours of the data-points between the range specified by `data_indices`
-    and stored in the 'results_queue'.
+    Then the neighbours of the data-points between the range specified by `data_indices`
+    are retrieved and stored in the 'neighbours_array'.
 
-    Each result will be send to the result queue as a named tuple, 'IndexNeighbours'
-    with field names ['row_index', 'neighbour_list'].
-
-    :param: multiprocessing.Queue results_queue. Queue worker will push results to.
+    :param: multiprocessing.Array neighbours_array. 1D array that worker will insert results into.
     :param: tuple data_indices. Specifies range (start, end) to retrieve neighbours for.
     :param: Callable knn_init. Function to load index from disk.
-    :param: Optional[multiprocessing.Queue]. If exception encountered, will be pushed to this
+    :param: int k. Number of neighbours to retrieve. Will be passed as kwargs to knn_init function.
+    :param: Optional[multiprocessing.Value] progress_counter. Incremented for every row processed.
+    :param: Optional[multiprocessing.Queue] error_queue. Exceptions encountered are sent to this
         queue if provided.
     :param: **kwargs. Args to pass to knn_init function.
     """
 
-    def __init__(self, results_queue, data_indices, knn_init, error_queue=None, **kwargs):
-        self.results_queue = results_queue
+    def __init__(self, neighbours_array, data_indices, knn_init, k,
+                 progress_counter=None, error_queue=None, **kwargs):
+        super().__init__()
+        self.neighbours_array = neighbours_array
         self.data_indices = data_indices
+        self.k = k
         self.knn_init = knn_init
+        self.progress_counter = progress_counter
         self.error_queue = error_queue
         self.kwargs = kwargs
-        super().__init__()
+        self.kwargs['k'] = k
 
     def run(self):
-        """Load index, retrieve neighbouring points, and send to results queue."""
+        """Load index, retrieve neighbouring points, and insert results into 1D array.
+        Can update progress_counter and send Exceptions to error queue if provided."""
         try:
-            annoy_neighbours = self.knn_init(**self.kwargs)
+            knn_index = self.knn_init(**self.kwargs)
+
             for i in range(self.data_indices[0], self.data_indices[1]):
-                neighbour_indexes = annoy_neighbours[i]
-                self.results_queue.put(
-                    IndexNeighbours(row_index=i,
-                                    neighbour_list=neighbour_indexes))
+                neighbour_indexes = knn_index[i]
+                row_offset = i * self.k
+                for j in range(0, self.k):
+                    self.neighbours_array[row_offset + j] = neighbour_indexes[j]
+                if self.progress_counter is not None:
+                    self.progress_counter.value += 1
         except Exception as e:
             if self.error_queue:
                 self.error_queue.put(e)
-                self.error_queue.close()
-        finally:
-            self.results_queue.close()
+
+def _get_uint_ctype(integer):
+    """Gets smallest possible uint representation of provided integer.
+    Raises ValueError if invalid value provided (negative or above uint64)."""
+    for dtype in np.typecodes["UnsignedInteger"]:
+        min_val, max_val = attrgetter('min', 'max')(np.iinfo(np.dtype(dtype)))
+        if min_val <= integer <= max_val:
+            return dtype
+    raise ValueError("Cannot parse {} as a uint64".format(integer))
