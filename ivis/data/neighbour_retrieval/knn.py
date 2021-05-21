@@ -207,6 +207,10 @@ def extract_knn(data_shape, k, index_builder=AnnoyKnnMatrix.load, verbose=1, **k
                 pbar.update(num_processed - pbar.n)
                 time.sleep(0.1)
 
+        # Join processes to avoid zombie processes on UNIX
+        for process in process_pool:
+            process.join()
+
         neighbour_matrix = np.ndarray((data_shape[0], k), buffer=neighbours_array,
                                       dtype=array_ctype)
         return neighbour_matrix
@@ -215,6 +219,7 @@ def extract_knn(data_shape, k, index_builder=AnnoyKnnMatrix.load, verbose=1, **k
         print('Halting KNN retrieval and cleaning up')
         for process in process_pool:
             process.terminate()
+            process.join()
         raise
 
 
@@ -262,6 +267,7 @@ class KnnWorker(Process):
         except Exception as e:
             if self.error_queue:
                 self.error_queue.put(e)
+            raise
 
 def _get_uint_ctype(integer):
     """Gets smallest possible uint representation of provided integer.
