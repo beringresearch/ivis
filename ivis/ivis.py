@@ -1,7 +1,9 @@
 """ scikit-learn wrapper class for the Ivis algorithm. """
+import weakref
 import json
 import os
 import shutil
+import tempfile
 import dill as pkl
 import tensorflow as tf
 import numpy as np
@@ -175,16 +177,20 @@ class Ivis(BaseEstimator):
         return state
 
     def _fit(self, X, Y=None, shuffle_mode=True):
-
         if self.neighbour_matrix is None:
             if self.annoy_index_path is None:
-                self.annoy_index_path = 'annoy.index'
+                # Create a temporary folder to store the index on disk
+                temp_dir = tempfile.mkdtemp()
+                self.annoy_index_path = os.path.join(temp_dir, 'annoy.index')
                 self.neighbour_matrix = AnnoyKnnMatrix.build(X, path=self.annoy_index_path,
                                                              k=self.k, metric=self.knn_distance_metric,
                                                              search_k=self.search_k,
                                                              include_distances=False, ntrees=self.ntrees,
                                                              build_index_on_disk=self.build_index_on_disk,
                                                              precompute=self.precompute, verbose=self.verbose)
+
+                # Clean up temporary folder with index before object is garbage collected
+                weakref.finalize(self, cleanup_knn_index, self.neighbour_matrix, temp_dir)
             else:
                 self.neighbour_matrix = AnnoyKnnMatrix.load(self.annoy_index_path, X.shape,
                                                             k=self.k, search_k=self.search_k,
