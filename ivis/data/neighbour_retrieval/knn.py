@@ -1,6 +1,8 @@
 """ KNN retrieval using an Annoy index. """
 
+from contextlib import suppress
 import functools
+import shutil
 import time
 from multiprocessing import Array, Process, Value, cpu_count, Queue
 from collections.abc import Sequence
@@ -45,7 +47,9 @@ class AnnoyKnnMatrix(Sequence):
         if precompute:
             self.precomputed_neighbours = self.get_neighbour_indices()
 
-    def __del__(self):
+    def unload(self):
+        """Unloads the index from disk, allowing other processes to read/write to the index file.
+        After calling this, the index will no longer be usable from this instance."""
         self.index.unload()
 
     @classmethod
@@ -97,6 +101,17 @@ class AnnoyKnnMatrix(Sequence):
             search_k=self.search_k,
             include_distances=self.include_distances)
 
+    def save(self, path):
+        """Saves internal Annoy index to disk at given path."""
+        self.index.save(path)
+
+def cleanup_knn_index(index, path):
+    """Cleans up disk resources used by a KNN index.
+    First will attempt to call the `unload` method on the index,
+    then will recursively remove the files at the path provided."""
+    with suppress(Exception):
+        index.unload()
+    shutil.rmtree(path, ignore_errors=True)
 
 def _validate_knn_shape(shape, k):
     if k >= shape[0]:
