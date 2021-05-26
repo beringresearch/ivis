@@ -12,7 +12,7 @@ Description: Implementation of the ivis algorithm as described in the paper:
   with neighbouring points being pulled together and non-neighours being pushed away.
 Depends: R (>= 3.2.3)
 Imports: reticulate
-License: MIT 
+License: Apache License, Version 2.0
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.0.2
