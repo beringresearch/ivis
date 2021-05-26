@@ -1,10 +1,16 @@
-import os
-import imp
+import importlib
+from pathlib import Path
 from setuptools import setup
 from setuptools import find_packages
 
-VERSION = imp.load_source(
-        'ivis.version', os.path.join('ivis', 'version.py')).VERSION
+def get_ivis_version():
+    spec = importlib.util.spec_from_file_location(
+        'ivis.version', str(Path('ivis/version.py')))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.VERSION
+
+VERSION = get_ivis_version()
 
 with open('README.md') as f:
     long_description = f.read()
