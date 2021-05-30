@@ -13,7 +13,7 @@ from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.models import load_model, Model
 from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras import regularizers
-from sklearn.base import BaseEstimator
+from sklearn.base import BaseEstimator, TransformerMixin
 
 from .data.generators import generator_from_neighbour_matrix, KerasSequence
 from .nn.network import triplet_network, base_network
@@ -24,12 +24,12 @@ from .data.neighbour_retrieval import AnnoyKnnMatrix
 from .data.neighbour_retrieval.knn import cleanup_knn_index
 
 
-class Ivis(BaseEstimator):
+class Ivis(BaseEstimator, TransformerMixin):
     """Ivis is a technique that uses an artificial neural network for
     dimensionality reduction, often useful for the purposes of visualization.
     The network trains on triplets of data-points at a time and pulls positive
     points together, while pushing more distant points away from each other.
-    Triplets are sampled from the original data using KNN aproximation using
+    Triplets are sampled from the original data using KNN approximation using
     the Annoy library.
 
     :param int embedding_dims: Number of dimensions in the embedding space
@@ -143,18 +143,20 @@ class Ivis(BaseEstimator):
         self.supervised_model_ = None
         self.loss_history_ = []
         self.annoy_index_path = annoy_index_path
-
-        if callbacks is None:
-            self.callbacks = []
-        else:
-            self.callbacks = callbacks
-        for callback in self.callbacks:
-            if isinstance(callback, ModelCheckpoint):
-                callback = callback.register_ivis_model(self)
+        self.callbacks = callbacks
+        self.callbacks_ = None
         self.build_index_on_disk = build_index_on_disk
         self.neighbour_matrix = neighbour_matrix
         self.verbose = verbose
         self.n_classes = None
+
+    def _validate_parameters(self):
+        """ Validate parameters before fitting """
+        self.callbacks_ = [] if self.callbacks is None else self.callbacks
+
+        for callback in self.callbacks_:
+            if isinstance(callback, ModelCheckpoint):
+                callback.register_ivis_model(self)
 
     def __getstate__(self):
         """ Return object serializable variable dict """
@@ -177,6 +179,8 @@ class Ivis(BaseEstimator):
         return state
 
     def _fit(self, X, Y=None, shuffle_mode=True):
+        self._validate_parameters()
+
         if self.neighbour_matrix is None:
             if self.annoy_index_path is None:
                 # Create a temporary folder to store the index on disk
@@ -295,8 +299,8 @@ class Ivis(BaseEstimator):
         hist = self.model_.fit(
             datagen,
             epochs=self.epochs,
-            callbacks=self.callbacks + [EarlyStopping(monitor=loss_monitor,
-                                                      patience=self.n_epochs_without_progress)],
+            callbacks=self.callbacks_ + [EarlyStopping(monitor=loss_monitor,
+                                                       patience=self.n_epochs_without_progress)],
             shuffle=shuffle_mode,
             steps_per_epoch=int(np.ceil(X.shape[0] / self.batch_size)),
             verbose=self.verbose)
@@ -332,7 +336,7 @@ class Ivis(BaseEstimator):
             Data to train on and then embedded.
             Needs to have a `.shape` attribute and a `__getitem__` method.
         Y : array, shape (n_samples)
-            Optional array for supervised dimentionality reduction.
+            Optional array for supervised dimensionality reduction.
             If Y contains -1 labels, and 'sparse_categorical_crossentropy'
             is the loss function, semi-supervised learning will be used.
 
