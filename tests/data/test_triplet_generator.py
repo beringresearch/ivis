@@ -34,30 +34,34 @@ def test_generator_from_neighbour_matrix():
     # Test too large batch_size raises exception
     with pytest.raises(Exception):
         generator_from_neighbour_matrix(np.zeros(shape=(4, 4)),
-                                        None, 
+                                        None,
                                         np.zeros(shape=(4, 2)), batch_size=32)
     with pytest.raises(Exception):
         generator_from_neighbour_matrix(np.zeros(shape=(4, 4)),
-                                        np.zeros(shape=(4,)), 
+                                        np.zeros(shape=(4,)),
                                         np.zeros(shape=(4, 2)), batch_size=32)
 
     # Test with valid hyperparameters
-    unsupervised_gen = generator_from_neighbour_matrix(np.zeros(shape=(4, 4)),
-                                          None, 
-                                          np.zeros(shape=(4, 2)), batch_size=2)
+    unsupervised_gen = generator_from_neighbour_matrix(
+        np.zeros(shape=(4, 4)),
+        None,
+        np.zeros(shape=(4, 2)), batch_size=2)
+
     for triplets, labels in unsupervised_gen:
         assert isinstance(triplets, tuple)
-        assert(len(triplets) == 3)
+        assert len(triplets) == 3
         for triplet in triplets:
-            assert(triplet.shape == (2, 4))
+            assert triplet.shape == (2, 4)
 
-    supervised_gen = generator_from_neighbour_matrix(np.zeros(shape=(4, 4)),
-                                          np.ones(shape=(4,)), 
-                                          np.zeros(shape=(4, 2)), batch_size=2)
+    supervised_gen = generator_from_neighbour_matrix(
+        np.zeros(shape=(4, 4)),
+        np.ones(shape=(4,)),
+        np.zeros(shape=(4, 2)), batch_size=2)
+
     for triplets, labels in supervised_gen:
         assert isinstance(triplets, tuple)
-        assert(len(triplets) == 3)
+        assert len(triplets) == 3
         for triplet in triplets:
-            assert(triplet.shape == (2, 4))
-        assert(isinstance(labels, tuple))
-        assert(np.all(np.unique(labels) == 1))
+            assert triplet.shape == (2, 4)
+        assert isinstance(labels, tuple)
+        assert np.all(np.unique(labels) == 1)
