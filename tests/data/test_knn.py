@@ -12,9 +12,8 @@ from ivis.data.neighbour_retrieval.knn import build_annoy_index, extract_knn
 
 @pytest.fixture(scope='function')
 def annoy_index_file():
-    _, filepath = tempfile.mkstemp('.index')
-    yield filepath
-    os.remove(filepath)
+    with tempfile.TemporaryDirectory() as f:
+        yield os.path.join(f, 'annoy.index')
 
 
 def test_build_sparse_annoy_index(annoy_index_file):
@@ -60,8 +59,9 @@ def test_knn_retrieval():
 
     k = 3
     search_k = -1
-    neighbour_list = extract_knn(X.shape, index_path=annoy_index_filepath,
-                                 k=k, search_k=search_k)
+
+    index = AnnoyKnnMatrix.load(annoy_index_filepath, X.shape, k=k, search_k=search_k)
+    neighbour_list = extract_knn(index, k=k)
 
     assert np.all(expected_neighbour_list == neighbour_list)
 
@@ -77,4 +77,4 @@ def test_knn_matrix_construction_params(annoy_index_file):
     loaded_index = AnnoyKnnMatrix.load(annoy_index_file, (4, 4), k=2)
 
     for original_row, loaded_row in zip(index, loaded_index):
-        assert(original_row == loaded_row)
+        assert original_row == loaded_row
