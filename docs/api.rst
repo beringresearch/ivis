@@ -12,7 +12,10 @@ Ivis
   :show-inheritance:
 
 Neighbour Retrieval
-=============
+===================
+.. autoclass:: ivis.data.neighbour_retrieval.NeighbourMatrix
+  :members:
+  :show-inheritance:
 
 .. autoclass:: ivis.data.neighbour_retrieval.AnnoyKnnMatrix
   :members:
@@ -25,6 +28,8 @@ Neighbour Retrieval
   :show-inheritance:
   :special-members:
   :exclude-members: __weakref__
+
+.. autofunction:: ivis.data.neighbour_retrieval.knn.build_annoy_index
 
 Indexable Datasets
 ==================
