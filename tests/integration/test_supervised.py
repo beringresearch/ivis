@@ -12,7 +12,7 @@ def test_1d_supervied_iris_embedding():
     x = iris.data
     y = iris.target
 
-    ivis_iris = Ivis(epochs=5, embedding_dims=1)
+    ivis_iris = Ivis(epochs=2, embedding_dims=1)
     ivis_iris.k = 15
     ivis_iris.batch_size = 16
 
@@ -23,7 +23,7 @@ def test_score_samples_unsupervised():
     x = iris.data
     y = iris.target
 
-    ivis_iris = Ivis(k=15, batch_size=16, epochs=5)
+    ivis_iris = Ivis(k=15, batch_size=16, epochs=2)
     embeddings = ivis_iris.fit_transform(x)
 
     # Unsupervised model cannot classify
@@ -37,7 +37,7 @@ def test_score_samples():
     y = iris.target
 
     supervision_metric = 'sparse_categorical_crossentropy'
-    ivis_iris = Ivis(k=15, batch_size=16, epochs=5,
+    ivis_iris = Ivis(k=15, batch_size=16, epochs=2,
                      supervision_metric=supervision_metric)
 
     embeddings = ivis_iris.fit_transform(x, y)
@@ -60,7 +60,7 @@ def test_correctly_indexed_classificaton_classes():
     y = iris.target
 
     supervision_metric = 'sparse_categorical_crossentropy'
-    ivis_iris = Ivis(k=15, batch_size=16, epochs=5,
+    ivis_iris = Ivis(k=15, batch_size=16, epochs=2,
                      supervision_metric=supervision_metric)
 
     embeddings = ivis_iris.fit_transform(x, y)
@@ -75,7 +75,7 @@ def test_non_zero_indexed_classificaton_classes():
     y = y + 1
 
     supervision_metric = 'sparse_categorical_crossentropy'
-    ivis_iris = Ivis(k=15, batch_size=16, epochs=5,
+    ivis_iris = Ivis(k=15, batch_size=16, epochs=2,
                      supervision_metric=supervision_metric)
 
     with pytest.raises(ValueError):
@@ -91,7 +91,7 @@ def test_non_consecutive_indexed_classificaton_classes():
     y[y == max(y)] = max(y) + 1
 
     supervision_metric = 'sparse_categorical_crossentropy'
-    ivis_iris = Ivis(k=15, batch_size=16, epochs=5,
+    ivis_iris = Ivis(k=15, batch_size=16, epochs=2,
                      supervision_metric=supervision_metric)
 
     with pytest.raises(ValueError):
@@ -104,7 +104,7 @@ def test_invalid_metric():
     y = iris.target
 
     supervision_metric = 'invalid_loss_function'
-    ivis_iris = Ivis(k=15, batch_size=16, epochs=5,
+    ivis_iris = Ivis(k=15, batch_size=16, epochs=2,
                      supervision_metric=supervision_metric)
 
     # Loss function not specified
@@ -118,7 +118,7 @@ def test_svm_score_samples():
     y = iris.target
 
     supervision_metric = 'categorical_hinge'
-    ivis_iris = Ivis(k=15, batch_size=16, epochs=5,
+    ivis_iris = Ivis(k=15, batch_size=16, epochs=2,
                      supervision_metric=supervision_metric)
 
     # Correctly formatted one-hot labels train successfully
@@ -138,7 +138,7 @@ def test_regression():
     (x_train, y_train), (x_test, y_test) = boston_housing.load_data()
 
     supervision_metric = 'mae'
-    ivis_boston = Ivis(k=15, batch_size=16, epochs=5,
+    ivis_boston = Ivis(k=15, batch_size=16, epochs=2,
                        supervision_metric=supervision_metric)
     ivis_boston.fit(x_train, y_train)
 
