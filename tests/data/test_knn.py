@@ -61,7 +61,7 @@ def test_knn_retrieval():
     search_k = -1
 
     index = AnnoyKnnMatrix.load(annoy_index_filepath, X.shape, k=k, search_k=search_k)
-    neighbour_list = extract_knn(index, k=k)
+    neighbour_list = extract_knn(index)
 
     assert np.all(expected_neighbour_list == neighbour_list)
 
