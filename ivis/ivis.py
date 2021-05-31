@@ -170,6 +170,8 @@ class Ivis(BaseEstimator, TransformerMixin):
             state['supervised_model_'] = None
         if 'callbacks' in state:
             state['callbacks'] = []
+        if 'callbacks_' in state:
+            state['callbacks_'] = []
         if not isinstance(state['model'], str):
             state['model'] = None
         if 'neighbour_matrix' in state:
