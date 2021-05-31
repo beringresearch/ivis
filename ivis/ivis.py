@@ -4,6 +4,7 @@ import json
 import os
 import shutil
 import tempfile
+from copy import copy
 import dill as pkl
 import tensorflow as tf
 import numpy as np
@@ -151,7 +152,7 @@ class Ivis(BaseEstimator, TransformerMixin):
 
     def _validate_parameters(self):
         """ Validate parameters before fitting """
-        self.callbacks_ = [] if self.callbacks is None else self.callbacks
+        self.callbacks_ = [] if self.callbacks is None else list(map(copy, self.callbacks))
 
         for callback in self.callbacks_:
             if isinstance(callback, ModelCheckpoint):
