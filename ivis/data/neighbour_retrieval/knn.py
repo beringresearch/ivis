@@ -1,9 +1,9 @@
 """ KNN retrieval using an Annoy index. """
 
-import functools
+import os
 import shutil
 import time
-from multiprocessing import Array, Process, Value, cpu_count, Queue
+from threading import Thread
 from collections.abc import Sequence
 from operator import attrgetter
 from pathlib import Path
@@ -93,13 +93,7 @@ class AnnoyKnnMatrix(Sequence):
         """Retrieves neighbours for every row in parallel"""
         if self.precomputed_neighbours is not None:
             return self.precomputed_neighbours
-        return extract_knn(
-            self.shape, k=self.k,
-            index_builder=self.load,
-            verbose=self.verbose,
-            index_path=self.index_path,
-            search_k=self.search_k,
-            include_distances=self.include_distances)
+        return extract_knn(self, k=self.k, verbose=self.verbose)
 
     def save(self, path):
         """Saves internal Annoy index to disk at given path."""
@@ -175,114 +169,73 @@ def build_annoy_index(X, path, metric='angular', ntrees=50, build_index_on_disk=
         index.save(path)
     return index
 
-def extract_knn(data_shape, k, index_builder=AnnoyKnnMatrix.load, verbose=1, **kwargs):
-    """Starts multiple processes to retrieve nearest neighbours from a built index in parallel.
+def extract_knn(knn_index, k, verbose=1):
+    """Starts multiple threads to retrieve nearest neighbours from a built index in parallel.
 
-    :param int k: Number of neighbours to retrieve. Passed as a kwarg to index builder function.
-    :param tuple data_shape: The shape of the data that the index was built on.
-    :param Callable index_builder: Called within each worker process to load the index.
+    :param collections.abc.Sequence knn_index: Indexable neighbour index. When indexed, returns
+        a list of neighbour indices for that row of the dataset it was built on.
+    :param int k: Number of neighbours to retrieve.
     :param int verbose: Controls verbosity of output.
-    :param kwargs: keyword arguments to pass to the index_builder function."""
+    """
 
     if verbose:
         print("Extracting KNN neighbours")
 
-    if len(data_shape) > 2:
-        if verbose:
-            print('Flattening data before retrieving KNN from index')
-        data_shape = (data_shape[0], functools.reduce(lambda x, y: x*y, data_shape[1:]))
+    nrows = len(knn_index)
+    neighbour_matrix = np.empty((nrows, k), dtype=_get_uint_ctype(nrows))
 
-    array_ctype = _get_uint_ctype(data_shape[0])
-    neighbours_array = Array(array_ctype, data_shape[0] * k, lock=False)
+    worker_exception = None  # Halt signal
+    def knn_worker(thread_index, data_indices):
+        nonlocal worker_exception
+        for i in range(data_indices[0], data_indices[1]):
+            try:
+                if worker_exception:
+                    break
+                neighbour_matrix[i] = knn_index[i]
+                progress_counters[thread_index] += 1
+            except Exception as e:
+                worker_exception = e
 
-    chunk_size = max(1, data_shape[0] // cpu_count())
-    process_pool = []
-    progress_counters = []
-    error_queue = Queue()
+    # Split up the indices and assign a thread for each chunk
+    cpus_available = os.cpu_count() or 1
+    chunk_size = max(1, nrows // cpus_available)
+    data_split_indices = [(min_index, min(nrows, min_index + chunk_size))
+                          for min_index in range(0, nrows, chunk_size)]
 
-    # Split up the indices and assign processes for each chunk
-    for i in range(0, data_shape[0], chunk_size):
-        counter = Value(array_ctype, 0, lock=False)
-        process_pool.append(KnnWorker(neighbours_array, (i, min(i+chunk_size, data_shape[0])),
-                                      index_builder, k=k, shape=data_shape, error_queue=error_queue,
-                                      progress_counter=counter, **kwargs))
-        progress_counters.append(counter)
+    progress_counters = [0 for i in range(len(data_split_indices))]
+    thread_pool = [
+        Thread(
+            target=knn_worker,
+            kwargs={
+                'thread_index': i,
+                'data_indices': (min_index, max_index)
+            }
+        ) for i, (min_index, max_index) in enumerate(data_split_indices)
+    ]
+
     try:
-        for process in process_pool:
-            process.start()
+        for thread in thread_pool:
+            thread.start()
 
         # Poll for progress updates
-        with tqdm(total=data_shape[0], disable=verbose < 1) as pbar:
-            while pbar.n < data_shape[0]:
+        with tqdm(total=nrows, disable=verbose < 1) as pbar:
+            while pbar.n < nrows:
                 # Raise worker errors
-                if not error_queue.empty():
-                    raise error_queue.get()
+                if worker_exception:
+                    raise worker_exception
 
-                num_processed = sum([num.value for num in progress_counters])
+                num_processed = sum(progress_counters)
                 pbar.update(num_processed - pbar.n)
                 time.sleep(0.1)
 
-        # Join processes to avoid zombie processes on UNIX
-        for process in process_pool:
-            process.join()
-
-        neighbour_matrix = np.ndarray((data_shape[0], k), buffer=neighbours_array,
-                                      dtype=array_ctype)
         return neighbour_matrix
 
-    except:
+    except BaseException as e:
         print('Halting KNN retrieval and cleaning up')
-        for process in process_pool:
-            process.terminate()
-            process.join()
+        # Signal worker threads to terminate
+        worker_exception = e
         raise
 
-
-class KnnWorker(Process):
-    """When run, this worker process loads an index from disk using the provided
-    'knn_init' function, passing all additional 'kwargs' to this initializer function.
-    Then the neighbours of the data-points between the range specified by `data_indices`
-    are retrieved and stored in the 'neighbours_array'.
-
-    :param: multiprocessing.Array neighbours_array. 1D array that worker will insert results into.
-    :param: tuple data_indices. Specifies range (start, end) to retrieve neighbours for.
-    :param: Callable knn_init. Function to load index from disk.
-    :param: int k. Number of neighbours to retrieve. Will be passed as kwargs to knn_init function.
-    :param: Optional[multiprocessing.Value] progress_counter. Incremented for every row processed.
-    :param: Optional[multiprocessing.Queue] error_queue. Exceptions encountered are sent to this
-        queue if provided.
-    :param: **kwargs. Args to pass to knn_init function.
-    """
-
-    def __init__(self, neighbours_array, data_indices, knn_init, k,
-                 progress_counter=None, error_queue=None, **kwargs):
-        super().__init__()
-        self.neighbours_array = neighbours_array
-        self.data_indices = data_indices
-        self.k = k
-        self.knn_init = knn_init
-        self.progress_counter = progress_counter
-        self.error_queue = error_queue
-        self.kwargs = kwargs
-        self.kwargs['k'] = k
-
-    def run(self):
-        """Load index, retrieve neighbouring points, and insert results into 1D array.
-        Can update progress_counter and send Exceptions to error queue if provided."""
-        try:
-            knn_index = self.knn_init(**self.kwargs)
-
-            for i in range(self.data_indices[0], self.data_indices[1]):
-                neighbour_indexes = knn_index[i]
-                row_offset = i * self.k
-                for j in range(0, self.k):
-                    self.neighbours_array[row_offset + j] = neighbour_indexes[j]
-                if self.progress_counter is not None:
-                    self.progress_counter.value += 1
-        except Exception as e:
-            if self.error_queue:
-                self.error_queue.put(e)
-            raise
 
 def _get_uint_ctype(integer):
     """Gets smallest possible uint representation of provided integer.
