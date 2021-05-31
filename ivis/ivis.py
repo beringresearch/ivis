@@ -22,7 +22,6 @@ from .nn.callbacks import ModelCheckpoint
 from .nn.losses import triplet_loss, is_categorical, is_multiclass, is_hinge
 from .nn.losses import semi_supervised_loss, validate_sparse_labels
 from .data.neighbour_retrieval import AnnoyKnnMatrix
-from .data.neighbour_retrieval.knn import cleanup_knn_index
 
 
 class Ivis(BaseEstimator, TransformerMixin):
@@ -197,7 +196,7 @@ class Ivis(BaseEstimator, TransformerMixin):
                                                              precompute=self.precompute, verbose=self.verbose)
 
                 # Clean up temporary folder with index before object is garbage collected
-                weakref.finalize(self, cleanup_knn_index, self.neighbour_matrix, temp_dir)
+                weakref.finalize(self, self.neighbour_matrix.delete_index, parent=True)
             else:
                 self.neighbour_matrix = AnnoyKnnMatrix.load(self.annoy_index_path, X.shape,
                                                             k=self.k, search_k=self.search_k,

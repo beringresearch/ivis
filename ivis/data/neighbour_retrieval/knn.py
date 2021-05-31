@@ -1,12 +1,12 @@
 """ KNN retrieval using an Annoy index. """
 
-from contextlib import suppress
 import functools
 import shutil
 import time
 from multiprocessing import Array, Process, Value, cpu_count, Queue
 from collections.abc import Sequence
 from operator import attrgetter
+from pathlib import Path
 from scipy.sparse import issparse
 from annoy import AnnoyIndex
 from tqdm import tqdm
@@ -105,13 +105,13 @@ class AnnoyKnnMatrix(Sequence):
         """Saves internal Annoy index to disk at given path."""
         self.index.save(path)
 
-def cleanup_knn_index(index, path):
-    """Cleans up disk resources used by a KNN index.
-    First will attempt to call the `unload` method on the index,
-    then will recursively remove the files at the path provided."""
-    with suppress(Exception):
-        index.unload()
-    shutil.rmtree(path, ignore_errors=True)
+    def delete_index(self, parent=False):
+        """Cleans up disk resources used by the index, rendering it unusable.
+        First will `unload` the index, then recursively removes the files at index path.
+        If parent is True, will recursively remove parent folder."""
+        path = self.index_path if not parent else str(Path(self.index_path).parent)
+        self.index.unload()
+        shutil.rmtree(path)
 
 def _validate_knn_shape(shape, k):
     if k >= shape[0]:
