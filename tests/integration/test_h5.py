@@ -1,4 +1,3 @@
-import os
 import tempfile
 import h5py
 import numpy as np
@@ -7,10 +6,9 @@ from ivis import Ivis
 
 
 @pytest.fixture(scope='function')
-def h5_filepath():
-    _, filepath = tempfile.mkstemp('.h5')
-    yield filepath
-    os.remove(filepath)
+def h5_file():
+    with tempfile.NamedTemporaryFile(suffix=".h5") as f:
+        yield f
 
 
 def create_random_dataset(path, rows, dims):
@@ -23,12 +21,12 @@ def create_random_dataset(path, rows, dims):
         y_dataset[:] = y
 
 
-def test_h5_file(h5_filepath):
+def test_h5_file(h5_file):
     rows, dims = 258, 32
-    create_random_dataset(h5_filepath, rows, dims)
+    create_random_dataset(h5_file, rows, dims)
 
     # Load data
-    with h5py.File(h5_filepath, 'r') as f:
+    with h5py.File(h5_file, 'r') as f:
         X_train = f['data']
         y_train = f['labels']
 

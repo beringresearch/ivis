@@ -10,12 +10,11 @@ from ivis import Ivis
 @pytest.fixture(scope='function')
 def model_filepath():
     with tempfile.TemporaryDirectory() as temp_dir:
-        model_filepath = os.path.join(temp_dir, 'test.ivis.model.saving.ivis')
-        yield model_filepath
+        yield os.path.join(temp_dir, 'test.ivis.model.saving.ivis')
 
 
 def test_ivis_model_saving(model_filepath):
-    model = Ivis(k=15, batch_size=16, epochs=5)
+    model = Ivis(k=15, batch_size=16, epochs=2)
     iris = datasets.load_iris()
     X = iris.data
 
@@ -55,7 +54,7 @@ def test_ivis_model_saving(model_filepath):
     y_pred_2 = model_2.fit_transform(X)
 
 def test_supervised_model_saving(model_filepath):
-    model = Ivis(k=15, batch_size=16, epochs=5,
+    model = Ivis(k=15, batch_size=16, epochs=2,
                  supervision_metric='sparse_categorical_crossentropy')
     iris = datasets.load_iris()
     X = iris.data
@@ -105,13 +104,13 @@ def test_custom_model_saving(model_filepath):
 
     # Create a custom model
     inputs = tf.keras.layers.Input(shape=(X.shape[-1],))
-    x = tf.keras.layers.Dense(128, activation='relu')(inputs)
+    x = tf.keras.layers.Dense(8, activation='relu')(inputs)
     custom_model = tf.keras.Model(inputs, x)
 
-    model = Ivis(k=15, batch_size=16, epochs=5,
-                supervision_metric='sparse_categorical_crossentropy',
-                model=custom_model)
-    
+    model = Ivis(k=15, batch_size=16, epochs=2,
+                 supervision_metric='sparse_categorical_crossentropy',
+                 model=custom_model)
+
     model.fit(X, Y)
     model.save_model(model_filepath, overwrite=True)
 
@@ -127,7 +126,7 @@ def test_custom_model_saving(model_filepath):
 
     # Check all weights are the same
     for model_layer, model_2_layer in zip(model.encoder.layers,
-                                            model_2.encoder.layers):
+                                          model_2.encoder.layers):
         model_layer_weights = model_layer.get_weights()
         model_2_layer_weights = model_2_layer.get_weights()
         for i in range(len(model_layer_weights)):
@@ -135,7 +134,7 @@ def test_custom_model_saving(model_filepath):
 
     # Check optimizer weights are the same
     for w1, w2 in zip(model.model_.optimizer.get_weights(),
-                        model_2.model_.optimizer.get_weights()):
+                      model_2.model_.optimizer.get_weights()):
         assert np.all(w1 == w2)
 
     # Train new model
