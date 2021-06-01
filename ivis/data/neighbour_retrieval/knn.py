@@ -228,15 +228,17 @@ def extract_knn(knn_index, verbose=1):
         for thread in thread_pool:
             thread.start()
 
+        num_processed = 0
         # Poll for progress updates
         with tqdm(total=nrows, disable=verbose < 1) as pbar:
-            while pbar.n < nrows:
+            while num_processed < nrows:
                 # Raise worker errors
                 if worker_exception:
                     raise worker_exception
 
-                num_processed = sum(progress_counters)
-                pbar.update(num_processed - pbar.n)
+                progress = sum(progress_counters) - num_processed
+                num_processed += progress
+                pbar.update(progress)
                 time.sleep(0.1)
 
         return neighbour_matrix
