@@ -90,9 +90,8 @@ class Ivis(BaseEstimator, TransformerMixin):
         in supervised mode. The higher the weight, the more classification
         influences training. Ignored if using Ivis in unsupervised mode.
     :param str annoy_index_path: The filepath of a pre-trained annoy index file
-        saved on disk. If provided, the annoy index file will be used.
-        Otherwise, a new index will be generated and saved to disk in the
-        current directory as 'annoy.index'.
+        saved on disk. If provided, the annoy index file will be loaded and used.
+        Otherwise, a new index will be generated and saved to disk in a temporary directory.
     :param [keras.callbacks.Callback] callbacks: List of keras Callbacks to
         pass model during training, such as the TensorBoard callback. A set of
         ivis-specific callbacks are provided in the ivis.nn.callbacks module.
@@ -188,8 +187,8 @@ class Ivis(BaseEstimator, TransformerMixin):
             if self.annoy_index_path is None:
                 # Create a temporary folder to store the index on disk
                 temp_dir = tempfile.mkdtemp()
-                self.annoy_index_path = os.path.join(temp_dir, 'annoy.index')
-                self.neighbour_matrix = AnnoyKnnMatrix.build(X, path=self.annoy_index_path,
+                temp_index_path = os.path.join(temp_dir, 'annoy.index')
+                self.neighbour_matrix = AnnoyKnnMatrix.build(X, path=temp_index_path,
                                                              k=self.k, metric=self.knn_distance_metric,
                                                              search_k=self.search_k,
                                                              include_distances=False, ntrees=self.ntrees,
