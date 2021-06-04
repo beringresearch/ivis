@@ -44,11 +44,13 @@ class AnnoyKnnMatrix(NeighbourMatrix):
     __doc__ = NeighbourMatrix.__doc__ + __doc__
     k = None
 
-    def __init__(self, index, nrows, index_path='annoy.index', k=150, search_k=-1,
+    def __init__(self, index, nrows, index_path='annoy.index', metric='angular', k=150, search_k=-1,
                  precompute=False, include_distances=False, verbose=False):
         """Constructs an AnnoyKnnMatrix instance from an AnnoyIndex object with given parameters"""
         self.index = index
         self.nrows = nrows
+        self.index_dims = index.f
+        self.metric = metric
         self.index_path = index_path
         self.k = k
         self.search_k = search_k
@@ -57,6 +59,13 @@ class AnnoyKnnMatrix(NeighbourMatrix):
         self.precomputed_neighbours = None
         if precompute:
             self.precomputed_neighbours = self.get_neighbour_indices()
+
+    def __getstate__(self):
+        """ Return object serializable variable dict """
+
+        state = dict(self.__dict__)
+        state['index'] = None
+        return state
 
     def unload(self):
         """Unloads the index from disk, allowing other processes to read/write to the index file.
@@ -71,17 +80,25 @@ class AnnoyKnnMatrix(NeighbourMatrix):
 
         _validate_knn_shape(X.shape[0], k)
         index = build_annoy_index(X, path, metric, ntrees, build_index_on_disk, verbose)
-        return cls(index, X.shape[0], path, k, search_k, precompute, include_distances, verbose)
+        return cls(index, X.shape[0], path, metric, k, search_k,
+                   precompute, include_distances, verbose)
 
     @classmethod
-    def load(cls, index_path, data_shape, k=150, search_k=-1, include_distances=False,
-             precompute=False, verbose=1):
+    def load(cls, index_path, data_shape, k=150, metric='angular', search_k=-1,
+             include_distances=False, precompute=False, verbose=1):
         """Constructs and returns an AnnoyKnnMatrix object from an existing Annoy Index on disk."""
 
         _validate_knn_shape(data_shape[0], k)
-        index = AnnoyIndex(data_shape[1], metric='angular')
-        index.load(index_path)
-        return cls(index, data_shape[0], index_path, k, search_k,
+        if not Path(index_path).exists():
+            raise FileNotFoundError("Failed to load annoy index at '%s': "
+                                    "file does not exist" % index_path)
+
+        index = AnnoyIndex(data_shape[1], metric=metric)
+        try:
+            index.load(index_path)
+        except IOError as err:
+            raise IOError("Failed to load annoy index at '%s': file corrupt" % index_path) from err
+        return cls(index, data_shape[0], index_path, metric, k, search_k,
                    precompute, include_distances, verbose)
 
     def __len__(self):
@@ -173,9 +190,8 @@ def build_annoy_index(X, path, metric='angular', ntrees=50, build_index_on_disk=
     try:
         index.build(ntrees)
     except Exception as e:
-        msg = ("Error building Annoy Index. Passing on_disk_build=False"
-               " may solve the issue, especially on Windows.")
-        raise Exception(msg) from e
+        raise Exception("Error building Annoy Index. Passing on_disk_build=False "
+                        "may solve the issue, especially on Windows.") from e
 
     if not build_index_on_disk:
         index.save(path)
@@ -193,7 +209,11 @@ def extract_knn(knn_index, verbose=1):
         print("Extracting KNN neighbours")
 
     nrows = len(knn_index)
-    neighbour_matrix = np.empty((nrows, knn_index.k), dtype=_get_uint_ctype(nrows))
+    try:
+        neighbour_matrix = np.empty((nrows, knn_index.k), dtype=_get_uint_ctype(nrows))
+    except (ValueError, MemoryError) as err:
+        raise MemoryError("Unable to allocate memory for precomputed KNN matrix. "
+                          "Set `precompute` to False or reduce the value for `k`.") from err
 
     worker_exception = None  # Halt signal
     def knn_worker(thread_index, data_indices):
@@ -244,9 +264,11 @@ def extract_knn(knn_index, verbose=1):
         return neighbour_matrix
 
     except BaseException as e:
-        print('Halting KNN retrieval and cleaning up')
+        print('Error encountered. Halting KNN retrieval and cleaning up')
         # Signal worker threads to terminate
         worker_exception = e
+        for thread in thread_pool:
+            thread.join()
         raise
 
 
