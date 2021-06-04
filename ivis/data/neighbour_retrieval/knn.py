@@ -137,6 +137,8 @@ class AnnoyKnnMatrix(NeighbourMatrix):
         shutil.rmtree(path)
 
 def _validate_knn_shape(nrows, k):
+    if k <= 0:
+        raise ValueError('Invalid value of `%s` for k. k must be positive' %k)
     if k >= nrows:
         raise ValueError('''k value greater than or equal to num_rows
                             (k={}, rows={}). Lower k to a smaller
