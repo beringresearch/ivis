@@ -21,7 +21,7 @@ def test_triplet_network():
     base_model = Sequential()
     base_model.add(Dense(8, input_shape=(X.shape[-1],)))
 
-    model, _, _, _ = triplet_network(base_model, embedding_dims=embedding_dims, embedding_l2=0.1)
+    model, _ = triplet_network(base_model, embedding_dims=embedding_dims, embedding_l2=0.1)
     encoder = model.layers[3]
 
     assert model.layers[3].output_shape == (None, 3)
@@ -29,4 +29,3 @@ def test_triplet_network():
     assert np.all([isinstance(layer, keras.layers.InputLayer) for layer in model.layers[:3]])
 
     assert encoder.output_shape == (None, embedding_dims)
-
