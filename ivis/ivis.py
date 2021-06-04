@@ -217,11 +217,11 @@ class Ivis(BaseEstimator, TransformerMixin):
         if self.model_ is None:
             if isinstance(self.model, str):
                 input_size = (X.shape[-1],)
-                self.model_, anchor_embedding, _, _ = \
+                self.model_, (anchor_embedding, *_) = \
                     triplet_network(base_network(self.model, input_size),
                                     embedding_dims=self.embedding_dims)
             else:
-                self.model_, anchor_embedding, _, _ = \
+                self.model_, (anchor_embedding, *_) = \
                     triplet_network(self.model,
                                     embedding_dims=self.embedding_dims)
 
@@ -469,7 +469,7 @@ class Ivis(BaseEstimator, TransformerMixin):
                                       allow_pickle=True)
             optimizer.set_weights(optimizer_state)
 
-            self.model_, _, _, _ = triplet_network(base_model, embedding_dims=None)
+            self.model_, _ = triplet_network(base_model, embedding_dims=None)
             self.model_.compile(loss=loss_function, optimizer=optimizer)
 
         self.encoder = self.model_.layers[3]
