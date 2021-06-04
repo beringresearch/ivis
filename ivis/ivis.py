@@ -199,7 +199,8 @@ class Ivis(BaseEstimator, TransformerMixin):
                 weakref.finalize(self, self.neighbour_matrix.delete_index, parent=True)
             else:
                 self.neighbour_matrix = AnnoyKnnMatrix.load(self.annoy_index_path, X.shape,
-                                                            k=self.k, search_k=self.search_k,
+                                                            k=self.k, metric=self.knn_distance_metric,
+                                                            search_k=self.search_k,
                                                             include_distances=False, precompute=self.precompute,
                                                             verbose=self.verbose)
 
