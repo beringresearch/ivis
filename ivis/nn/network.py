@@ -36,9 +36,9 @@ def triplet_network(base_network, embedding_dims=2, embedding_l2=0.0):
 
     Outputs: tuple(
         model: tf.keras.models.Model. The constructed triplet Siamese network
-        processed_a: tf.keras.layers.Dense. Result of applying the base_network to anchor input.
-        processed_p: tf.keras.layers.Dense. Result of applying the base_network to positive input.
-        processed_n: tf.keras.layers.Dense. Result of applying the base_network to negative input.
+        embeddings: [tf.keras.layers.Dense, tf.keras.layers.Dense, tf.keras.layers.Dense].
+        Results of applying the base_network to triplet inputs -
+        anchor, positive and negative respectively.
     ) """
 
     def output_shape(shapes):
@@ -68,7 +68,7 @@ def triplet_network(base_network, embedding_dims=2, embedding_l2=0.0):
                                                processed_n],)
     model = Model([input_a, input_p, input_n], triplet)
 
-    return model, processed_a, processed_p, processed_n
+    return model, (processed_a, processed_p, processed_n)
 
 
 def base_network(model_name, input_shape):
