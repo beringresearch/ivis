@@ -206,7 +206,6 @@ class Ivis(BaseEstimator, TransformerMixin):
                                                   neighbour_matrix=self.neighbour_matrix,
                                                   batch_size=self.batch_size)
 
-        loss_monitor = 'loss'
         try:
             triplet_loss_func = triplet_loss(distance=self.distance)
         except KeyError:
@@ -260,7 +259,7 @@ class Ivis(BaseEstimator, TransformerMixin):
         hist = self.model_.fit(
             datagen,
             epochs=self.epochs,
-            callbacks=self.callbacks_ + [EarlyStopping(monitor=loss_monitor,
+            callbacks=self.callbacks_ + [EarlyStopping(monitor='loss',
                                                        patience=self.n_epochs_without_progress)],
             shuffle=shuffle_mode,
             steps_per_epoch=int(np.ceil(X.shape[0] / self.batch_size)),
