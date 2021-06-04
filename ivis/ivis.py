@@ -15,6 +15,7 @@ from tensorflow.keras.models import load_model, Model
 from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras import regularizers
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.exceptions import NotFittedError
 
 
 from .data.generators import generator_from_neighbour_matrix, KerasSequence
@@ -367,6 +368,10 @@ class Ivis(BaseEstimator, TransformerMixin):
             Embedding of the data in low-dimensional space.
         """
 
+
+        if self.encoder is None:
+            raise NotFittedError("Model was not fitted yet. Call `fit` before calling `transform`.")
+
         embedding = self.encoder.predict(KerasSequence(X, batch_size=self.batch_size),
                                          verbose=self.verbose)
         return embedding
@@ -389,10 +394,10 @@ class Ivis(BaseEstimator, TransformerMixin):
         """
 
         if self.supervised_model_ is None:
-            raise Exception("Model was not trained in classification mode.")
+            raise NotFittedError("Model was not trained in classification mode.")
 
-        softmax_output = self.supervised_model_.predict(X, verbose=self.verbose)
-        return softmax_output
+        supervised_output = self.supervised_model_.predict(X, verbose=self.verbose)
+        return supervised_output
 
     def save_model(self, folder_path, overwrite=False):
         """Save an ivis model
