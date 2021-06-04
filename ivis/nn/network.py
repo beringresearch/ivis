@@ -8,6 +8,23 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.regularizers import l2
 
 
+
+base_networks = {}
+def register_network(build_fn=None, *, name=None):
+    """Registers a function that returns a tf.keras.models.Model as an ivis base network.
+    A mapping will be created between the name and the network builder function passed.
+
+    If no name is provided to this function, the name of the passed function will be used
+    as a key.
+    """
+
+    if build_fn is None:
+        return partial(register_network, name=name)
+
+    key = name or build_fn.__name__
+    base_networks[key] = build_fn
+    return build_fn
+
 def triplet_network(base_network, embedding_dims=2, embedding_l2=0.0):
     """ Creates a triplet Siamese Neural Network from a base_network.
     The base network will have an extra Dense layer of the requested embedding_dims added to
@@ -57,24 +74,19 @@ def triplet_network(base_network, embedding_dims=2, embedding_l2=0.0):
 def base_network(model_name, input_shape):
     '''Return the defined base_network defined by the model_name string.
     '''
-    # Select network to return in if statements to avoid running and
-    # constructing unnecessary models as would occur in a dict.
-    if model_name == 'szubert':
-        return szubert_base_network(input_shape)
-    if model_name == 'hinton':
-        return hinton_base_network(input_shape)
-    if model_name == 'maaten':
-        return maaten_base_network(input_shape)
-
-    raise NotImplementedError(
-        'Base network {} is not implemented'.format(model_name))
+    try:
+        return base_networks[model_name](input_shape)
+    except KeyError:
+        raise NotImplementedError(
+            'Base network {} is not implemented'.format(model_name))
 
 
 def get_base_networks():
-    return ['szubert', 'hinton', 'maaten']
+    return list(base_networks.keys())
 
 SeluDense = partial(Dense, activation='selu', kernel_initializer='lecun_normal')
 
+@register_network(name='szubert')
 def szubert_base_network(input_shape):
     '''A small, quick-to-train base network. The default for Ivis.'''
     return Sequential([
@@ -85,6 +97,7 @@ def szubert_base_network(input_shape):
         SeluDense(128)
     ])
 
+@register_network(name='hinton')
 def hinton_base_network(input_shape):
     '''A base network inspired by the autoencoder architecture published in Hinton's paper
     'Reducing Dimensionality of Data with Neural Networks'
@@ -97,6 +110,7 @@ def hinton_base_network(input_shape):
         SeluDense(500)
     ])
 
+@register_network(name='maaten')
 def maaten_base_network(input_shape):
     '''A base network inspired by the network architecture published in Maaten's t-SNE paper
     'Learning a Parametric Embedding by Preserving Local Structure'
