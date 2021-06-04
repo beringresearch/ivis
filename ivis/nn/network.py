@@ -2,11 +2,14 @@
 Additionally, provides several base network constructors as default options."""
 
 from functools import partial
+import numpy as np
+from tensorflow.keras import regularizers
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.layers import Input, Dense, AlphaDropout, Lambda
 from tensorflow.keras import backend as K
 from tensorflow.keras.regularizers import l2
 
+from .losses import is_categorical, is_hinge, is_multiclass, validate_sparse_labels
 
 
 base_networks = {}
@@ -123,3 +126,33 @@ def maaten_base_network(input_shape):
         SeluDense(2000)
     ])
 
+
+def build_supervised_layer(supervision_metric, Y, name='supervised'):
+    """Constructs a dense layer suitable for the requested supervision metric and labels."""
+
+    SupervisedDense = partial(Dense, name=name)
+    SvmDense = partial(SupervisedDense, activation='linear', kernel_regularizer=regularizers.l2())
+
+    # Regression
+    if not is_categorical(supervision_metric):
+        n_classes = Y.shape[-1] if len(Y.shape) > 1 else 1
+        return SupervisedDense(n_classes, activation='linear')
+
+    # Multiclass classification
+    if is_multiclass(supervision_metric):
+        if is_hinge(supervision_metric):
+            # Multiclass Linear SVM layer
+            n_classes = len(np.unique(Y, axis=0))
+            return SvmDense(n_classes)
+        # Softmax classifier
+        validate_sparse_labels(Y)
+        n_classes = len(np.unique(Y[Y != np.array(-1)]))
+        return SupervisedDense(n_classes, activation='softmax')
+
+    # Binary classification
+    n_classes = Y.shape[-1] if len(Y.shape) > 1 else 1
+    if is_hinge(supervision_metric):
+        # Binary Linear SVM layer
+        return SvmDense(n_classes)
+    # Binary logistic classifier
+    return SupervisedDense(n_classes, activation='sigmoid')

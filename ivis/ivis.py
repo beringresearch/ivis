@@ -12,17 +12,14 @@ import numpy as np
 from tensorflow import keras
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.models import load_model, Model
-from tensorflow.keras.layers import Dense, Input
-from tensorflow.keras import regularizers
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.exceptions import NotFittedError
 
 
 from .data.generators import generator_from_neighbour_matrix, KerasSequence
-from .nn.network import triplet_network, base_network
+from .nn.network import build_supervised_layer, triplet_network, base_network
 from .nn.callbacks import ModelCheckpoint
-from .nn.losses import triplet_loss, is_categorical, is_multiclass, is_hinge
-from .nn.losses import semi_supervised_loss, validate_sparse_labels
+from .nn.losses import triplet_loss, semi_supervised_loss
 from .data.neighbour_retrieval import AnnoyKnnMatrix
 
 
@@ -229,55 +226,18 @@ class Ivis(BaseEstimator, TransformerMixin):
             if Y is None:
                 self.model_.compile(optimizer='adam', loss=triplet_loss_func)
             else:
-                if is_categorical(self.supervision_metric):
-                    if not is_multiclass(self.supervision_metric):
-                        if not is_hinge(self.supervision_metric):
-                            # Binary logistic classifier
-                            if len(Y.shape) > 1:
-                                self.n_classes = Y.shape[-1]
-                            else:
-                                self.n_classes = 1
-                            supervised_output = Dense(self.n_classes, activation='sigmoid',
-                                                      name='supervised')(anchor_embedding)
-                        else:
-                            # Binary Linear SVM output
-                            if len(Y.shape) > 1:
-                                self.n_classes = Y.shape[-1]
-                            else:
-                                self.n_classes = 1
-                            supervised_output = Dense(self.n_classes, activation='linear',
-                                                      name='supervised',
-                                                      kernel_regularizer=regularizers.l2())(anchor_embedding)
-                    else:
-                        if not is_hinge(self.supervision_metric):
-                            validate_sparse_labels(Y)
-                            self.n_classes = len(np.unique(Y[Y != np.array(-1)]))
-                            # Softmax classifier
-                            supervised_output = Dense(self.n_classes, activation='softmax',
-                                                      name='supervised')(anchor_embedding)
-                        else:
-                            self.n_classes = len(np.unique(Y, axis=0))
-                            # Multiclass Linear SVM output
-                            supervised_output = Dense(self.n_classes, activation='linear',
-                                                      name='supervised',
-                                                      kernel_regularizer=regularizers.l2())(anchor_embedding)
-                else:
-                    # Regression
-                    if len(Y.shape) > 1:
-                        self.n_classes = Y.shape[-1]
-                    else:
-                        self.n_classes = 1
-                    supervised_output = Dense(self.n_classes, activation='linear',
-                                              name='supervised')(anchor_embedding)
+                supervised_layer = build_supervised_layer(self.supervision_metric,
+                                                          Y, name='supervised')
+                supervised_out = supervised_layer(anchor_embedding)
+                self.n_classes = supervised_layer.units
 
                 supervised_loss = keras.losses.get(self.supervision_metric)
                 if self.supervision_metric == 'sparse_categorical_crossentropy':
                     supervised_loss = semi_supervised_loss(supervised_loss)
 
-                final_network = Model(inputs=self.model_.inputs,
-                                      outputs=[self.model_.output,
-                                               supervised_output])
-                self.model_ = final_network
+                self.model_ = Model(inputs=self.model_.inputs,
+                                    outputs=[self.model_.output,
+                                             supervised_out])
                 self.model_.compile(
                     optimizer='adam',
                     loss={
@@ -289,11 +249,8 @@ class Ivis(BaseEstimator, TransformerMixin):
                         'supervised': self.supervision_weight})
 
                 # Store dedicated classification model
-                supervised_model_input = Input(shape=(X.shape[-1],))
-                embedding = self.model_.layers[3](supervised_model_input)
-                softmax_out = self.model_.layers[-1](embedding)
-
-                self.supervised_model_ = Model(supervised_model_input, softmax_out)
+                self.supervised_model_ = Model(self.model_.inputs[0],
+                                               self.model_.get_layer('supervised').output)
 
         self.encoder = self.model_.layers[3]
 
