@@ -78,3 +78,18 @@ def test_knn_matrix_construction_params(annoy_index_file):
 
     for original_row, loaded_row in zip(index, loaded_index):
         assert original_row == loaded_row
+
+def test_knn_retrieval_non_verbose():
+    annoy_index_filepath = 'tests/data/.test-annoy-index.index'
+    expected_neighbour_list = np.load('tests/data/test_knn_k3.npy')
+
+    iris = datasets.load_iris()
+    X = iris.data
+
+    k = 3
+    search_k = -1
+
+    index = AnnoyKnnMatrix.load(annoy_index_filepath, X.shape, k=k, search_k=search_k, verbose=0)
+    neighbour_list = extract_knn(index)
+
+    assert np.all(expected_neighbour_list == neighbour_list)
