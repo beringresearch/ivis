@@ -65,7 +65,14 @@ class AnnoyKnnMatrix(NeighbourMatrix):
 
         state = dict(self.__dict__)
         state['index'] = None
+        state['precomputed_neighbours'] = None
         return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        index = AnnoyIndex(self.index_dims, metric=self.metric)
+        index.load(self.index_path)
+        self.index = index
 
     def unload(self):
         """Unloads the index from disk, allowing other processes to read/write to the index file.
