@@ -50,7 +50,7 @@ class TripletGenerator(Sequence, ABC):
             # Flatten triplets, get batch of data, then reshape back into triplets
             indices = list(itertools.chain.from_iterable(triplet_indices))
             data = self.X.get_batch(indices)
-            triplet_batch = list(zip(*[itertools.islice(data, i, None, 3) for i in range(3)]))
+            triplet_batch = list(zip(*[iter(data)] * 3))
         else:
             if isinstance(self.X, np.ndarray):
                 # Fancy index for speed if data is a numpy array
