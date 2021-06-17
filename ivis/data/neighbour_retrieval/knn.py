@@ -204,18 +204,30 @@ def build_annoy_index(X, path, metric='angular', ntrees=50, build_index_on_disk=
             print('Flattening multidimensional input before building KNN index using Annoy')
         X = X.reshape((X.shape[0], -1))
 
+    batched_retrieval = hasattr(X, 'get_batch')
+
     index = AnnoyIndex(X.shape[1], metric=metric)
     if build_index_on_disk:
         index.on_disk_build(path)
 
-    if issparse(X):
-        for i in tqdm(range(X.shape[0]), disable=verbose < 1):
-            vector = X[i].toarray()[0]
-            index.add_item(i, vector)
+    if not batched_retrieval:
+        if issparse(X):
+            for i in tqdm(range(X.shape[0]), disable=verbose < 1):
+                vector = X[i].toarray()[0]
+                index.add_item(i, vector)
+        else:
+            for i in tqdm(range(X.shape[0]), disable=verbose < 1):
+                vector = X[i]
+                index.add_item(i, vector)
     else:
-        for i in tqdm(range(X.shape[0]), disable=verbose < 1):
-            vector = X[i]
-            index.add_item(i, vector)
+        # Reusing n_jobs for batch_size here - separate config may be better
+        batch_size = n_jobs if n_jobs > 0 else os.cpu_count() + n_jobs + 1
+        for batch_start_idx in tqdm(range(0, X.shape[0], batch_size), disable=verbose < 1):
+            batch_indices = range(batch_start_idx,
+                                  min(batch_start_idx + batch_size, X.shape[0]))
+            batch = X.get_batch(batch_indices)
+            for idx, vector in zip(batch_indices, batch):
+                index.add_item(idx, vector)
 
     try:
         index.build(ntrees, n_jobs=n_jobs)
