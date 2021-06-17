@@ -9,13 +9,12 @@ class LabeledNeighbourMap(Sequence):
     def __init__(self, labels):
         """Constructs a LabeledNeighbourMap instance from a list of labels.
         :param labels list: List of labels for each data-point. One label per data-point."""
-        class_indicies = {label: np.argwhere(labels == label).ravel()
-                          for label in np.unique(labels)}
-        neighbour_matrix = np.array([class_indicies[label] for label in labels])
-        self.neighbour_matrix = neighbour_matrix
+        self.class_indicies = {label: np.argwhere(labels == label).ravel()
+                               for label in np.unique(labels)}
+        self.labels = labels
     def __len__(self):
         """Returns the number of rows in the data"""
-        return len(self.neighbour_matrix)
+        return len(self.labels)
     def __getitem__(self, idx):
         """Retrieves the neighbours for the row index provided"""
-        return self.neighbour_matrix[idx]
+        return self.class_indicies[self.labels[idx]]
