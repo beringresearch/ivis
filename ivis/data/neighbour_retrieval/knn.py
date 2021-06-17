@@ -25,6 +25,12 @@ class NeighbourMatrix(Sequence):
         """The width of the matrix (number of neighbours retrieved)"""
         raise NotImplementedError
 
+    def get_batch(self, idx_seq):
+        """Gets a batch of neighbours corresponding to the provided index sequence.
+
+        Non-optimized version, can be overridden by child classes to be made be efficient"""
+        return [self.__getitem__(item) for item in idx_seq]
+
 class AnnoyKnnMatrix(NeighbourMatrix):
     r"""Neighbouring points are KNN retrieved using an Annoy Index.
 
