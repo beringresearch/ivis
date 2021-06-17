@@ -1,5 +1,8 @@
 """Custom datasets that load images from disk."""
 
+import os
+from concurrent.futures import ThreadPoolExecutor
+
 import numpy as np
 import tensorflow as tf
 
@@ -29,7 +32,7 @@ class ImageDataset(IndexableDataset):
     shape = None
     def __init__(self, filepath_list, img_shape, color_mode="rgb",
                  resize_method="bilinear", preserve_aspect_ratio=False,
-                 dtype=tf.uint8, preprocessing_function=None):
+                 dtype=tf.uint8, preprocessing_function=None, n_jobs=-1):
         self.filepath_list = np.array(filepath_list)
         self.img_shape = img_shape
         if color_mode == "rgb":
@@ -46,18 +49,24 @@ class ImageDataset(IndexableDataset):
         self.dtype = dtype
         self.preprocessing_function = preprocessing_function
         self.shape = (len(filepath_list), *img_shape, self.channels)
+        self.n_jobs = n_jobs
+        self.workers = None
+        if n_jobs and os.cpu_count():
+            # Negative worker counts wrap around to cpu core count, where -1 is one worker/core
+            self.workers = ThreadPoolExecutor(
+                max_workers=n_jobs if n_jobs > 0 else os.cpu_count() + n_jobs + 1)
 
     def __getitem__(self, idx):
         if isinstance(idx, slice):
             start, stop, step = idx.indices(len(self))
-            return [self[i] for i in range(start, stop, step)]
+            return self.get_batch(range(start, stop, step))
         if idx < 0:
             idx += len(self)
         img = self.read_image(self.filepath_list[idx])
         img = self.resize_image(img)
         if self.preprocessing_function:
             img = self.preprocessing_function(img)
-        return img
+        return np.asarray(img)
 
     def __len__(self):
         return len(self.filepath_list)
@@ -75,6 +84,11 @@ class ImageDataset(IndexableDataset):
             img = tf.image.resize_with_pad(img, *self.img_shape, method=self.resize_method)
         return tf.cast(img, self.dtype).numpy()
 
+    def get_batch(self, idx_seq):
+        """Returns a batch of data points based on the index sequence provided."""
+        if self.workers is not None:
+            return list(self.workers.map(self.__getitem__, idx_seq))
+        return super().get_batch(idx_seq)
 
 class FlattenedImageDataset(ImageDataset):
     """Returns flattened versions of images read in from disk. This dataset can be
@@ -83,10 +97,13 @@ class FlattenedImageDataset(ImageDataset):
 
     def __init__(self, filepath_list, img_shape, color_mode="rgb",
                  resize_method="bilinear", preserve_aspect_ratio=False,
-                 dtype=tf.uint8, preprocessing_function=None):
+                 dtype=tf.uint8, preprocessing_function=None, n_jobs=None):
         super().__init__(filepath_list, img_shape, color_mode, resize_method,
-                         preserve_aspect_ratio, dtype, preprocessing_function)
+                         preserve_aspect_ratio, dtype, preprocessing_function,
+                         n_jobs=n_jobs)
         self.shape = (self.shape[0], np.prod(self.shape[1:]))
 
     def __getitem__(self, idx):
-        return super().__getitem__(idx).flatten()
+        if isinstance(idx, slice):
+            return np.asarray(super().__getitem__(idx))
+        return np.asarray(super().__getitem__(idx)).flatten()
