@@ -32,7 +32,7 @@ achieved by simultaneously minimising the tripplet loss and softmax loss
 functions. The resulting embeddings encode relevant class-specific
 information into lower dimensional space. It is possible to control the
 relative importance ``ivis`` places on class labels when training in
-supervised mode with the ``classification_weight`` parameter. This
+supervised mode with the ``supervision_weight`` parameter. This
 variable should be a float between 0.0 to 1.0, with higher values
 resulting in classification affecting the training process more, and
 smaller values resulting in it impacting the training less. By default,
@@ -108,7 +108,7 @@ embedding problems:
 
     ivis = Ivis(embedding_dims=2, model='maaten',
                 k=15, n_epochs_without_progress=5,
-                classification_weight=0.80,
+                supervision_weight=0.80,
                 verbose=0)
     ivis.fit(train_X, train_Y.values)
 
