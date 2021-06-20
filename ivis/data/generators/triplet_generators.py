@@ -67,14 +67,15 @@ class TripletGenerator(Sequence, ABC):
 
         return self.output_triplets(triplet_batch, label_batch)
 
-    def get_triplet_indices(self, idx_seq):
+    def get_triplet_indices(self, anchor_indices):
         """Generates and returns the triplet indices corresponding to the provided indexes.
         Neighbours are randomly sampled for each row from self.neighbour_matrix and negative
         samples that are not in the neighbour list are generated randomly."""
-        anchor_indices = np.fromiter(idx_seq,
+
+        neighbour_cands = self.get_all_neighbour_indices(anchor_indices)
+        anchor_indices = np.fromiter(anchor_indices,
                                      dtype=np.array(self.X.shape[0]).dtype,
-                                     count=len(idx_seq))
-        neighbour_cands = self.get_all_neighbour_indices(idx_seq)
+                                     count=len(anchor_indices))
         try:
             # Auto ragged array creation deprecated in NumPy 1.19, 2019-11-01, will throw error
             neighbour_cands = np.asarray(neighbour_cands)
@@ -92,13 +93,13 @@ class TripletGenerator(Sequence, ABC):
         negative_indices = self.gen_negative_indices(neighbour_cands)
         return (anchor_indices, neighbour_indices, negative_indices)
 
-    def get_all_neighbour_indices(self, idx_seq):
+    def get_all_neighbour_indices(self, anchor_indices):
         """Retrieves neighbours for the indexes provided from inner neighbour matrix.
         Uses specialized `get_batch` retrieval method if generator is in batched_neighbours mode.
         """
         if self.batched_neighbours:
-            return self.neighbour_matrix.get_batch(idx_seq)
-        return [self.neighbour_matrix[idx] for idx in idx_seq]
+            return self.neighbour_matrix.get_batch(anchor_indices)
+        return [self.neighbour_matrix[idx] for idx in anchor_indices]
 
     def gen_negative_indices(self, neighbour_matrix):
         """Generate random candidate negative indices until the candidate for every
@@ -123,12 +124,12 @@ class TripletGenerator(Sequence, ABC):
 
         neighbour_indices = list(map(random.choice, neighbour_cands))
         negative_indices = self.gen_negative_indices_generic(neighbour_cands)
-        return (np.asarray(anchor_indices), neighbour_indices, negative_indices)
+        return (anchor_indices, neighbour_indices, negative_indices)
 
     def gen_negative_indices_generic(self, neighbour_map):
         """Slower, generic way of generating negative indices that works on
         sequences, not just numpy arrays."""
-        cands = [random.randrange(0, self.X.shape[0]) for i in range(len(neighbour_map))]
+        cands = [random.randrange(0, self.X.shape[0]) for _ in range(len(neighbour_map))]
         for i in range(len(cands)):
             while cands[i] in neighbour_map[i]:
                 cands[i] = random.randrange(0, self.X.shape[0])

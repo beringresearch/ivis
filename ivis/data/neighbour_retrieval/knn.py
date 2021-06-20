@@ -143,7 +143,7 @@ class AnnoyKnnMatrix(NeighbourMatrix):
         """Retrieves neighbours for every row in parallel"""
         if self.precomputed_neighbours is not None:
             return self.precomputed_neighbours
-        return extract_knn(self, n_jobs=n_jobs, verbose=self.verbose)
+        return extract_knn(self, verbose=self.verbose, n_jobs=n_jobs)
 
     def get_batch(self, idx_seq):
         """Returns a batch of neighbours based on the index sequence provided."""
@@ -239,7 +239,7 @@ def build_annoy_index(X, path, metric='angular', ntrees=50, build_index_on_disk=
         index.save(path)
     return index
 
-def extract_knn(knn_index, n_jobs=-1, verbose=1):
+def extract_knn(knn_index, verbose=1, n_jobs=-1):
     """Starts multiple threads to retrieve nearest neighbours from a built index in parallel.
 
     :param `NeighbourMatrix` knn_index: Indexable neighbour index. When indexed, returns
@@ -276,7 +276,7 @@ def extract_knn(knn_index, n_jobs=-1, verbose=1):
     data_split_indices = [(min_index, min(nrows, min_index + chunk_size))
                           for min_index in range(0, nrows, chunk_size)]
 
-    progress_counters = [0 for i in range(len(data_split_indices))]
+    progress_counters = [0 for _ in range(len(data_split_indices))]
     thread_pool = [
         Thread(
             target=knn_worker,
