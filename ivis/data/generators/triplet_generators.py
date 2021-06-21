@@ -8,6 +8,7 @@ dynamically generated.
 """
 
 from abc import ABC, abstractmethod
+from functools import partial
 import itertools
 import random
 import math
@@ -42,10 +43,12 @@ class TripletGenerator(Sequence, ABC):
         """Gets one batch of triplets"""
         batch_indices = range(idx * self.batch_size,
                               min((idx + 1) * self.batch_size, self.X.shape[0]))
+        # indices shape: (3, batch_size)
         triplet_indices = self.get_triplet_indices(batch_indices)
         label_batch = self.get_labels(batch_indices)
 
         # Retrieve actual data using triplet_indices
+        # triplet_batch shape: (3, batch_size, *X.shape[1:])
         if self.batched_data:
             # Flatten triplets, get batch of data, then reshape back into triplets
             indices = list(itertools.chain.from_iterable(triplet_indices))
@@ -54,11 +57,10 @@ class TripletGenerator(Sequence, ABC):
         else:
             if isinstance(self.X, np.ndarray):
                 # Fancy index for speed if data is a numpy array
-                triplet_indices = np.asarray(triplet_indices, dtype=np.array(self.X.shape[0]).dtype)
-                triplet_batch = self.X[np.moveaxis(triplet_indices, 0, 1)]
+                triplet_indices = np.asarray(triplet_indices, dtype=self.idx_dtype)
+                triplet_batch = self.X[triplet_indices]
             else:
-                triplet_batch = [(self.X[idx], self.X[pos_idx], self.X[neg_idx])
-                                 for (idx, pos_idx, neg_idx) in zip(*triplet_indices)]
+                triplet_batch = [[self.X[idx] for idx in seq] for seq in triplet_indices]
 
         if issparse(self.X):
             triplet_batch = [[e.toarray()[0] for e in t] for t in triplet_batch]
@@ -74,11 +76,11 @@ class TripletGenerator(Sequence, ABC):
 
         neighbour_cands = self.get_all_neighbour_indices(anchor_indices)
         anchor_indices = np.fromiter(anchor_indices,
-                                     dtype=np.array(self.X.shape[0]).dtype,
+                                     dtype=self.idx_dtype,
                                      count=len(anchor_indices))
         try:
             # Auto ragged array creation deprecated in NumPy 1.19, 2019-11-01, will throw error
-            neighbour_cands = np.asarray(neighbour_cands)
+            neighbour_cands = np.asarray(neighbour_cands, dtype=self.idx_dtype)
         except ValueError:
             # Handle ragged array with slower, more generic method
             return self.get_triplet_indices_generic(anchor_indices, neighbour_cands)
@@ -105,13 +107,14 @@ class TripletGenerator(Sequence, ABC):
         """Generate random candidate negative indices until the candidate for every
         row is not present in corresponding row of neighbour_matrix."""
         neighbour_matrix = np.asarray(neighbour_matrix)
-        cands = np.random.randint(self.X.shape[0], size=len(neighbour_matrix))
+        generate_cands = partial(np.random.randint, self.X.shape[0], dtype=self.idx_dtype)
+        cands = generate_cands(size=len(neighbour_matrix))
 
         # Where random cand is present in neighbour row, invalid cand
         invalid_cands = (cands[:, np.newaxis] == neighbour_matrix).any(axis=1)
         n_invalid = invalid_cands.sum()
         while n_invalid > 0:
-            cands[invalid_cands] = np.random.randint(self.X.shape[0], size=n_invalid)
+            cands[invalid_cands] = generate_cands(size=n_invalid)
             invalid_cands = (cands[:, np.newaxis] == neighbour_matrix).any(axis=1)
             n_invalid = invalid_cands.sum()
         return cands
@@ -135,6 +138,11 @@ class TripletGenerator(Sequence, ABC):
                 cands[i] = random.randrange(0, self.X.shape[0])
         return cands
 
+    @property
+    def idx_dtype(self):
+        """Returns the numpy dtype to use when indexing the internal dataset."""
+        return np.array(self.X.shape[0]).dtype
+
     @abstractmethod
     def get_labels(self, batch_indices):
         raise NotImplementedError("Override this method with a concrete implementation")
@@ -153,7 +161,7 @@ class UnsupervisedTripletGenerator(TripletGenerator):
         return self.placeholder_labels[:len(batch_indices)]
 
     def output_triplets(self, triplet_batch, label_batch):
-        return tuple([triplet_batch[:, 0], triplet_batch[:, 1], triplet_batch[:, 2]]), label_batch
+        return tuple([*triplet_batch]), label_batch
 
 
 class SupervisedTripletGenerator(TripletGenerator):
@@ -166,4 +174,4 @@ class SupervisedTripletGenerator(TripletGenerator):
 
     def output_triplets(self, triplet_batch, label_batch):
         label_batch = np.array(label_batch)
-        return tuple([triplet_batch[:, 0], triplet_batch[:, 1], triplet_batch[:, 2]]), tuple([label_batch, label_batch])
+        return tuple([*triplet_batch]), tuple([label_batch] * 2)
