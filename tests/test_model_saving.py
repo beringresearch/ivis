@@ -30,8 +30,8 @@ def test_ivis_model_saving(model_filepath):
     assert model.__getstate__() == model_2.__getstate__()
 
     # Check all weights are the same
-    for model_layer, model_2_layer in zip(model.encoder.layers,
-                                          model_2.encoder.layers):
+    for model_layer, model_2_layer in zip(model.encoder_.layers,
+                                          model_2.encoder_.layers):
         model_layer_weights = model_layer.get_weights()
         model_2_layer_weights = model_2_layer.get_weights()
         for i in range(len(model_layer_weights)):
@@ -74,8 +74,8 @@ def test_supervised_model_saving(model_filepath):
     assert model.__getstate__() == model_2.__getstate__()
 
     # Check all weights are the same
-    for model_layer, model_2_layer in zip(model.encoder.layers,
-                                          model_2.encoder.layers):
+    for model_layer, model_2_layer in zip(model.encoder_.layers,
+                                          model_2.encoder_.layers):
         model_layer_weights = model_layer.get_weights()
         model_2_layer_weights = model_2_layer.get_weights()
         for i in range(len(model_layer_weights)):
@@ -125,8 +125,8 @@ def test_custom_model_saving(model_filepath):
     assert model.__getstate__() == model_2.__getstate__()
 
     # Check all weights are the same
-    for model_layer, model_2_layer in zip(model.encoder.layers,
-                                          model_2.encoder.layers):
+    for model_layer, model_2_layer in zip(model.encoder_.layers,
+                                          model_2.encoder_.layers):
         model_layer_weights = model_layer.get_weights()
         model_2_layer_weights = model_2_layer.get_weights()
         for i in range(len(model_layer_weights)):
