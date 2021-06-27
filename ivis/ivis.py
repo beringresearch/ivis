@@ -1,27 +1,28 @@
 """ scikit-learn wrapper class for the Ivis algorithm. """
-import weakref
 import json
 import os
 import shutil
 import tempfile
+import weakref
 
 from copy import copy
 
 import dill as pkl
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
 
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.exceptions import NotFittedError
 from tensorflow import keras
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.models import load_model, Model
-from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.exceptions import NotFittedError
 
 from .data.generators import generator_from_neighbour_matrix, KerasSequence
+from .data.neighbour_retrieval import AnnoyKnnMatrix
 from .nn.network import build_supervised_layer, triplet_network, base_network
 from .nn.callbacks import ModelCheckpoint
 from .nn.losses import triplet_loss, semi_supervised_loss
-from .data.neighbour_retrieval import AnnoyKnnMatrix
+from .utils import deprecation
 
 
 class Ivis(BaseEstimator, TransformerMixin):
@@ -58,6 +59,7 @@ class Ivis(BaseEstimator, TransformerMixin):
     :param int n_trees: The number of random projections trees built by Annoy to
         approximate KNN. The more trees the higher the memory usage, but the
         better the accuracy of results.
+    :param int ntrees: Deprecated. Use `n_trees` instead.
     :param str knn_distance_metric: The distance metric used to retrieve nearest
         neighbours. Supports "angular" (default), "euclidean", "manhattan",
         "hamming", or "dot".
@@ -112,12 +114,10 @@ class Ivis(BaseEstimator, TransformerMixin):
     :param int verbose: Controls the volume of logging output the model
         produces when training. When set to 0, silences outputs, when above 0
         will print outputs.
-
     """
-
     def __init__(self, embedding_dims=2, k=150, distance='pn', batch_size=128,
                  epochs=1000, n_epochs_without_progress=20, n_trees=50,
-                 knn_distance_metric='angular', search_k=-1,
+                 ntrees=None, knn_distance_metric='angular', search_k=-1,
                  precompute=True, model='szubert',
                  supervision_metric='sparse_categorical_crossentropy',
                  supervision_weight=0.5, annoy_index_path=None,
@@ -130,7 +130,7 @@ class Ivis(BaseEstimator, TransformerMixin):
         self.epochs = epochs
         self.n_epochs_without_progress = n_epochs_without_progress
         self.knn_distance_metric = knn_distance_metric
-        self.n_trees = n_trees
+        self.n_trees = ntrees or n_trees
         self.search_k = search_k
         self.precompute = precompute
         self.model = model
@@ -142,13 +142,15 @@ class Ivis(BaseEstimator, TransformerMixin):
         self.build_index_on_disk = build_index_on_disk
         self.neighbour_matrix = neighbour_matrix
         self.verbose = verbose
-        self.n_classes = None
 
-        self.model_ = None
-        self.encoder_ = None
-        self.supervised_model_ = None
         self.callbacks_ = None
+        self.encoder_ = None
+        self.model_ = None
+        self.n_classes_ = None
         self.neighbour_matrix_ = None
+        self.supervised_model_ = None
+
+        deprecation.check_deprecated_ntrees(ntrees)
 
     def _validate_parameters(self):
         """ Validate parameters before fitting """
@@ -234,7 +236,7 @@ class Ivis(BaseEstimator, TransformerMixin):
                 supervised_layer = build_supervised_layer(self.supervision_metric,
                                                           Y, name='supervised')
                 supervised_out = supervised_layer(anchor_embedding)
-                self.n_classes = supervised_layer.units
+                self.n_classes_ = supervised_layer.units
 
                 supervised_loss = keras.losses.get(self.supervision_metric)
                 if self.supervision_metric == 'sparse_categorical_crossentropy':
