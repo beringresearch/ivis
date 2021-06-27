@@ -4,11 +4,12 @@ import json
 import os
 import shutil
 import tempfile
+
+from copy import copy
+
 import dill as pkl
 import tensorflow as tf
 import numpy as np
-
-from copy import copy
 
 from tensorflow import keras
 from tensorflow.keras.callbacks import EarlyStopping
