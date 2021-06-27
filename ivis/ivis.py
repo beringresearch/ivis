@@ -131,6 +131,7 @@ class Ivis(BaseEstimator, TransformerMixin):
         self.n_epochs_without_progress = n_epochs_without_progress
         self.knn_distance_metric = knn_distance_metric
         self.n_trees = ntrees or n_trees
+        self.ntrees = ntrees
         self.search_k = search_k
         self.precompute = precompute
         self.model = model
