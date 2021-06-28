@@ -22,7 +22,7 @@ from .data.neighbour_retrieval import AnnoyKnnMatrix
 from .nn.network import build_supervised_layer, triplet_network, base_network
 from .nn.callbacks import ModelCheckpoint
 from .nn.losses import triplet_loss, semi_supervised_loss
-from .utils import deprecation
+from .utils.deprecation import check_deprecated_ntrees, deprecate_positional_args
 
 
 class Ivis(BaseEstimator, TransformerMixin):
@@ -115,7 +115,9 @@ class Ivis(BaseEstimator, TransformerMixin):
         produces when training. When set to 0, silences outputs, when above 0
         will print outputs.
     """
-    def __init__(self, embedding_dims=2, k=150, distance='pn', batch_size=128,
+    
+    @deprecate_positional_args
+    def __init__(self, *, embedding_dims=2, k=150, distance='pn', batch_size=128,
                  epochs=1000, n_epochs_without_progress=20, n_trees=50,
                  ntrees=None, knn_distance_metric='angular', search_k=-1,
                  precompute=True, model='szubert',
@@ -153,6 +155,7 @@ class Ivis(BaseEstimator, TransformerMixin):
 
     def _validate_parameters(self):
         """ Validate parameters before fitting """
+
         self.callbacks_ = [] if self.callbacks is None else list(map(copy, self.callbacks))
         self.neighbour_matrix_ = self.neighbour_matrix
 
@@ -161,13 +164,14 @@ class Ivis(BaseEstimator, TransformerMixin):
                 callback.register_ivis_model(self)
 
         if self.ntrees is not None:
-            deprecation.check_deprecated_ntrees(self.ntrees)
+            check_deprecated_ntrees(self.ntrees)
 
             self.n_trees = self.ntrees
             self.ntrees = None
 
     def __getstate__(self):
         """ Return object serializable variable dict """
+
         state = dict(self.__dict__)
 
         if 'model_' in state:
@@ -296,6 +300,7 @@ class Ivis(BaseEstimator, TransformerMixin):
         self: ivis.Ivis object
             Returns estimator instance.
         """
+
         self._fit(X, Y, shuffle_mode)
         return self
 
@@ -335,6 +340,7 @@ class Ivis(BaseEstimator, TransformerMixin):
         X_new : array, shape (n_samples, embedding_dims)
             Embedding of the data in low-dimensional space.
         """
+
         if self.encoder_ is None:
             raise NotFittedError("Model was not fitted yet. Call `fit` before calling `transform`.")
 
@@ -372,6 +378,8 @@ class Ivis(BaseEstimator, TransformerMixin):
         ----------
         folder_path : string
             Path to serialised model files and metadata
+        overwrite : bool
+            Whether to overwrite the specified folder path.
         """
 
         if overwrite:
