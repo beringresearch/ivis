@@ -16,6 +16,7 @@ import numpy as np
 from tensorflow.keras.utils import Sequence
 from scipy.sparse import issparse
 
+from ..data import get_uint_ctype
 
 def generator_from_neighbour_matrix(X, Y, neighbour_matrix, batch_size):
     if Y is None:
@@ -35,6 +36,7 @@ class TripletGenerator(Sequence, ABC):
         self.batch_size = batch_size
         self.batched_data = hasattr(X, 'get_batch')
         self.batched_neighbours = hasattr(neighbour_matrix, 'get_batch')
+        self._idx_dtype = get_uint_ctype(self.X.shape[0])
 
     def __len__(self):
         return int(math.ceil(self.X.shape[0] / float(self.batch_size)))
@@ -49,23 +51,7 @@ class TripletGenerator(Sequence, ABC):
 
         # Retrieve actual data using triplet_indices
         # triplet_batch shape: (3, batch_size, *X.shape[1:])
-        if self.batched_data:
-            # Flatten triplets, get batch of data, then reshape back into triplets
-            indices = list(itertools.chain.from_iterable(triplet_indices))
-            data = self.X.get_batch(indices)
-            triplet_batch = list(zip(*[iter(data)] * 3))
-        else:
-            if isinstance(self.X, np.ndarray):
-                # Fancy index for speed if data is a numpy array
-                triplet_indices = np.asarray(triplet_indices, dtype=self.idx_dtype)
-                triplet_batch = self.X[triplet_indices]
-            else:
-                triplet_batch = [[self.X[idx] for idx in seq] for seq in triplet_indices]
-
-        if issparse(self.X):
-            triplet_batch = [[e.toarray()[0] for e in t] for t in triplet_batch]
-
-        triplet_batch = np.asarray(triplet_batch)
+        triplet_batch = self.get_triplet_data(triplet_indices)
 
         return self.output_triplets(triplet_batch, label_batch)
 
@@ -76,11 +62,11 @@ class TripletGenerator(Sequence, ABC):
 
         neighbour_cands = self.get_all_neighbour_indices(anchor_indices)
         anchor_indices = np.fromiter(anchor_indices,
-                                     dtype=self.idx_dtype,
+                                     dtype=self._idx_dtype,
                                      count=len(anchor_indices))
         try:
             # Auto ragged array creation deprecated in NumPy 1.19, 2019-11-01, will throw error
-            neighbour_cands = np.asarray(neighbour_cands, dtype=self.idx_dtype)
+            neighbour_cands = np.asarray(neighbour_cands, dtype=self._idx_dtype)
         except ValueError:
             # Handle ragged array with slower, more generic method
             return self.get_triplet_indices_generic(anchor_indices, neighbour_cands)
@@ -107,7 +93,7 @@ class TripletGenerator(Sequence, ABC):
         """Generate random candidate negative indices until the candidate for every
         row is not present in corresponding row of neighbour_matrix."""
         neighbour_matrix = np.asarray(neighbour_matrix)
-        generate_cands = partial(np.random.randint, self.X.shape[0], dtype=self.idx_dtype)
+        generate_cands = partial(np.random.randint, self.X.shape[0], dtype=self._idx_dtype)
         cands = generate_cands(size=len(neighbour_matrix))
 
         # Where random cand is present in neighbour row, invalid cand
@@ -118,6 +104,28 @@ class TripletGenerator(Sequence, ABC):
             invalid_cands = (cands[:, np.newaxis] == neighbour_matrix).any(axis=1)
             n_invalid = invalid_cands.sum()
         return cands
+
+    def get_triplet_data(self, triplet_indices):
+        """Maps triplet indices to the actual data in internal data store.
+        Returns a numpy array of shape (3, batch_size, *self.X.shape[0])."""
+        if self.batched_data:
+            # Flatten triplets, get batch of data, then reshape back into triplets
+            indices = list(itertools.chain.from_iterable(triplet_indices))
+            data = self.X.get_batch(indices)
+            triplet_batch = list(zip(*[iter(data)] * 3))
+        else:
+            if isinstance(self.X, np.ndarray):
+                # Fancy index for speed if data is a numpy array
+                triplet_indices = np.asarray(triplet_indices, dtype=self._idx_dtype)
+                triplet_batch = self.X[triplet_indices]
+            else:
+                triplet_batch = [[self.X[idx] for idx in seq] for seq in triplet_indices]
+
+        if issparse(self.X):
+            triplet_batch = [[e.toarray()[0] for e in t] for t in triplet_batch]
+
+        triplet_batch = np.asarray(triplet_batch)
+        return triplet_batch
 
     def get_triplet_indices_generic(self, anchor_indices, neighbour_cands=None):
         """Slower, generic way of generating triplet indices that works on
@@ -137,11 +145,6 @@ class TripletGenerator(Sequence, ABC):
             while cands[i] in neighbour_map[i]:
                 cands[i] = random.randrange(0, self.X.shape[0])
         return cands
-
-    @property
-    def idx_dtype(self):
-        """Returns the numpy dtype to use when indexing the internal dataset."""
-        return np.array(self.X.shape[0]).dtype
 
     @abstractmethod
     def get_labels(self, batch_indices):
@@ -173,5 +176,5 @@ class SupervisedTripletGenerator(TripletGenerator):
         return self.Y[batch_indices]
 
     def output_triplets(self, triplet_batch, label_batch):
-        label_batch = np.array(label_batch)
+        label_batch = np.asarray(label_batch)
         return tuple([*triplet_batch]), tuple([label_batch] * 2)
