@@ -7,13 +7,13 @@ import time
 from abc import abstractmethod
 from threading import Thread
 from collections.abc import Sequence
-from operator import attrgetter
 from pathlib import Path
 from scipy.sparse import issparse
 from annoy import AnnoyIndex
 from tqdm import tqdm
 import numpy as np
 
+from ..data import get_uint_ctype
 
 class NeighbourMatrix(Sequence):
     r"""A matrix A\ :subscript:`ij` where i is the row index of the data point and j
@@ -252,7 +252,7 @@ def extract_knn(knn_index, verbose=1, n_jobs=-1):
 
     nrows = len(knn_index)
     try:
-        neighbour_matrix = np.empty((nrows, knn_index.k), dtype=_get_uint_ctype(nrows))
+        neighbour_matrix = np.empty((nrows, knn_index.k), dtype=get_uint_ctype(nrows))
     except (ValueError, MemoryError) as err:
         raise MemoryError("Unable to allocate memory for precomputed KNN matrix. "
                           "Set `precompute` to False or reduce the value for `k`.") from err
@@ -313,13 +313,3 @@ def extract_knn(knn_index, verbose=1, n_jobs=-1):
         for thread in thread_pool:
             thread.join()
         raise
-
-
-def _get_uint_ctype(integer):
-    """Gets smallest possible uint representation of provided integer.
-    Raises ValueError if invalid value provided (negative or above uint64)."""
-    for dtype in np.typecodes["UnsignedInteger"]:
-        min_val, max_val = attrgetter('min', 'max')(np.iinfo(np.dtype(dtype)))
-        if min_val <= integer <= max_val:
-            return dtype
-    raise ValueError("Cannot parse {} as a uint64".format(integer))
