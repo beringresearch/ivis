@@ -11,3 +11,9 @@ class IndexableDataset(Sequence):
         """Returns the shape of the dataset. First dimension corresponds to rows,
         the other dimensions correspond to features."""
         raise NotImplementedError
+
+    def get_batch(self, idx_seq):
+        """Returns a batch of data points based on the index sequence provided.
+
+        Non-optimized version, can be overridden by child classes to be made be efficient"""
+        return [self.__getitem__(item) for item in idx_seq]

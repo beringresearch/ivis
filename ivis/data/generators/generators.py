@@ -13,15 +13,20 @@ class KerasSequence(tf.keras.utils.Sequence):
         self.X = X
         self.batch_size = batch_size
         self.placeholder_labels = np.empty(batch_size, dtype=np.uint8)
+        self.batched_data = hasattr(X, 'get_batch')
     def __len__(self):
         return int(np.ceil(self.X.shape[0] / float(self.batch_size)))
     def __getitem__(self, index):
         batch_indices = range(index * self.batch_size, min((index + 1) * self.batch_size, self.X.shape[0]))
 
-        if issparse(self.X):
-            batch = np.array([self.X[i].toarray() for i in batch_indices])
-            batch = np.squeeze(batch)
+        if self.batched_data:
+            batch = self.X.get_batch(batch_indices)
         else:
-            batch = np.array([self.X[i] for i in batch_indices])
+            batch = [self.X[i] for i in batch_indices]
+
+        if issparse(self.X):
+            batch = [ele.toarray() for ele in batch]
+            batch = np.squeeze(batch)
+
         placeholder_labels = self.placeholder_labels[:len(batch_indices)]
-        return batch, placeholder_labels
+        return np.asarray(batch), placeholder_labels
