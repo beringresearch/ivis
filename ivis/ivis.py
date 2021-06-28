@@ -130,7 +130,7 @@ class Ivis(BaseEstimator, TransformerMixin):
         self.epochs = epochs
         self.n_epochs_without_progress = n_epochs_without_progress
         self.knn_distance_metric = knn_distance_metric
-        self.n_trees = ntrees or n_trees
+        self.n_trees = n_trees
         self.ntrees = ntrees
         self.search_k = search_k
         self.precompute = precompute
@@ -151,8 +151,6 @@ class Ivis(BaseEstimator, TransformerMixin):
         self.neighbour_matrix_ = None
         self.supervised_model_ = None
 
-        deprecation.check_deprecated_ntrees(ntrees)
-
     def _validate_parameters(self):
         """ Validate parameters before fitting """
         self.callbacks_ = [] if self.callbacks is None else list(map(copy, self.callbacks))
@@ -161,6 +159,12 @@ class Ivis(BaseEstimator, TransformerMixin):
         for callback in self.callbacks_:
             if isinstance(callback, ModelCheckpoint):
                 callback.register_ivis_model(self)
+
+        if self.ntrees is not None:
+            deprecation.check_deprecated_ntrees(self.ntrees)
+
+            self.n_trees = self.ntrees
+            self.ntrees = None
 
     def __getstate__(self):
         """ Return object serializable variable dict """
