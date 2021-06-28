@@ -1,26 +1,28 @@
 """ scikit-learn wrapper class for the Ivis algorithm. """
-import weakref
 import json
 import os
 import shutil
 import tempfile
-from copy import copy
-import dill as pkl
-import tensorflow as tf
-import numpy as np
+import weakref
 
+from copy import copy
+
+import dill as pkl
+import numpy as np
+import tensorflow as tf
+
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.exceptions import NotFittedError
 from tensorflow import keras
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.models import load_model, Model
-from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.exceptions import NotFittedError
-
 
 from .data.generators import generator_from_neighbour_matrix, KerasSequence
+from .data.neighbour_retrieval import AnnoyKnnMatrix
 from .nn.network import build_supervised_layer, triplet_network, base_network
 from .nn.callbacks import ModelCheckpoint
 from .nn.losses import triplet_loss, semi_supervised_loss
-from .data.neighbour_retrieval import AnnoyKnnMatrix
+from .utils import deprecation
 
 
 class Ivis(BaseEstimator, TransformerMixin):
@@ -54,9 +56,10 @@ class Ivis(BaseEstimator, TransformerMixin):
         once.
     :param int n_epochs_without_progress: After n number of epochs without an
         improvement to the loss, terminate training early.
-    :param int ntrees: The number of random projections trees built by Annoy to
+    :param int n_trees: The number of random projections trees built by Annoy to
         approximate KNN. The more trees the higher the memory usage, but the
         better the accuracy of results.
+    :param int ntrees: Deprecated. Use `n_trees` instead.
     :param str knn_distance_metric: The distance metric used to retrieve nearest
         neighbours. Supports "angular" (default), "euclidean", "manhattan",
         "hamming", or "dot".
@@ -111,18 +114,15 @@ class Ivis(BaseEstimator, TransformerMixin):
     :param int verbose: Controls the volume of logging output the model
         produces when training. When set to 0, silences outputs, when above 0
         will print outputs.
-
     """
-
     def __init__(self, embedding_dims=2, k=150, distance='pn', batch_size=128,
-                 epochs=1000, n_epochs_without_progress=20, ntrees=50,
-                 knn_distance_metric='angular', search_k=-1,
+                 epochs=1000, n_epochs_without_progress=20, n_trees=50,
+                 ntrees=None, knn_distance_metric='angular', search_k=-1,
                  precompute=True, model='szubert',
                  supervision_metric='sparse_categorical_crossentropy',
                  supervision_weight=0.5, annoy_index_path=None,
                  callbacks=None, build_index_on_disk=True,
                  neighbour_matrix=None, verbose=1):
-
         self.embedding_dims = embedding_dims
         self.k = k
         self.distance = distance
@@ -130,40 +130,50 @@ class Ivis(BaseEstimator, TransformerMixin):
         self.epochs = epochs
         self.n_epochs_without_progress = n_epochs_without_progress
         self.knn_distance_metric = knn_distance_metric
+        self.n_trees = n_trees
         self.ntrees = ntrees
         self.search_k = search_k
         self.precompute = precompute
         self.model = model
-        self.model_ = None
-        self.encoder = None
         self.supervision_metric = supervision_metric
         self.supervision_weight = supervision_weight
-        self.supervised_model_ = None
         self.loss_history_ = []
         self.annoy_index_path = annoy_index_path
         self.callbacks = callbacks
-        self.callbacks_ = None
         self.build_index_on_disk = build_index_on_disk
         self.neighbour_matrix = neighbour_matrix
         self.verbose = verbose
-        self.n_classes = None
+
+        self.callbacks_ = None
+        self.encoder_ = None
+        self.model_ = None
+        self.n_classes_ = None
+        self.neighbour_matrix_ = None
+        self.supervised_model_ = None
 
     def _validate_parameters(self):
         """ Validate parameters before fitting """
         self.callbacks_ = [] if self.callbacks is None else list(map(copy, self.callbacks))
+        self.neighbour_matrix_ = self.neighbour_matrix
 
         for callback in self.callbacks_:
             if isinstance(callback, ModelCheckpoint):
                 callback.register_ivis_model(self)
 
+        if self.ntrees is not None:
+            deprecation.check_deprecated_ntrees(self.ntrees)
+
+            self.n_trees = self.ntrees
+            self.ntrees = None
+
     def __getstate__(self):
         """ Return object serializable variable dict """
-
         state = dict(self.__dict__)
+
         if 'model_' in state:
             state['model_'] = None
-        if 'encoder' in state:
-            state['encoder'] = None
+        if 'encoder_' in state:
+            state['encoder_'] = None
         if 'supervised_model_' in state:
             state['supervised_model_'] = None
         if 'callbacks' in state:
@@ -174,36 +184,39 @@ class Ivis(BaseEstimator, TransformerMixin):
             state['model'] = None
         if 'neighbour_matrix' in state:
             state['neighbour_matrix'] = None
+        if 'neighbour_matrix_' in state:
+            state['neighbour_matrix_'] = None
         if callable(state['distance']):
             state['distance'] = state['distance'].__name__
+
         return state
 
     def _fit(self, X, Y=None, shuffle_mode=True):
         self._validate_parameters()
 
-        if self.neighbour_matrix is None:
+        if self.neighbour_matrix_ is None:
             if self.annoy_index_path is None:
                 # Create a temporary folder to store the index on disk
                 temp_dir = tempfile.mkdtemp()
                 temp_index_path = os.path.join(temp_dir, 'annoy.index')
-                self.neighbour_matrix = AnnoyKnnMatrix.build(X, path=temp_index_path,
-                                                             k=self.k, metric=self.knn_distance_metric,
-                                                             search_k=self.search_k,
-                                                             include_distances=False, ntrees=self.ntrees,
-                                                             build_index_on_disk=self.build_index_on_disk,
-                                                             precompute=self.precompute, verbose=self.verbose)
+                self.neighbour_matrix_ = AnnoyKnnMatrix.build(X, path=temp_index_path,
+                                                              k=self.k, metric=self.knn_distance_metric,
+                                                              search_k=self.search_k,
+                                                              include_distances=False, ntrees=self.n_trees,
+                                                              build_index_on_disk=self.build_index_on_disk,
+                                                              precompute=self.precompute, verbose=self.verbose)
 
                 # Clean up temporary folder with index before object is garbage collected
-                weakref.finalize(self, self.neighbour_matrix.delete_index, parent=True)
+                weakref.finalize(self, self.neighbour_matrix_.delete_index, parent=True)
             else:
-                self.neighbour_matrix = AnnoyKnnMatrix.load(self.annoy_index_path, X.shape,
-                                                            k=self.k, metric=self.knn_distance_metric,
-                                                            search_k=self.search_k,
-                                                            include_distances=False, precompute=self.precompute,
-                                                            verbose=self.verbose)
+                self.neighbour_matrix_ = AnnoyKnnMatrix.load(self.annoy_index_path, X.shape,
+                                                             k=self.k, metric=self.knn_distance_metric,
+                                                             search_k=self.search_k,
+                                                             include_distances=False, precompute=self.precompute,
+                                                             verbose=self.verbose)
 
         datagen = generator_from_neighbour_matrix(X, Y,
-                                                  neighbour_matrix=self.neighbour_matrix,
+                                                  neighbour_matrix=self.neighbour_matrix_,
                                                   batch_size=self.batch_size)
 
         try:
@@ -228,7 +241,7 @@ class Ivis(BaseEstimator, TransformerMixin):
                 supervised_layer = build_supervised_layer(self.supervision_metric,
                                                           Y, name='supervised')
                 supervised_out = supervised_layer(anchor_embedding)
-                self.n_classes = supervised_layer.units
+                self.n_classes_ = supervised_layer.units
 
                 supervised_loss = keras.losses.get(self.supervision_metric)
                 if self.supervision_metric == 'sparse_categorical_crossentropy':
@@ -251,7 +264,7 @@ class Ivis(BaseEstimator, TransformerMixin):
                 self.supervised_model_ = Model(self.model_.inputs[0],
                                                self.model_.get_layer('supervised').output)
 
-        self.encoder = self.model_.layers[3]
+        self.encoder_ = self.model_.layers[3]
 
         if self.verbose > 0:
             print('Training neural network')
@@ -274,7 +287,7 @@ class Ivis(BaseEstimator, TransformerMixin):
         X : np.array, ivis.data.sequence.IndexableDataset, tensorflow.keras.utils.HDF5Matrix
             Data to be embedded. Needs to have a `.shape` attribute and a `__getitem__` method.
         Y : array, shape (n_samples)
-            Optional array for supervised dimentionality reduction.
+            Optional array for supervised dimensionality reduction.
             If Y contains -1 labels, and 'sparse_categorical_crossentropy'
             is the loss function, semi-supervised learning will be used.
 
@@ -283,7 +296,6 @@ class Ivis(BaseEstimator, TransformerMixin):
         self: ivis.Ivis object
             Returns estimator instance.
         """
-
         self._fit(X, Y, shuffle_mode)
         return self
 
@@ -323,13 +335,11 @@ class Ivis(BaseEstimator, TransformerMixin):
         X_new : array, shape (n_samples, embedding_dims)
             Embedding of the data in low-dimensional space.
         """
-
-
-        if self.encoder is None:
+        if self.encoder_ is None:
             raise NotFittedError("Model was not fitted yet. Call `fit` before calling `transform`.")
 
-        embedding = self.encoder.predict(KerasSequence(X, batch_size=self.batch_size),
-                                         verbose=self.verbose)
+        embedding = self.encoder_.predict(KerasSequence(X, batch_size=self.batch_size),
+                                          verbose=self.verbose)
         return embedding
 
     def score_samples(self, X):
@@ -429,7 +439,7 @@ class Ivis(BaseEstimator, TransformerMixin):
             self.model_, _ = triplet_network(base_model, embedding_dims=None)
             self.model_.compile(loss=loss_function, optimizer=optimizer)
 
-        self.encoder = self.model_.layers[3]
+        self.encoder_ = self.model_.layers[3]
 
         # If a supervised model exists, load it
         supervised_path = os.path.join(folder_path, 'supervised_model.h5')
