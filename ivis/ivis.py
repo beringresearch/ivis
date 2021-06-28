@@ -219,10 +219,7 @@ class Ivis(BaseEstimator, TransformerMixin):
                                                   neighbour_matrix=self.neighbour_matrix_,
                                                   batch_size=self.batch_size)
 
-        try:
-            triplet_loss_func = triplet_loss(distance=self.distance)
-        except KeyError:
-            raise ValueError('Loss function `{}` not implemented.'.format(self.distance))
+        triplet_loss_func = triplet_loss(distance=self.distance)
 
         if self.model_ is None:
             if isinstance(self.model, str):
