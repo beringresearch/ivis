@@ -117,7 +117,7 @@ class Ivis(BaseEstimator, TransformerMixin):
     """
     
     @deprecate_positional_args
-    def __init__(self, *, embedding_dims=2, k=150, distance='pn', batch_size=128,
+    def __init__(self, embedding_dims=2, *, k=150, distance='pn', batch_size=128,
                  epochs=1000, n_epochs_without_progress=20, n_trees=50,
                  ntrees=None, knn_distance_metric='angular', search_k=-1,
                  precompute=True, model='szubert',
