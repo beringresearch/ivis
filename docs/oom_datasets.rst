@@ -60,10 +60,10 @@ other hyperparameters are left at their default values.
         X = f['data']
         y = f['labels']
 
-    model = Ivis(epochs=5)
-    model.fit(X, shuffle_mode='batch') # Shuffle batches when using h5 files
+        model = Ivis(epochs=5)
+        model.fit(X, shuffle_mode='batch') # Shuffle batches when using h5 files
 
-    y_pred = model.transform(X)
+        y_pred = model.transform(X)
 
 Visualisations
 ~~~~~~~~~~~~~~
