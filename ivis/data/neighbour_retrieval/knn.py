@@ -15,11 +15,13 @@ import numpy as np
 
 from ..data import get_uint_ctype
 
+
 class NeighbourMatrix(Sequence):
     r"""A matrix A\ :subscript:`ij` where i is the row index of the data point and j
     refers to the index of the neigbouring point.
 
     """
+
     @property
     @abstractmethod
     def k(self):
@@ -31,6 +33,7 @@ class NeighbourMatrix(Sequence):
 
         Non-optimized version, can be overridden by child classes to be made be efficient"""
         return [self.__getitem__(item) for item in idx_seq]
+
 
 class AnnoyKnnMatrix(NeighbourMatrix):
     r"""Neighbouring points are KNN retrieved using an Annoy Index.
@@ -163,13 +166,15 @@ class AnnoyKnnMatrix(NeighbourMatrix):
         self.index.unload()
         shutil.rmtree(path)
 
+
 def _validate_knn_shape(nrows, k):
     if k <= 0:
-        raise ValueError('Invalid value of `%s` for k. k must be positive' %k)
+        raise ValueError('Invalid value of `%s` for k. k must be positive' % k)
     if k >= nrows:
         raise ValueError('''k value greater than or equal to num_rows
                             (k={}, rows={}). Lower k to a smaller
                             value.'''.format(k, nrows))
+
 
 def build_annoy_index(X, path, metric='angular', ntrees=50, build_index_on_disk=True,
                       verbose=1, n_jobs=-1):
@@ -239,6 +244,7 @@ def build_annoy_index(X, path, metric='angular', ntrees=50, build_index_on_disk=
         index.save(path)
     return index
 
+
 def extract_knn(knn_index, verbose=1, n_jobs=-1):
     """Starts multiple threads to retrieve nearest neighbours from a built index in parallel.
 
@@ -258,6 +264,7 @@ def extract_knn(knn_index, verbose=1, n_jobs=-1):
                           "Set `precompute` to False or reduce the value for `k`.") from err
 
     worker_exception = None  # Halt signal
+
     def knn_worker(thread_index, data_indices):
         nonlocal worker_exception
         for i in range(data_indices[0], data_indices[1]):
