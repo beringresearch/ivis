@@ -1,4 +1,5 @@
 """ scikit-learn wrapper class for the Ivis algorithm. """
+import base64
 import json
 import os
 import shutil
@@ -115,7 +116,7 @@ class Ivis(BaseEstimator, TransformerMixin):
         produces when training. When set to 0, silences outputs, when above 0
         will print outputs.
     """
-    
+
     @deprecate_positional_args
     def __init__(self, embedding_dims=2, *, k=150, distance='pn', batch_size=128,
                  epochs=1000, n_epochs_without_progress=20, n_trees=50,
@@ -170,6 +171,81 @@ class Ivis(BaseEstimator, TransformerMixin):
             self.ntrees = None
 
     def __getstate__(self):
+        """ Ensures the Ivis instance is serializable to be pickled """
+        state = self.__dict__.copy()
+
+        state["optimizer_"], state["optimizer_state_"] = None, None
+        state["encoder_"], state["neighbour_matrix_"] = None, None
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            key_path_mapping = {
+                "model_": os.path.join(temp_dir, "ivis_model.h5"),
+                "optimizer_": os.path.join(temp_dir, "optimizer.pkl"),
+                "optimizer_state_": os.path.join(temp_dir, "optimizer_state.npy"),
+                "supervised_model_": os.path.join(temp_dir, "supervised_model.h5")
+            }
+
+            # Create files
+            if state["model_"] is not None:
+                state["model_"].layers[3].save(key_path_mapping["model_"])
+
+                state["optimizer_"], state["optimizer_state_"] = "", ""
+
+                with open(key_path_mapping["optimizer_"], "wb") as pkl_file:
+                    pkl.dump(self.model_.optimizer, pkl_file)
+
+                np.save(key_path_mapping["optimizer_state_"],
+                        np.array(self.model_.optimizer.get_weights(), dtype=object))
+
+            if state["supervised_model_"] is not None:
+                state["supervised_model_"].save(key_path_mapping["supervised_model_"])
+
+            # Save base85-encoded versions of created files within the object
+            for key, path in key_path_mapping.items():
+                if state[key] is not None:
+                    with open(path, "rb") as file:
+                        state[key] = base64.b85encode(file.read())
+
+        return state
+
+    def __setstate__(self, state):
+        """ Loads a pickled Ivis instance """
+        with tempfile.TemporaryDirectory() as temp_dir:
+            key_path_mapping = {
+                "model_": os.path.join(temp_dir, "ivis_model.h5"),
+                "optimizer_": os.path.join(temp_dir, "optimizer.pkl"),
+                "optimizer_state_": os.path.join(temp_dir, "optimizer_state.npy"),
+                "supervised_model_": os.path.join(temp_dir, "supervised_model.h5")
+            }
+
+            for key, path in key_path_mapping.items():
+                if state[key] is not None:
+                    with open(path, "wb") as file:
+                        file.write(base64.b85decode(state[key]))
+
+            if state["model_"] is not None:
+                state["model_"] = load_model(key_path_mapping["model_"])
+
+                with open(key_path_mapping["optimizer_"], 'rb') as pkl_file:
+                    optimizer = pkl.load(pkl_file)
+
+                optimizer_state = np.load(key_path_mapping["optimizer_state_"], allow_pickle=True)
+
+                optimizer.set_weights(optimizer_state)
+
+                state["model_"], _ = triplet_network(state["model_"], None)
+                state["model_"].compile(optimizer, triplet_loss('pn'))
+
+                state["encoder_"] = state["model_"].layers[3]
+
+            if state["supervised_model_"] is not None:
+                state["supervised_model_"] = load_model(key_path_mapping["supervised_model_"])
+
+        del state["optimizer_"], state["optimizer_state_"]
+
+        self.__dict__ = state
+
+    def __getstate_old__(self):
         """ Return object serializable variable dict """
 
         state = dict(self.__dict__)
@@ -201,6 +277,7 @@ class Ivis(BaseEstimator, TransformerMixin):
         if self.neighbour_matrix_ is None:
             if self.annoy_index_path is None:
                 # Create a temporary folder to store the index on disk
+
                 temp_dir = tempfile.mkdtemp()
                 temp_index_path = os.path.join(temp_dir, 'annoy.index')
                 self.neighbour_matrix_ = AnnoyKnnMatrix.build(X, path=temp_index_path,
@@ -400,7 +477,7 @@ class Ivis(BaseEstimator, TransformerMixin):
         np.save(os.path.join(folder_path, 'optimizer_state.npy'),
                 np.array(self.model_.optimizer.get_weights(), dtype=object))
 
-        json.dump(self.__getstate__(),
+        json.dump(self.__getstate_old__(),
                   open(os.path.join(folder_path, 'ivis_params.json'), 'w'))
 
     def load_model(self, folder_path):
