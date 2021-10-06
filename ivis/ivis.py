@@ -15,7 +15,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.exceptions import NotFittedError
 from tensorflow import keras
 from tensorflow.keras.callbacks import EarlyStopping
-from tensorflow.keras.models import load_model, Model
+from tensorflow.keras.models import load_model, Model, model_from_json
 
 from .data.generators import generator_from_neighbour_matrix, KerasSequence
 from .data.neighbour_retrieval import AnnoyKnnMatrix
@@ -186,6 +186,7 @@ class Ivis(BaseEstimator, TransformerMixin):
 
             # Create files
             if state["model_"] is not None:
+                state["model_"].layers[3].compile()
                 state["model_"].layers[3].save(key_path_mapping["model_"])
 
                 state["optimizer_"], state["optimizer_state_"] = "", ""
@@ -197,9 +198,10 @@ class Ivis(BaseEstimator, TransformerMixin):
                         np.array(self.model_.optimizer.get_weights(), dtype=object))
 
             if state["supervised_model_"] is not None:
+                state["supervised_model_"].compile()
                 state["supervised_model_"].save(key_path_mapping["supervised_model_"])
 
-            # Save created files within the object
+            # Save file bytes within the object
             for key, path in key_path_mapping.items():
                 if state[key] is not None:
                     with open(path, "rb") as file:
@@ -217,7 +219,6 @@ class Ivis(BaseEstimator, TransformerMixin):
                 "supervised_model_": os.path.join(temp_dir, "supervised_model.h5")
             }
 
-            # Recreate files
             for key, path in key_path_mapping.items():
                 if state[key] is not None:
                     with open(path, "wb") as file:
@@ -462,9 +463,11 @@ class Ivis(BaseEstimator, TransformerMixin):
         os.makedirs(folder_path)
 
         # serialize weights to HDF5
+        self.model_.layers[3].compile()
         self.model_.layers[3].save(os.path.join(folder_path, 'ivis_model.h5'))
         # Have to serialize supervised model separately
         if self.supervised_model_ is not None:
+            self.supervised_model_.compile()
             self.supervised_model_.save(os.path.join(folder_path,
                                                      'supervised_model.h5'))
 
