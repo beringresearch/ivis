@@ -1,5 +1,4 @@
 """ scikit-learn wrapper class for the Ivis algorithm. """
-import base64
 import json
 import os
 import shutil
@@ -200,11 +199,11 @@ class Ivis(BaseEstimator, TransformerMixin):
             if state["supervised_model_"] is not None:
                 state["supervised_model_"].save(key_path_mapping["supervised_model_"])
 
-            # Save base85-encoded versions of created files within the object
+            # Save created files within the object
             for key, path in key_path_mapping.items():
                 if state[key] is not None:
                     with open(path, "rb") as file:
-                        state[key] = base64.b85encode(file.read())
+                        state[key] = file.read()
 
         return state
 
@@ -218,10 +217,11 @@ class Ivis(BaseEstimator, TransformerMixin):
                 "supervised_model_": os.path.join(temp_dir, "supervised_model.h5")
             }
 
+            # Recreate files
             for key, path in key_path_mapping.items():
                 if state[key] is not None:
                     with open(path, "wb") as file:
-                        file.write(base64.b85decode(state[key]))
+                        file.write(state[key])
 
             if state["model_"] is not None:
                 state["model_"] = load_model(key_path_mapping["model_"])
