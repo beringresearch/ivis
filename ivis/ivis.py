@@ -173,11 +173,11 @@ class Ivis(BaseEstimator, TransformerMixin):
         """ Ensures the Ivis instance is serializable to be pickled """
         state = self.__dict__.copy()
 
-        state["optimizer_"], state["optimizer_state_"] = None, None
         state["encoder_"], state["neighbour_matrix_"] = None, None
 
         with tempfile.TemporaryDirectory() as temp_dir:
             key_path_mapping = {
+                "ivis_params_": os.path.join(temp_dir, "ivis_params.json"),
                 "model_": os.path.join(temp_dir, "ivis_model.h5"),
                 "optimizer_": os.path.join(temp_dir, "optimizer.pkl"),
                 "optimizer_state_": os.path.join(temp_dir, "optimizer_state.npy"),
@@ -186,24 +186,11 @@ class Ivis(BaseEstimator, TransformerMixin):
 
             # Create files
             if state["model_"] is not None:
-                state["model_"].layers[3].compile()
-                state["model_"].layers[3].save(key_path_mapping["model_"])
-
-                state["optimizer_"], state["optimizer_state_"] = "", ""
-
-                with open(key_path_mapping["optimizer_"], "wb") as pkl_file:
-                    pkl.dump(self.model_.optimizer, pkl_file)
-
-                np.save(key_path_mapping["optimizer_state_"],
-                        np.array(self.model_.optimizer.get_weights(), dtype=object))
-
-            if state["supervised_model_"] is not None:
-                state["supervised_model_"].compile()
-                state["supervised_model_"].save(key_path_mapping["supervised_model_"])
+                self.save_model(temp_dir, save_format='h5', overwrite=True)
 
             # Save file bytes within the object
             for key, path in key_path_mapping.items():
-                if state[key] is not None:
+                if os.path.exists(path):
                     with open(path, "rb") as file:
                         state[key] = file.read()
 
@@ -213,6 +200,7 @@ class Ivis(BaseEstimator, TransformerMixin):
         """ Loads a pickled Ivis instance """
         with tempfile.TemporaryDirectory() as temp_dir:
             key_path_mapping = {
+                "ivis_params_": os.path.join(temp_dir, "ivis_params.json"),
                 "model_": os.path.join(temp_dir, "ivis_model.h5"),
                 "optimizer_": os.path.join(temp_dir, "optimizer.pkl"),
                 "optimizer_state_": os.path.join(temp_dir, "optimizer_state.npy"),
@@ -225,26 +213,7 @@ class Ivis(BaseEstimator, TransformerMixin):
                         file.write(state[key])
 
             if state["model_"] is not None:
-                state["model_"] = load_model(key_path_mapping["model_"])
-
-                with open(key_path_mapping["optimizer_"], 'rb') as pkl_file:
-                    optimizer = pkl.load(pkl_file)
-
-                optimizer_state = np.load(key_path_mapping["optimizer_state_"], allow_pickle=True)
-
-                optimizer.set_weights(optimizer_state)
-
-                state["model_"], _ = triplet_network(state["model_"], None)
-                state["model_"].compile(optimizer, triplet_loss('pn'))
-
-                state["encoder_"] = state["model_"].layers[3]
-
-            if state["supervised_model_"] is not None:
-                state["supervised_model_"] = load_model(key_path_mapping["supervised_model_"])
-
-        del state["optimizer_"], state["optimizer_state_"]
-
-        self.__dict__ = state
+                self.load_model(temp_dir)
 
     def _get_serializable_dict(self):
         """ Return object serializable variable dict by removing non-serializable values"""
