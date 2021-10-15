@@ -27,7 +27,7 @@ def test_ivis_model_saving(model_filepath):
     # Check that model predictions are same
     assert np.all(model.transform(X) == model_2.transform(X))
     # Serializable dict eles same
-    assert model.__getstate__() == model_2.__getstate__()
+    assert model._get_serializable_dict() == model_2._get_serializable_dict()
 
     # Check all weights are the same
     for model_layer, model_2_layer in zip(model.encoder_.layers,
@@ -71,7 +71,7 @@ def test_supervised_model_saving(model_filepath):
     # Check that model supervised predictions are same
     assert np.all(model.score_samples(X) == model_2.score_samples(X))
     # Serializable dict eles same
-    assert model.__getstate__() == model_2.__getstate__()
+    assert model._get_serializable_dict() == model_2._get_serializable_dict()
 
     # Check all weights are the same
     for model_layer, model_2_layer in zip(model.encoder_.layers,
@@ -122,7 +122,7 @@ def test_custom_model_saving(model_filepath):
     # Check that model supervised predictions are same
     assert np.all(model.score_samples(X) == model_2.score_samples(X))
     # Serializable dict eles same
-    assert model.__getstate__() == model_2.__getstate__()
+    assert model._get_serializable_dict() == model_2._get_serializable_dict()
 
     # Check all weights are the same
     for model_layer, model_2_layer in zip(model.encoder_.layers,
