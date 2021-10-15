@@ -15,7 +15,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.exceptions import NotFittedError
 from tensorflow import keras
 from tensorflow.keras.callbacks import EarlyStopping
-from tensorflow.keras.models import load_model, Model, model_from_json
+from tensorflow.keras.models import load_model, Model
 
 from .data.generators import generator_from_neighbour_matrix, KerasSequence
 from .data.neighbour_retrieval import AnnoyKnnMatrix
@@ -246,8 +246,8 @@ class Ivis(BaseEstimator, TransformerMixin):
 
         self.__dict__ = state
 
-    def __getstate_old__(self):
-        """ Return object serializable variable dict """
+    def _get_serializable_dict(self):
+        """ Return object serializable variable dict by removing non-serializable values"""
 
         state = dict(self.__dict__)
 
@@ -446,13 +446,16 @@ class Ivis(BaseEstimator, TransformerMixin):
         supervised_output = self.supervised_model_.predict(X, verbose=self.verbose)
         return supervised_output
 
-    def save_model(self, folder_path, overwrite=False):
+    def save_model(self, folder_path, save_format='h5', overwrite=False):
         """Save an ivis model
 
         Parameters
         ----------
         folder_path : string
             Path to serialised model files and metadata
+        save_format: string
+            Format to save ivis model as. Either ".h5" for a .h5 file or
+            "tf" for TensorFlow SavedModel format.
         overwrite : bool
             Whether to overwrite the specified folder path.
         """
@@ -462,14 +465,15 @@ class Ivis(BaseEstimator, TransformerMixin):
                 shutil.rmtree(folder_path)
         os.makedirs(folder_path)
 
-        # serialize weights to HDF5
+        # serialize base model
+        model_suffix = '.h5' if save_format == 'h5' else ''
         self.model_.layers[3].compile()
-        self.model_.layers[3].save(os.path.join(folder_path, 'ivis_model.h5'))
+        self.model_.layers[3].save(os.path.join(folder_path, 'ivis_model' + model_suffix))
         # Have to serialize supervised model separately
         if self.supervised_model_ is not None:
             self.supervised_model_.compile()
             self.supervised_model_.save(os.path.join(folder_path,
-                                                     'supervised_model.h5'))
+                                                     'supervised_model' + model_suffix))
 
         # save optimizer structure and state separately.
         # pickle preserves structure (but not correct values).
@@ -480,7 +484,7 @@ class Ivis(BaseEstimator, TransformerMixin):
         np.save(os.path.join(folder_path, 'optimizer_state.npy'),
                 np.array(self.model_.optimizer.get_weights(), dtype=object))
 
-        json.dump(self.__getstate_old__(),
+        json.dump(self._get_serializable_dict(),
                   open(os.path.join(folder_path, 'ivis_params.json'), 'w'))
 
     def load_model(self, folder_path):
@@ -499,20 +503,24 @@ class Ivis(BaseEstimator, TransformerMixin):
 
         ivis_config = json.load(open(os.path.join(folder_path,
                                                   'ivis_params.json'), 'r'))
-        if callable(self.distance):
-            ivis_config['distance'] = self.distance
+        try:
+            if callable(self.distance):
+                ivis_config['distance'] = self.distance
+        except AttributeError:
+            pass
         self.__dict__ = ivis_config
 
         loss_function = triplet_loss(self.distance)
 
+        model_path = _resolve_model_path(folder_path)
         # ivis models trained before version 1.8.3 won't have separate optimizer file
         # maintain compatibility by falling back to old load behavior
         if not os.path.exists(os.path.join(folder_path, 'optimizer.pkl')):
-            self.model_ = load_model(os.path.join(folder_path, 'ivis_model.h5'),
+            self.model_ = load_model(model_path,
                                      custom_objects={'tf': tf,
                                                      loss_function.__name__: loss_function})
         else:
-            base_model = load_model(os.path.join(folder_path, 'ivis_model.h5'))
+            base_model = load_model(model_path)
 
             with open(os.path.join(folder_path, 'optimizer.pkl'), 'rb') as f:
                 optimizer = pkl.load(f)
@@ -527,7 +535,18 @@ class Ivis(BaseEstimator, TransformerMixin):
         self.encoder_ = self.model_.layers[3]
 
         # If a supervised model exists, load it
-        supervised_path = os.path.join(folder_path, 'supervised_model.h5')
-        if os.path.exists(supervised_path):
+        supervised_path = _resolve_model_path(folder_path, model_filename='supervised_model')
+        if supervised_path:
             self.supervised_model_ = load_model(supervised_path)
         return self
+
+
+def _resolve_model_path(folder_path, model_filename='ivis_model'):
+    """Utility function for returning path of an ivis model on disk, whether it's stored as
+    a .h5 file or as a folder (TF SavedModel format)"""
+    model_path = None
+    for file_extention in ['', '.h5']:
+        path = os.path.join(folder_path, model_filename + file_extention)
+        if os.path.exists(path):
+            model_path = path
+    return model_path
