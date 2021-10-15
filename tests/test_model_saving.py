@@ -130,8 +130,8 @@ def _supervised_custom_model_saving(model_filepath, save_fn, load_fn):
     y_pred_2 = model_2.fit_transform(X, Y)
 
 ### Save and load ###
-def _save_ivis_model(model, filepath):
-    model.save_model(filepath, overwrite=True)
+def _save_ivis_model(model, filepath, save_format='h5'):
+    model.save_model(filepath, save_format=save_format, overwrite=True)
 
 def _load_ivis_model(filepath):
     model_2 = Ivis()
@@ -178,6 +178,11 @@ test_supervised_custom_model_saving = partial(_supervised_custom_model_saving,
 # dill required to serialize custom model due to non-global scope definition
 test_supervised_custom_model_pickling = partial(_supervised_custom_model_saving,
                                                 save_fn=_dill_ivis_model, load_fn=_undill_ivis_model)
+
+### Other ###
+test_tf_savedmodel_persistence = partial(_unsupervised_model_save_test,
+                                         save_fn=partial(_save_ivis_model, save_format='tfs'),
+                                         load_fn=_load_ivis_model)
 
 def test_save_overwriting(model_filepath):
     model = Ivis(k=15, batch_size=16, epochs=2)
