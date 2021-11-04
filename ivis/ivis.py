@@ -185,8 +185,7 @@ class Ivis(BaseEstimator, TransformerMixin):
             }
 
             # Create files
-            if state["model_"] is not None:
-                self.save_model(temp_dir, save_format='h5', overwrite=True)
+            self.save_model(temp_dir, save_format='h5', overwrite=True)
 
             # Save file bytes within the object
             for key, path in key_path_mapping.items():
@@ -208,12 +207,11 @@ class Ivis(BaseEstimator, TransformerMixin):
             }
 
             for key, path in key_path_mapping.items():
-                if state[key] is not None:
+                if key in state and state[key] is not None:
                     with open(path, "wb") as file:
                         file.write(state[key])
 
-            if state["model_"] is not None:
-                self.load_model(temp_dir)
+            self.load_model(temp_dir)
 
     def _get_serializable_dict(self):
         """ Return object serializable variable dict by removing non-serializable values"""
@@ -434,24 +432,25 @@ class Ivis(BaseEstimator, TransformerMixin):
                 shutil.rmtree(folder_path)
         os.makedirs(folder_path)
 
-        # serialize base model
+        # serialize base model if exists
         model_suffix = '.h5' if save_format == 'h5' else ''
-        self.model_.layers[3].compile()
-        self.model_.layers[3].save(os.path.join(folder_path, 'ivis_model' + model_suffix))
-        # Have to serialize supervised model separately
+        if self.model_ is not None:
+            self.model_.layers[3].compile()
+            self.model_.layers[3].save(os.path.join(folder_path, 'ivis_model' + model_suffix))
+
+            # save optimizer structure and state separately.
+            # pickle preserves structure (but not correct values).
+            with open(os.path.join(folder_path, 'optimizer.pkl'), 'wb') as f:
+                pkl.dump(self.model_.optimizer, f)
+            # save optimizer state in numpy array
+            np.save(os.path.join(folder_path, 'optimizer_state.npy'),
+                    np.array(self.model_.optimizer.get_weights(), dtype=object))
+
+        # Serialize supervised model separately
         if self.supervised_model_ is not None:
             self.supervised_model_.compile()
             self.supervised_model_.save(os.path.join(folder_path,
                                                      'supervised_model' + model_suffix))
-
-        # save optimizer structure and state separately.
-        # pickle preserves structure (but not correct values).
-        with open(os.path.join(folder_path, 'optimizer.pkl'), 'wb') as f:
-            pkl.dump(self.model_.optimizer, f)
-
-        # save optimizer state in numpy array
-        np.save(os.path.join(folder_path, 'optimizer_state.npy'),
-                np.array(self.model_.optimizer.get_weights(), dtype=object))
 
         json.dump(self._get_serializable_dict(),
                   open(os.path.join(folder_path, 'ivis_params.json'), 'w'))
@@ -482,30 +481,31 @@ class Ivis(BaseEstimator, TransformerMixin):
         loss_function = triplet_loss(self.distance)
 
         model_path = _resolve_model_path(folder_path)
-        # ivis models trained before version 1.8.3 won't have separate optimizer file
-        # maintain compatibility by falling back to old load behavior
-        if not os.path.exists(os.path.join(folder_path, 'optimizer.pkl')):
-            self.model_ = load_model(model_path,
-                                     custom_objects={'tf': tf,
-                                                     loss_function.__name__: loss_function})
-        else:
-            base_model = load_model(model_path)
+        if model_path is not None:
+            # ivis models trained before version 1.8.3 won't have separate optimizer file
+            # maintain compatibility by falling back to old load behavior
+            if not os.path.exists(os.path.join(folder_path, 'optimizer.pkl')):
+                self.model_ = load_model(model_path,
+                                         custom_objects={'tf': tf,
+                                                         loss_function.__name__: loss_function})
+            else:
+                base_model = load_model(model_path)
 
-            with open(os.path.join(folder_path, 'optimizer.pkl'), 'rb') as f:
-                optimizer = pkl.load(f)
+                with open(os.path.join(folder_path, 'optimizer.pkl'), 'rb') as f:
+                    optimizer = pkl.load(f)
 
-            optimizer_state = np.load(os.path.join(folder_path, 'optimizer_state.npy'),
-                                      allow_pickle=True)
-            optimizer.set_weights(optimizer_state)
+                optimizer_state = np.load(os.path.join(folder_path, 'optimizer_state.npy'),
+                                          allow_pickle=True)
+                optimizer.set_weights(optimizer_state)
 
-            self.model_, _ = triplet_network(base_model, embedding_dims=None)
-            self.model_.compile(loss=loss_function, optimizer=optimizer)
+                self.model_, _ = triplet_network(base_model, embedding_dims=None)
+                self.model_.compile(loss=loss_function, optimizer=optimizer)
 
-        self.encoder_ = self.model_.layers[3]
+                self.encoder_ = self.model_.layers[3]
 
         # If a supervised model exists, load it
         supervised_path = _resolve_model_path(folder_path, model_filename='supervised_model')
-        if supervised_path:
+        if supervised_path is not None:
             self.supervised_model_ = load_model(supervised_path)
         return self
 
