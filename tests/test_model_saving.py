@@ -184,6 +184,10 @@ test_tf_savedmodel_persistence = partial(_unsupervised_model_save_test,
                                          save_fn=partial(_save_ivis_model, save_format='tfs'),
                                          load_fn=_load_ivis_model)
 
+def test_untrained_model_persistence(model_filepath):
+    model = Ivis(k=15, batch_size=16, epochs=2)
+    model.save_model(model_filepath)
+
 def test_save_overwriting(model_filepath):
     model = Ivis(k=15, batch_size=16, epochs=2)
     iris = datasets.load_iris()
