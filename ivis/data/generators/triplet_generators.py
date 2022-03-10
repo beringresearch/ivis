@@ -111,8 +111,11 @@ class TripletGenerator(Sequence, ABC):
         if self.batched_data:
             # Flatten triplets, get batch of data, then reshape back into triplets
             indices = list(itertools.chain.from_iterable(triplet_indices))
+            # Last batch may be smaller than defined so check real batch size
+            batch_size = int(len(indices) / 3)
+
             data = self.X.get_batch(indices)
-            triplet_batch = list(zip(*[iter(data)] * 3))
+            triplet_batch = list(zip(*[iter(data)] * batch_size))
         else:
             if isinstance(self.X, np.ndarray):
                 # Fancy index for speed if data is a numpy array
