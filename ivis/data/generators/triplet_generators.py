@@ -107,7 +107,7 @@ class TripletGenerator(Sequence, ABC):
 
     def get_triplet_data(self, triplet_indices):
         """Maps triplet indices to the actual data in internal data store.
-        Returns a numpy array of shape (3, batch_size, *self.X.shape[0])."""
+        Returns a numpy array of shape (3, batch_size, *self.X.shape[1])."""
         if self.batched_data:
             # Flatten triplets, get batch of data, then reshape back into triplets
             indices = list(itertools.chain.from_iterable(triplet_indices))
