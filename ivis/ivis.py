@@ -410,7 +410,8 @@ class Ivis(BaseEstimator, TransformerMixin):
         if self.supervised_model_ is None:
             raise NotFittedError("Model was not trained in classification mode.")
 
-        supervised_output = self.supervised_model_.predict(X, verbose=self.verbose)
+        gen = KerasSequence(X, batch_size=self.batch_size)
+        supervised_output = self.supervised_model_.predict(gen, verbose=self.verbose)
         return supervised_output
 
     def save_model(self, folder_path, save_format='h5', overwrite=False):
