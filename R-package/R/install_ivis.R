@@ -26,7 +26,7 @@ install_ivis <- function(){
     envname <- "ivis"
     env_create(envname)
 
-    py_install("ivis[cpu]", envname="ivis")
+    py_install("ivis[cpu]", envname="ivis", pip=TRUE)
 }   
 
 
