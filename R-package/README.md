@@ -11,7 +11,7 @@ Prior to installation, ensure that `reticulate` is available on your machine.
 install.packages("reticulate")
 ```
 
-Next, install [virtualenv](https://virtualenv.pypa.io/en/latest/installation/) package as it will be used to safely interface with the `ivis` Python package.
+Next, install [virtualenv](https://virtualenv.pypa.io/en/latest/) package as it will be used to safely interface with the `ivis` Python package.
 
 Finally, the easiest way to install `ivis` is using the `devtools` package:
 
