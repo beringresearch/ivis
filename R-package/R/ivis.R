@@ -76,7 +76,8 @@ ivis <- function(embedding_dims = 2L,
     batch_size = 128L,
     epochs = 1000L,
     n_epochs_without_progress = 20L,
-    ntrees = 50L,
+    ntrees = NULL,
+    n_trees = 50,
     knn_distance_metric='angular',
     search_k = -1L,
     precompute = TRUE,
@@ -84,7 +85,7 @@ ivis <- function(embedding_dims = 2L,
     supervision_metric = "sparse_categorical_crossentropy",
     supervision_weight = 0.5,
     annoy_index_path=NULL,
-    build_index_on_disk=NULL,
+    build_index_on_disk=TRUE,
     neighbour_matrix=NULL, verbose=1L){
 
     k <- as.integer(k)
@@ -93,7 +94,10 @@ ivis <- function(embedding_dims = 2L,
     batch_size <- as.integer(batch_size)
     epochs <- as.integer(epochs)
     n_epochs_without_progress = as.integer(n_epochs_without_progress)
-    ntrees <- as.integer(ntrees)
+    if (!is.null(ntrees)) { 
+      ntrees <- as.integer(ntrees)
+    }
+    n_trees = as.integer(n_trees)
     search_k <- as.integer(search_k)
 
     if (!is.null(neighbour_matrix)) {
@@ -107,6 +111,7 @@ ivis <- function(embedding_dims = 2L,
                               epochs=epochs,
                               n_epochs_without_progress=n_epochs_without_progress,
                               ntrees=ntrees,
+                              n_trees=n_trees,
                               knn_distance_metric='angular',
                               search_k=search_k,
                               precompute=precompute, model=model,
@@ -115,6 +120,7 @@ ivis <- function(embedding_dims = 2L,
                               annoy_index_path=annoy_index_path,
                               build_index_on_disk=build_index_on_disk,
                               neighbour_matrix=neighbour_matrix,
+                              callbacks=NULL,
                               verbose=verbose)
   
     return(model)
