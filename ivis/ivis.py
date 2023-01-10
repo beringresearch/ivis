@@ -271,6 +271,11 @@ class Ivis(BaseEstimator, TransformerMixin):
         triplet_loss_func = triplet_loss(distance=self.distance)
 
         if self.model_ is None:
+            try:
+                optimizer_fn = tf.keras.optimizers.legacy.Adam()
+            except ImportError:
+                optimizer_fn = tf.keras.optimizers.Adam()
+
             if isinstance(self.model, str):
                 input_size = (X.shape[-1],)
                 self.model_, (anchor_embedding, *_) = \
@@ -282,7 +287,7 @@ class Ivis(BaseEstimator, TransformerMixin):
                                     embedding_dims=self.embedding_dims)
 
             if Y is None:
-                self.model_.compile(optimizer='adam', loss=triplet_loss_func)
+                self.model_.compile(optimizer=optimizer_fn, loss=triplet_loss_func)
             else:
                 supervised_layer = build_supervised_layer(self.supervision_metric,
                                                           Y, name='supervised')
@@ -297,7 +302,7 @@ class Ivis(BaseEstimator, TransformerMixin):
                                     outputs=[self.model_.output,
                                              supervised_out])
                 self.model_.compile(
-                    optimizer='adam',
+                    optimizer=optimizer_fn,
                     loss={
                         'stacked_triplets': triplet_loss_func,
                         'supervised': supervised_loss
