@@ -419,7 +419,7 @@ class Ivis(BaseEstimator, TransformerMixin):
         supervised_output = self.supervised_model_.predict(gen, verbose=self.verbose)
         return supervised_output
 
-    def save_model(self, folder_path, save_format='h5', overwrite=False):
+    def save_model(self, folder_path, save_format='tf', overwrite=False):
         """Save an ivis model
 
         Parameters
@@ -427,8 +427,8 @@ class Ivis(BaseEstimator, TransformerMixin):
         folder_path : string
             Path to serialised model files and metadata
         save_format: string
-            Format to save ivis model as. Either ".h5" for a .h5 file or
-            "tf" for TensorFlow SavedModel format.
+            Format to save ivis model as. Either "tf" for TensorFlow SavedModel format
+            or "h5" for a .h5 file. Default is "tf".
         overwrite : bool
             Whether to overwrite the specified folder path.
         """
