@@ -130,7 +130,7 @@ def _supervised_custom_model_saving(model_filepath, save_fn, load_fn):
     y_pred_2 = model_2.fit_transform(X, Y)
 
 ### Save and load ###
-def _save_ivis_model(model, filepath, save_format='h5'):
+def _save_ivis_model(model, filepath, save_format='tf'):
     model.save_model(filepath, save_format=save_format, overwrite=True)
 
 def _load_ivis_model(filepath):
