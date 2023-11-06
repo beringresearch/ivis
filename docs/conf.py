@@ -21,7 +21,7 @@ autodoc_mock_imports = ['tensorflow']
 # -- Project information -----------------------------------------------------
 
 project = 'ivis'
-copyright = '2021, Bering Limited'
+copyright = '2023, Bering Limited'
 author = 'Bering Limited'
 
 # The short X.Y version
@@ -62,7 +62,7 @@ master_doc = 'index'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
