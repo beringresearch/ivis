@@ -1,4 +1,4 @@
-[![DOI](https://joss.theoj.org/papers/10.21105/joss.01596/status.svg)](https://doi.org/10.21105/joss.01596) [![DOI](https://zenodo.org/badge/144551119.svg)](https://zenodo.org/badge/latestdoi/144551119) [![Documentation Status](https://readthedocs.org/projects/bering-ivis/badge/?version=latest)](https://bering-ivis.readthedocs.io/en/latest/?badge=latest) [![Downloads](https://pepy.tech/badge/ivis/month)](https://pepy.tech/project/ivis) [![Build Status](https://travis-ci.org/beringresearch/ivis.svg?branch=master)](https://travis-ci.org/beringresearch/ivis)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.01596/status.svg)](https://doi.org/10.21105/joss.01596) [![DOI](https://zenodo.org/badge/144551119.svg)](https://zenodo.org/badge/latestdoi/144551119) [![Documentation Status](https://readthedocs.org/projects/bering-ivis/badge/?version=latest)](https://bering-ivis.readthedocs.io/en/latest/?badge=latest) [![Downloads](https://pepy.tech/badge/ivis/month)](https://pepy.tech/project/ivis) [![Build Status](https://github.com/beringresearch/ivis/workflows/Test/badge.svg)](https://github.com/beringresearch/ivis/workflows/Test/badge.svg)
 
 # ivis
 
@@ -70,4 +70,4 @@ model = Ivis(embedding_dims=2, k=15)
 embeddings = model.fit_transform(X_scaled)
 ```
 
-Copyright 2022 Bering Limited
+Copyright 2023 Bering Limited
