@@ -6,6 +6,8 @@ on:
   push:
     branches:
       master
+  schedule:
+    - cron: "41 12 10 * *"
 
 permissions:
   contents: read
