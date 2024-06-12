@@ -36,8 +36,8 @@ setup(name='ivis',
       extras_require={
           'tests': ['pytest'],
           'visualization': ['matplotlib', 'seaborn'],
-          'cpu': ['tensorflow-cpu'],
-          'gpu': ['tensorflow']
+          'cpu': ['tensorflow-cpu>=1.13.1,<2.16'],
+          'gpu': ['tensorflow>=1.13.1,<2.16']
       },
       classifiers=[
           "Programming Language :: Python :: 3",
