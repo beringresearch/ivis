@@ -31,6 +31,6 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
-        run: pip install .[visualization] pytest tensorflow
+        run: pip install .[visualization] .[tests] .[cpu]
       - name: Run tests
         run: pytest tests
