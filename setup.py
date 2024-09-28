@@ -33,7 +33,7 @@ setup(name='ivis',
           'dill'
       ],
       extras_require={
-          'tests': ['pytest'],
+          'tests': ['pytest', 'scipy'],
           'visualization': ['matplotlib', 'seaborn'],
           'cpu': ['tensorflow-cpu>=1.13.1,<2.16'],
           'gpu': ['tensorflow>=1.13.1,<2.16']
