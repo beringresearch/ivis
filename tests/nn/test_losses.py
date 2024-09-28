@@ -1,7 +1,6 @@
 import tempfile
 import os
 import pytest
-from sklearn import datasets
 from tensorflow.keras import backend as K
 import tensorflow as tf
 
@@ -30,9 +29,7 @@ def test_custom_loss_fn_registration():
     assert custom_loss_fn is losses.loss_dict[custom_loss_fn.__name__]
     assert losses.triplet_loss(distance=custom_loss_fn.__name__) is custom_loss_fn
 
-def test_custom_loss_ivis(model_filepath):
-    iris = datasets.load_iris()
-    X = iris.data
+def test_custom_loss_ivis(X, model_filepath):
 
     def euclidean_loss(y_true, y_pred):
         margin = 1
@@ -51,9 +48,7 @@ def test_custom_loss_ivis(model_filepath):
     with pytest.raises(ValueError):
         model_3.load_model(model_filepath)
 
-def test_custom_loss_ivis_callable(model_filepath):
-    iris = datasets.load_iris()
-    X = iris.data
+def test_custom_loss_ivis_callable(X, model_filepath):
 
     class EuclideanDistance:
         def __init__(self, margin=1):

@@ -2,7 +2,6 @@ import os
 import tempfile
 import pytest
 import numpy as np
-from sklearn import datasets
 from ivis.nn.callbacks import ModelCheckpoint, EmbeddingsLogging, EmbeddingsImage, TensorBoardEmbeddingsImage
 from ivis import Ivis
 
@@ -13,10 +12,7 @@ def log_dir():
         yield temp_dir
 
 
-def test_model_checkpoint(log_dir):
-    iris = datasets.load_iris()
-    X = iris.data
-
+def test_model_checkpoint(X, log_dir):
     filename = 'model-checkpoint_{}.ivis'
     n_epochs = 2
     model = Ivis(epochs=n_epochs, k=15, batch_size=16,
@@ -30,10 +26,7 @@ def test_model_checkpoint(log_dir):
     model_2.fit_transform(X)
 
 
-def test_embeddings_logging(log_dir):
-    iris = datasets.load_iris()
-    X = iris.data
-
+def test_embeddings_logging(X, log_dir):
     filename = 'embeddings_{}.npy'
     n_epochs = 2
     model = Ivis(epochs=n_epochs, k=15, batch_size=16,
@@ -43,11 +36,7 @@ def test_embeddings_logging(log_dir):
     embeddings = np.load(os.path.join(log_dir, filename.format(n_epochs)))
 
 
-def test_embeddings_image(log_dir):
-    iris = datasets.load_iris()
-    X = iris.data
-    Y = iris.target
-
+def test_embeddings_image(X, Y, log_dir):
     filename = 'embeddings_{}.png'
     n_epochs = 2
     model = Ivis(epochs=n_epochs, k=15, batch_size=16,
@@ -57,11 +46,7 @@ def test_embeddings_image(log_dir):
     assert os.path.exists(os.path.join(log_dir, filename.format(n_epochs)))
 
 
-def test_embeddings_image(log_dir):
-    iris = datasets.load_iris()
-    X = iris.data
-    Y = iris.target
-
+def test_embeddings_image(X, Y, log_dir):
     n_epochs = 2
     model = Ivis(epochs=n_epochs, k=15, batch_size=16,
                  callbacks=[TensorBoardEmbeddingsImage(X, Y, log_dir, epoch_interval=1)])    
