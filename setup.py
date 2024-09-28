@@ -28,7 +28,6 @@ setup(name='ivis',
       python_requires='>=3.5',
       install_requires=[
           'numpy',
-          'scikit-learn>0.20.0',
           'annoy>=1.15.2',
           'tqdm',
           'dill'

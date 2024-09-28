@@ -11,8 +11,6 @@ import dill as pkl
 import numpy as np
 import tensorflow as tf
 
-from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.exceptions import NotFittedError
 from tensorflow import keras
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.models import load_model, Model
@@ -25,7 +23,11 @@ from .nn.losses import triplet_loss, semi_supervised_loss
 from .utils.deprecation import check_deprecated_ntrees, deprecate_positional_args
 
 
-class Ivis(BaseEstimator, TransformerMixin):
+class NotFittedError(Exception):
+    pass
+
+
+class Ivis:
     """Ivis is a technique that uses an artificial neural network for
     dimensionality reduction, often useful for the purposes of visualization.
     The network trains on triplets of data-points at a time and pulls positive
