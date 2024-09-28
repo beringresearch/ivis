@@ -3,8 +3,6 @@
 import tensorflow as tf
 import numpy as np
 
-from scipy.sparse import issparse
-
 
 class KerasSequence(tf.keras.utils.Sequence):
     """Wraps inputs into a Keras Sequence to allow Keras models to predict on
@@ -24,7 +22,7 @@ class KerasSequence(tf.keras.utils.Sequence):
         else:
             batch = [self.X[i] for i in batch_indices]
 
-        if issparse(self.X):
+        if hasattr(self.X, "toarray") and callable(self.X.toarray):
             batch = [ele.toarray() for ele in batch]
             batch = np.squeeze(batch)
 
