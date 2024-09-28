@@ -17,7 +17,6 @@ import os
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.callbacks import Callback
-from sklearn.preprocessing import MinMaxScaler
 
 # Matplotlib and seaborn are optional dependencies
 try:
@@ -190,7 +189,7 @@ class EmbeddingsImage(Callback):
             self.plot_embeddings(filename)
 
     def plot_embeddings(self, filename):
-        embeddings = MinMaxScaler((0, 1)).fit_transform(self.embeddings)
+        embeddings = (self.embeddings - self.embeddings.min()) / (self.embeddings.max() - self.embeddings.min())
 
         fig = plt.figure()
         sns.scatterplot(x=embeddings[:, 0], y=embeddings[:, 1], s=1,
@@ -265,7 +264,7 @@ class TensorBoardEmbeddingsImage(Callback):
                 tf.summary.image("Embeddings", image, step=epoch)
 
     def plot_embeddings(self, embeddings):
-        embeddings = MinMaxScaler((0, 1)).fit_transform(self.embeddings)
+        embeddings = (self.embeddings - self.embeddings.min()) / (self.embeddings.max() - self.embeddings.min())
 
         fig = plt.figure()
         buf = io.BytesIO()
