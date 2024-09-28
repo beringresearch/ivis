@@ -5,7 +5,6 @@ import pickle as pkl
 import dill
 from functools import partial
 
-from sklearn import datasets
 import numpy as np
 import tensorflow as tf
 from ivis import Ivis
@@ -34,10 +33,8 @@ def _validate_network_equality(model_1, model_2):
                       model_2.model_.optimizer.get_weights()):
         assert np.all(w1 == w2)
 
-def _unsupervised_model_save_test(model_filepath, save_fn, load_fn):
+def _unsupervised_model_save_test(model_filepath, X, save_fn, load_fn):
     model = Ivis(k=15, batch_size=16, epochs=2)
-    iris = datasets.load_iris()
-    X = iris.data
 
     model.fit(X)
     save_fn(model, model_filepath)
@@ -51,12 +48,9 @@ def _unsupervised_model_save_test(model_filepath, save_fn, load_fn):
     y_pred_2 = model_2.fit_transform(X)
 
 
-def _supervised_model_save_test(model_filepath, save_fn, load_fn):
+def _supervised_model_save_test(model_filepath, X, Y, save_fn, load_fn):
     model = Ivis(k=15, batch_size=16, epochs=2,
                  supervision_metric='sparse_categorical_crossentropy')
-    iris = datasets.load_iris()
-    X = iris.data
-    Y = iris.target
 
     model.fit(X, Y)
     save_fn(model, model_filepath)
@@ -73,10 +67,7 @@ def _supervised_model_save_test(model_filepath, save_fn, load_fn):
     y_pred_2 = model_2.fit_transform(X, Y)
 
 
-def _custom_model_saving(model_filepath, save_fn, load_fn):
-    iris = datasets.load_iris()
-    X = iris.data
-    Y = iris.target
+def _custom_model_saving(model_filepath, X, Y, save_fn, load_fn):
 
     # Create a custom model
     inputs = tf.keras.layers.Input(shape=(X.shape[-1],))
@@ -101,10 +92,7 @@ def _custom_model_saving(model_filepath, save_fn, load_fn):
     y_pred_2 = model_2.fit_transform(X, Y)
 
 
-def _supervised_custom_model_saving(model_filepath, save_fn, load_fn):
-    iris = datasets.load_iris()
-    X = iris.data
-    Y = iris.target
+def _supervised_custom_model_saving(model_filepath, X, Y, save_fn, load_fn):
 
     # Create a custom model
     inputs = tf.keras.layers.Input(shape=(X.shape[-1],))
@@ -188,10 +176,8 @@ def test_untrained_model_persistence(model_filepath):
     model = Ivis(k=15, batch_size=16, epochs=2)
     model.save_model(model_filepath)
 
-def test_save_overwriting(model_filepath):
+def test_save_overwriting(model_filepath, X):
     model = Ivis(k=15, batch_size=16, epochs=2)
-    iris = datasets.load_iris()
-    X = iris.data
 
     model.fit(X)
     model.save_model(model_filepath)

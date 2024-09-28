@@ -3,7 +3,6 @@ import os
 import pytest
 from annoy import AnnoyIndex
 from scipy.sparse import csr_matrix
-from sklearn import datasets
 import numpy as np
 
 from ivis.data.neighbour_retrieval import AnnoyKnnMatrix
@@ -50,12 +49,9 @@ def test_dense_annoy_index(annoy_index_file):
     loaded_index.unload()
 
 
-def test_knn_retrieval():
+def test_knn_retrieval(X):
     annoy_index_filepath = 'tests/data/.test-annoy-index.index'
     expected_neighbour_list = np.load('tests/data/test_knn_k3.npy')
-
-    iris = datasets.load_iris()
-    X = iris.data
 
     k = 3
     search_k = -1
@@ -79,12 +75,9 @@ def test_knn_matrix_construction_params(annoy_index_file):
     for original_row, loaded_row in zip(index, loaded_index):
         assert original_row == loaded_row
 
-def test_knn_retrieval_non_verbose():
+def test_knn_retrieval_non_verbose(X):
     annoy_index_filepath = 'tests/data/.test-annoy-index.index'
     expected_neighbour_list = np.load('tests/data/test_knn_k3.npy')
-
-    iris = datasets.load_iris()
-    X = iris.data
 
     k = 3
     search_k = -1

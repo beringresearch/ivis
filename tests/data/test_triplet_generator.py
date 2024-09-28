@@ -1,17 +1,14 @@
 import numpy as np
 import pytest
 
-from sklearn import datasets
 
 from ivis.data.generators import generator_from_neighbour_matrix
 from ivis.data.generators import UnsupervisedTripletGenerator
 
 
-def test_UnsupervisedTripletGenerator():
+def test_UnsupervisedTripletGenerator(X):
     neighbour_list = np.load('tests/data/test_knn_k3.npy')
 
-    iris = datasets.load_iris()
-    X = iris.data
     batch_size = 32
 
     data_generator = UnsupervisedTripletGenerator(X, neighbour_list,
