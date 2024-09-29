@@ -16,7 +16,7 @@ jobs:
           pip install -r docs_requirements.txt
       - name: Install ivis
         run: |
-          pip install -e .
+          pip install -e .[cpu]
       - name: Sphinx build
         run: |
           sphinx-build docs _build
