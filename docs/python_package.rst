@@ -46,7 +46,6 @@ Dependencies
 - Python 3.5+
 - tensorflow
 - numpy>1.14.2
-- scikit-learn>0.20.0
 - tqdm
 - annoy
 

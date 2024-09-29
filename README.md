@@ -1,4 +1,4 @@
-[![DOI](https://joss.theoj.org/papers/10.21105/joss.01596/status.svg)](https://doi.org/10.21105/joss.01596) [![DOI](https://zenodo.org/badge/144551119.svg)](https://zenodo.org/badge/latestdoi/144551119) [![Documentation Status](https://github.com/beringresearch/ivis/workflows/documentation/badge.svg)](https://beringresearch.github.io/ivis/) [![Downloads](https://pepy.tech/badge/ivis/month)](https://pepy.tech/project/ivis) [![Build Status](https://github.com/beringresearch/ivis/workflows/test/badge.svg)](https://github.com/beringresearch/ivis/actions/workflows/test.yml)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.01596/status.svg)](https://doi.org/10.21105/joss.01596) [![DOI](https://zenodo.org/badge/144551119.svg)](https://zenodo.org/badge/latestdoi/144551119) [![Documentation Status](https://github.com/beringresearch/ivis/workflows/documentation/badge.svg)](https://beringresearch.github.io/ivis/) [![Downloads](https://pepy.tech/badge/ivis)](https://pepy.tech/project/ivis) [![Build Status](https://github.com/beringresearch/ivis/workflows/test/badge.svg)](https://github.com/beringresearch/ivis/actions/workflows/test.yml)
 
 # ivis
 
@@ -40,7 +40,7 @@ The following **optional dependencies** are needed if using the visualization ca
 
 ## Upgrading
 
-Ivis Python package is updated frequently! To upgrade, run:
+To upgrade, run:
 
 ```
 pip install ivis --upgrade
