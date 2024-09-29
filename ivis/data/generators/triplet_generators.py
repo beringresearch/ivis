@@ -14,7 +14,6 @@ import random
 import math
 import numpy as np
 from tensorflow.keras.utils import Sequence
-from scipy.sparse import issparse
 
 from ..data import get_uint_ctype
 
@@ -124,7 +123,7 @@ class TripletGenerator(Sequence, ABC):
             else:
                 triplet_batch = [[self.X[idx] for idx in seq] for seq in triplet_indices]
 
-        if issparse(self.X):
+        if hasattr(self.X, "toarray") and callable(self.X.toarray):
             triplet_batch = [[e.toarray()[0] for e in t] for t in triplet_batch]
 
         triplet_batch = np.asarray(triplet_batch)

@@ -8,7 +8,6 @@ from abc import abstractmethod
 from threading import Thread
 from collections.abc import Sequence
 from pathlib import Path
-from scipy.sparse import issparse
 from annoy import AnnoyIndex
 from tqdm import tqdm
 import numpy as np
@@ -216,7 +215,7 @@ def build_annoy_index(X, path, metric='angular', ntrees=50, build_index_on_disk=
         index.on_disk_build(path)
 
     if not batched_retrieval:
-        if issparse(X):
+        if hasattr(X, "toarray") and callable(X.toarray):
             for i in tqdm(range(X.shape[0]), disable=verbose < 1):
                 vector = X[i].toarray()[0]
                 index.add_item(i, vector)
