@@ -92,39 +92,39 @@ SeluDense = partial(Dense, activation='selu', kernel_initializer='lecun_normal')
 @register_network(name='szubert')
 def szubert_base_network(input_shape):
     '''A small, quick-to-train base network. The default for Ivis.'''
-    return Sequential([
-        SeluDense(128, input_shape=input_shape),
-        AlphaDropout(0.1),
-        SeluDense(128),
-        AlphaDropout(0.1),
-        SeluDense(128)
-    ])
+    inputs = Input(shape=input_shape)
+    x = SeluDense(128)(inputs)
+    x = AlphaDropout(0.1)(x)
+    x = SeluDense(128)(x)
+    x = AlphaDropout(0.1)(x)
+    x = SeluDense(128)(x)
+    return Model(inputs, x)
 
 @register_network(name='hinton')
 def hinton_base_network(input_shape):
     '''A base network inspired by the autoencoder architecture published in Hinton's paper
     'Reducing Dimensionality of Data with Neural Networks'
     (https://www.cs.toronto.edu/~hinton/science.pdf)'''
-    return Sequential([
-        SeluDense(2000, input_shape=input_shape),
-        AlphaDropout(0.1),
-        SeluDense(1000),
-        AlphaDropout(0.1),
-        SeluDense(500)
-    ])
+    inputs = Input(shape=input_shape)
+    x = SeluDense(2000)(inputs)
+    x = AlphaDropout(0.1)(x)
+    x = SeluDense(1000)(x)
+    x = AlphaDropout(0.1)(x)
+    x = SeluDense(500)(x)
+    return Model(inputs, x)
 
 @register_network(name='maaten')
 def maaten_base_network(input_shape):
     '''A base network inspired by the network architecture published in Maaten's t-SNE paper
     'Learning a Parametric Embedding by Preserving Local Structure'
     (https://lvdmaaten.github.io/publications/papers/AISTATS_2009.pdf)'''
-    return Sequential([
-        SeluDense(500, input_shape=input_shape),
-        AlphaDropout(0.1),
-        SeluDense(500),
-        AlphaDropout(0.1),
-        SeluDense(2000)
-    ])
+    inputs = Input(shape=input_shape)
+    x = SeluDense(500)(inputs)
+    x = AlphaDropout(0.1)(x)
+    x = SeluDense(500)(x)
+    x = AlphaDropout(0.1)(x)
+    x = SeluDense(2000)(x)
+    return Model(inputs, x)
 
 
 def build_supervised_layer(supervision_metric, Y, name='supervised'):
