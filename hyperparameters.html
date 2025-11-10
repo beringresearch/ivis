@@ -1,0 +1,332 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hyperparameter Selection &mdash; ivis  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/bering.css?v=0437f1d2" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/js/bering.js?v=63551a6c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="prev" title="Semi-supervised Dimensionality Reduction" href="semi_supervised.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            ivis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="python_package.html">Python Package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="r_package.html">R Package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using ivis</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="unsupervised.html">Unsupervised Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supervised.html">Supervised Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="semi_supervised.html">Semi-supervised Dimensionality Reduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Hyperparameter Selection</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#k"><code class="docutils literal notranslate"><span class="pre">k</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#n-epochs-without-progress"><code class="docutils literal notranslate"><span class="pre">n_epochs_without_progress</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#model"><code class="docutils literal notranslate"><span class="pre">model</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#szubert">‘szubert’</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hinton">‘hinton’</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#maaten">‘maaten’</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#custom-backbone">Custom backbone</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Ivis Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="scanpy_singlecell.html">Visualising Single Cell Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comparisons.html">Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learning.html">Metric Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="oom_datasets.html">Out-of-memory Datasets</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="timings_benchmarks.html">Speed of Execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="embeddings_benchmarks.html">Distance Preservation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Ivis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#neighbour-retrieval">Neighbour Retrieval</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#indexable-datasets">Indexable Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#module-ivis.nn.losses">Losses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#module-ivis.nn.callbacks">Callbacks</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ivis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Hyperparameter Selection</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/hyperparameters.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="hyperparameter-selection">
+<span id="hyperparameters"></span><h1>Hyperparameter Selection<a class="headerlink" href="#hyperparameter-selection" title="Link to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">ivis</span></code> uses several hyperparameters that can have an impact on the desired embeddings:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">embedding_dims</span></code>: Number of dimensions in the embedding space.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">k</span></code>: The number of nearest neighbours to retrieve for each point.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_epochs_without_progress</span></code>: After n number of epochs without an improvement to the loss, terminate training early.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">model</span></code>: the keras model that is trained using triplet loss. If a
+model object is provided, an embedding layer of size
+<code class="docutils literal notranslate"><span class="pre">embedding_dims</span></code> will be appended to the end of the network. If a
+string is provided, a pre-defined network by that name will be used.
+Possible options are: ‘szubert’, ‘hinton’, ‘maaten’. By default the
+‘szubert’ network will be created, which is a selu network composed
+of 3 dense layers of 128 neurons each, followed by an embedding layer
+of size ‘embedding_dims’.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">k</span></code> , <code class="docutils literal notranslate"><span class="pre">n_epochs_without_progress</span></code>, and <code class="docutils literal notranslate"><span class="pre">model</span></code> are tunable parameters that should be selected on
+the basis of dataset size and complexity.  The following table summarizes our findings:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Observations</p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">k</span></code></p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">n_epochs_without_progress</span></code></p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">model</span></code></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>&lt; 1000</p></td>
+<td><p>10-15</p></td>
+<td><p>20-30</p></td>
+<td><p>maaten</p></td>
+</tr>
+<tr class="row-odd"><td><p>1000-10000</p></td>
+<td><p>10-30</p></td>
+<td><p>10-20</p></td>
+<td><p>maaten</p></td>
+</tr>
+<tr class="row-even"><td><p>10000-50000</p></td>
+<td><p>15-150</p></td>
+<td><p>10-20</p></td>
+<td><p>maaten</p></td>
+</tr>
+<tr class="row-odd"><td><p>50K-100K</p></td>
+<td><p>15-150</p></td>
+<td><p>10-15</p></td>
+<td><p>maaten</p></td>
+</tr>
+<tr class="row-even"><td><p>100K-500K</p></td>
+<td><p>15-150</p></td>
+<td><p>5-10</p></td>
+<td><p>maaten</p></td>
+</tr>
+<tr class="row-odd"><td><p>500K-1M</p></td>
+<td><p>15-150</p></td>
+<td><p>3-5</p></td>
+<td><p>szubert</p></td>
+</tr>
+<tr class="row-even"><td><p>&gt; 1M</p></td>
+<td><p>15-150</p></td>
+<td><p>2-3</p></td>
+<td><p>szubert</p></td>
+</tr>
+</tbody>
+</table>
+<p>We will now look at each of these parameters in turn.</p>
+<section id="k">
+<h2><code class="docutils literal notranslate"><span class="pre">k</span></code><a class="headerlink" href="#k" title="Link to this heading"></a></h2>
+<p>This parameter controls the balance between local and global features of
+the dataset. Low <code class="docutils literal notranslate"><span class="pre">k</span></code> values will result in prioritisation of local
+dataset features and the overall global structure may be missed.
+Conversely, high <code class="docutils literal notranslate"><span class="pre">k</span></code> values will force <code class="docutils literal notranslate"><span class="pre">ivis</span></code> to look at broader
+aspects of the data, losing desired granularity. We can visualise
+effects of low and large values on <code class="docutils literal notranslate"><span class="pre">k</span></code> on the
+<a class="reference external" href="https://github.com/lmweber/benchmark-data-Levine-32-dim">Levine dataset</a> (104,184 x 32).</p>
+<img alt="_images/ivis_k_embeddings.png" src="_images/ivis_k_embeddings.png" />
+<p>Box plots represent distances across pairs of points in the embeddings, binned using 50 equal-width bins over the pairwise distances in the original space using 10,000 randomly selected points, leading to 49,995,000 pairs of pairwise distances. For each embedding, the value of the Pearson correlation coefficient computed over the pairs of pairwise distances is reported. We can see that where <code class="docutils literal notranslate"><span class="pre">k=5</span></code>, smaller distances are better preserved, whilst larger distances have higher variability in the embedding space. As <code class="docutils literal notranslate"><span class="pre">k</span></code> values increase, larger distances are beginning to be better preserved as well. However, for very large <code class="docutils literal notranslate"><span class="pre">k</span></code>, smaller distances are no longer preserved.</p>
+<p>To establish an appropriate value of <code class="docutils literal notranslate"><span class="pre">k</span></code>, we evaluated a range of values across a severao subsamples of varying sizes,  keeping <code class="docutils literal notranslate"><span class="pre">n_epochs_without_progress</span></code> and <code class="docutils literal notranslate"><span class="pre">model</span></code> hyperparameters fixed.</p>
+<img alt="_images/ivis_k_accuracy.png" src="_images/ivis_k_accuracy.png" />
+<p>Accuracy was calculated by training a Support Vector Machine classifier on 75% of each subsample and evaluating the classifier performance on the remaining 25%, whilst predicting manually assigned cell types in the Levine dataset. Accuracy was high and generally stable for <code class="docutils literal notranslate"><span class="pre">k</span></code> between 10 and 150. A decrease was observed when <code class="docutils literal notranslate"><span class="pre">k</span></code> was considerably large in relation to subsample size.</p>
+<p>Overall, <code class="docutils literal notranslate"><span class="pre">ivis</span></code> is fairly robust to values of <code class="docutils literal notranslate"><span class="pre">k</span></code>, which can control the local vs. global trade off in the embedding space.</p>
+</section>
+<section id="n-epochs-without-progress">
+<h2><code class="docutils literal notranslate"><span class="pre">n_epochs_without_progress</span></code><a class="headerlink" href="#n-epochs-without-progress" title="Link to this heading"></a></h2>
+<p>This patience hyperparameter impacts both the quality of embeddings and speed with which they are generated. Generally, the higher <code class="docutils literal notranslate"><span class="pre">n_epochs_without_progress</span></code> are, the more accurate are the low-dimensional features. However, this comes at a computational cost. Here we examine, the speed vs. accuracy trade-off and recommend sensible defaults. For this experiment <code class="docutils literal notranslate"><span class="pre">ivis</span></code> hyperparameters were set to <code class="docutils literal notranslate"><span class="pre">k=15</span></code> and <code class="docutils literal notranslate"><span class="pre">model='maaten'</span></code>.</p>
+<p>Three datasets were used <a class="reference external" href="https://github.com/lmweber/benchmark-data-Levine-32-dim">Levine</a> (104,184 x 32), <a class="reference external" href="https://www.openml.org/d/554">MNIST</a> (70,000 x 784), and <a class="reference external" href="https://portals.broadinstitute.org/single_cell/study/SCP11/melanoma-intra-tumor-heterogeneity">Melanoma</a> (4,645 x 23,686). The Melanoma featurespace was further reduced to n=50 using Principal Component Analysis.</p>
+<p>For each dataset, we trained a Support Vector Machine classifier to assess how well <code class="docutils literal notranslate"><span class="pre">ivis</span></code> embeddings capture manually supplied response variable information. For example, in case of an MNIST dataset, the response variable is the digit label, whilst for Levine and Melanoma datasets it is the cell type. SVM classifier was trained on  <code class="docutils literal notranslate"><span class="pre">ivis</span></code> embeddings representing 3%, 40%, and 95% of the data obtained using a stratified random subsampling. The classifier was then validated on the <code class="docutils literal notranslate"><span class="pre">ivis</span></code> embeddings of the remaining 97%, 60%, and 5% of data. For each training set split, an <code class="docutils literal notranslate"><span class="pre">ivis</span></code> model was trained by keeping the <code class="docutils literal notranslate"><span class="pre">k</span></code> and <code class="docutils literal notranslate"><span class="pre">model</span></code> hyperparameters constat, whilst varying <code class="docutils literal notranslate"><span class="pre">n_epochs_without_progress</span></code>. Finally, classification accuracies were noramlised to a 0-1 range to facilitate comparisons between datasets.</p>
+<img alt="_images/ivis_patience_boxplots.png" src="_images/ivis_patience_boxplots.png" />
+<p>Our final results indicate that oveall accuracy of embeddings is a function of dataset size and <code class="docutils literal notranslate"><span class="pre">n_epochs_without_progress</span></code>. However, only marginal gain in performance is achieved when <code class="docutils literal notranslate"><span class="pre">n_epochs_without_progress&gt;20</span></code>. For large datasets (<code class="docutils literal notranslate"><span class="pre">n_observations&gt;10000</span></code>), <code class="docutils literal notranslate"><span class="pre">n_epochs_without_progress</span></code> between 3 and 5 comes to within 85% of optimal classification accuracy.</p>
+</section>
+<section id="model">
+<h2><code class="docutils literal notranslate"><span class="pre">model</span></code><a class="headerlink" href="#model" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">model</span></code> hyperparameter is a powerful way for <code class="docutils literal notranslate"><span class="pre">ivis</span></code> to handle
+complex non-linear feature-spaces. It refers to a trainable neural
+network that learns to minimise a triplet loss loss function.
+Structure-preserving dimensionality reduction is achieved by creating
+three replicates of the baseline architecture and assembling these
+replicates using a <a class="reference external" href="https://en.wikipedia.org/wiki/Siamese_network">siamese neural
+network</a> (SNNs). SNNs
+are a class of neural network that employ a unique architecture to
+naturally rank similarity between inputs. The ivis SNN consists of three
+identical base networks; each base network is followed by a final
+embedding layer. The size of the embedding layer reflects the desired
+dimensionality of outputs.</p>
+<img alt="_images/FigureS1.png" src="_images/FigureS1.png" />
+<p><code class="docutils literal notranslate"><span class="pre">model</span></code> parameter is defined using a <a class="reference external" href="https://keras.io">keras
+model</a>. This flexibility allows ivis to be trained
+using complex architectures and patterns, including convolutions. Out of
+the box, ivis supports three styles of baseline architectures -
+<strong>szubert</strong>, <strong>hinton</strong>, and <strong>maaten</strong>. This can be passed as string
+values to the <code class="docutils literal notranslate"><span class="pre">model</span></code> parameter.</p>
+<section id="szubert">
+<h3>‘szubert’<a class="headerlink" href="#szubert" title="Link to this heading"></a></h3>
+<p>The <strong>szubert</strong> network has three dense layers of 128 neurons followed by a
+final embedding layer (128-128-128). The size of the embedding layer reflects
+the desired dimensionality of outputs. The layers preceding the embedding
+layer use the SELU activation function, which gives the network a
+self-normalizing property. The weights for these layers are randomly
+initialized with the LeCun normal distribution. The embedding layers use
+a linear activation and have their weights initialized using Glorot’s
+uniform distribution.</p>
+</section>
+<section id="hinton">
+<h3>‘hinton’<a class="headerlink" href="#hinton" title="Link to this heading"></a></h3>
+<p>The <strong>hinton</strong> network has three dense layers (2000-1000-500) followed
+by a final embedding layer. The size of the embedding layer reflects the
+desired dimensionality of outputs. The layers preceding the embedding
+layer use the SELU activation function. The weights for these layers are
+randomly initialized with the LeCun normal distribution. The embedding
+layers use a linear activation and have their weights initialized using
+Glorot’s uniform distribution.</p>
+</section>
+<section id="maaten">
+<h3>‘maaten’<a class="headerlink" href="#maaten" title="Link to this heading"></a></h3>
+<p>The <strong>maaten</strong> network has three dense layers (500-500-2000) followed by
+a final embedding layer. The size of the embedding layer reflects the
+desired dimensionality of outputs. The layers preceding the embedding
+layer use the SELU activation function. The weights for these layers are
+randomly initialized with the LeCun normal distribution. The embedding
+layers use a linear activation and have their weights initialized using
+Glorot’s uniform distribution.</p>
+<p>Let’s examine each architectural option in greater detail:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">architecture</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;szubert&#39;</span><span class="p">,</span> <span class="s1">&#39;hinton&#39;</span><span class="p">,</span> <span class="s1">&#39;maaten&#39;</span><span class="p">]</span>
+<span class="n">embeddings</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">architecture</span><span class="p">:</span>
+    <span class="n">ivis</span> <span class="o">=</span> <span class="n">Ivis</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_poly</span><span class="p">)</span>
+    <span class="n">embeddings</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="n">ivis</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_poly</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">hspace</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span> <span class="n">wspace</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">)</span>
+
+<span class="n">axs</span> <span class="o">=</span> <span class="n">axs</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">nn</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">architecture</span><span class="p">):</span>
+    <span class="n">xy</span><span class="o">=</span><span class="n">embeddings</span><span class="p">[</span><span class="n">nn</span><span class="p">]</span>
+    <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xy</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">xy</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">s</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">nn</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/swiss_roll_model.png" src="_images/swiss_roll_model.png" />
+<p>Selecting an appropriate baseline architecture is a data-driven task.
+Three unique architectures that are shipped with ivis perform
+consistently well across a wide array of tasks. A general rule of thumb
+in our own experiments is to use the <strong>szubert</strong> network for
+computationally-intensive processing on large datasets (&gt;1 million
+observations) and select <strong>maaten</strong> architecture for smaller real-world
+datasets.</p>
+</section>
+<section id="custom-backbone">
+<h3>Custom backbone<a class="headerlink" href="#custom-backbone" title="Link to this heading"></a></h3>
+<p>Ivis also supports construction of arbitrary headless models, which can be
+helpful when dealing with multi-dimensional datasets such as images or text.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">tf.keras.applications.inception_v3</span><span class="w"> </span><span class="kn">import</span> <span class="n">InceptionV3</span>
+
+<span class="n">base_model</span> <span class="o">=</span> <span class="n">InceptionV3</span><span class="p">(</span><span class="n">include_top</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pooling</span><span class="o">=</span><span class="s1">&#39;avg&#39;</span><span class="p">)</span>
+<span class="n">ivis</span> <span class="o">=</span> <span class="n">Ivis</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">base_model</span><span class="p">)</span>
+<span class="n">ivis</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="semi_supervised.html" class="btn btn-neutral float-left" title="Semi-supervised Dimensionality Reduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="examples.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Bering Limited.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

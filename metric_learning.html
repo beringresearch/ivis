@@ -1,0 +1,327 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Metric Learning with Application to Supervised Anomaly Detection &mdash; ivis  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/bering.css?v=0437f1d2" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/js/bering.js?v=63551a6c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Training ivis on Out-of-memory Datasets" href="oom_datasets.html" />
+    <link rel="prev" title="Comparing ivis with other dimensionality reduction algorithms" href="comparisons.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            ivis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="python_package.html">Python Package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="r_package.html">R Package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using ivis</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="unsupervised.html">Unsupervised Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supervised.html">Supervised Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="semi_supervised.html">Semi-supervised Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hyperparameters.html">Hyperparameter Selection</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Ivis Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="scanpy_singlecell.html">Visualising Single Cell Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comparisons.html">Dimensionality Reduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Metric Learning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Metric Learning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#supervised-dimensionality-reduction">Supervised Dimensionality Reduction</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#results">Results</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#data-selection">Data Selection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-preparation">Data Preparation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dimensionality-reduction">Dimensionality Reduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#visualisations">Visualisations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#linear-classifier">Linear Classifier</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#conclusions">Conclusions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="oom_datasets.html">Out-of-memory Datasets</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="timings_benchmarks.html">Speed of Execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="embeddings_benchmarks.html">Distance Preservation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Ivis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#neighbour-retrieval">Neighbour Retrieval</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#indexable-datasets">Indexable Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#module-ivis.nn.losses">Losses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#module-ivis.nn.callbacks">Callbacks</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ivis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Metric Learning with Application to Supervised Anomaly Detection</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/metric_learning.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="metric-learning-with-application-to-supervised-anomaly-detection">
+<span id="metric-learning"></span><h1>Metric Learning with Application to Supervised Anomaly Detection<a class="headerlink" href="#metric-learning-with-application-to-supervised-anomaly-detection" title="Link to this heading"></a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
+<section id="id1">
+<h3>Metric Learning<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<p>Metric Learning is a machine learning task that aims to learn a distance
+function over a set of observations. This can be useful in a number of
+applications, including clustering, face identification, and
+recommendation systems.</p>
+<p><code class="docutils literal notranslate"><span class="pre">ivis</span></code> was developed to address this task using
+concepts of the Siamese Neural Networks. In this example, we will
+demonstrate that Metric Learning using <code class="docutils literal notranslate"><span class="pre">ivis</span></code> can effectively deal
+with class imbalance, yielding features resulting in state-of-the-art
+classification performance.</p>
+</section>
+<section id="supervised-dimensionality-reduction">
+<h3>Supervised Dimensionality Reduction<a class="headerlink" href="#supervised-dimensionality-reduction" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">ivis</span></code> is able to make use of any provided class labels to perform
+supervised dimensionality reduction. Supervised embeddings combine the
+distance-based characteristics of the unsupervised <code class="docutils literal notranslate"><span class="pre">ivis</span></code> algorithm
+with clear class boundaries between the class categories. This is
+achieved by simultaneously minimising the tripplet loss and softmax loss
+functions. The resulting embeddings encode relevant class-specific
+information into lower dimensional space. It is possible to control the
+relative importance <code class="docutils literal notranslate"><span class="pre">ivis</span></code> places on class labels when training in
+supervised mode with the <code class="docutils literal notranslate"><span class="pre">supervision_weight</span></code> parameter. This
+variable should be a float between 0.0 to 1.0, with higher values
+resulting in classification affecting the training process more, and
+smaller values resulting in it impacting the training less. By default,
+the parameter is set to 0.5. Increasing it to 0.8 will result in more
+cleanly separated classes.</p>
+</section>
+</section>
+<section id="results">
+<h2>Results<a class="headerlink" href="#results" title="Link to this heading"></a></h2>
+<section id="data-selection">
+<h3>Data Selection<a class="headerlink" href="#data-selection" title="Link to this heading"></a></h3>
+<p>In this example we will make use of the <a class="reference external" href="https://www.kaggle.com/mlg-ulb/creditcardfraud">Credit Card Fraud Dataset</a>. The datasets contains transactions made by credit cards in September 2013 by european cardholders. This dataset presents transactions that occurred in two days, where we have 492 frauds out of 284,807 transactions. The dataset is highly unbalanced, the positive class (frauds) account for 0.172% of all transactions. Traditional supervised classification approaches would typically balance the training dataset either by over-sampling the minority class or down-sampling the majority class. Here, we investigate how <code class="docutils literal notranslate"><span class="pre">ivis</span></code> handles class embalance.</p>
+</section>
+<section id="data-preparation">
+<h3>Data Preparation<a class="headerlink" href="#data-preparation" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardScaler</span><span class="p">,</span> <span class="n">MinMaxScaler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">confusion_matrix</span><span class="p">,</span> <span class="n">average_precision_score</span><span class="p">,</span> <span class="n">roc_auc_score</span><span class="p">,</span> <span class="n">classification_report</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogisticRegression</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ivis</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ivis</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../input/creditcard.csv&#39;</span><span class="p">)</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Class&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The Credit Card Fraud dataset is highly skewed, consisting of 492 frauds
+in a total of 284,807 observations (0.17% fraud cases). The features
+consist of numerical values from the 28 ‘Principal Component Analysis
+(PCA)’ transformed features, as well as Time and Amount of a
+transaction.</p>
+<p>In this analysis we will train <code class="docutils literal notranslate"><span class="pre">ivis</span></code> algorithm using a 5% stratified
+subsample of the dataset. Our previous experiments have shown that
+<code class="docutils literal notranslate"><span class="pre">ivis</span></code> can yield &gt;90% accurate embeddings using just 1% of the total
+data.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">train_X</span><span class="p">,</span> <span class="n">test_X</span><span class="p">,</span> <span class="n">train_Y</span><span class="p">,</span> <span class="n">test_Y</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">stratify</span><span class="o">=</span><span class="n">Y</span><span class="p">,</span>
+                                                    <span class="n">test_size</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1234</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Next, because <code class="docutils literal notranslate"><span class="pre">ivis</span></code> will learn a distance over observations, scaling
+must be applied to features. Additionally, transforming the data to a
+range [0, 1] allows the neural network to extract more meaningful
+features.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">standard_scaler</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_X</span><span class="p">[[</span><span class="s1">&#39;Time&#39;</span><span class="p">,</span> <span class="s1">&#39;Amount&#39;</span><span class="p">]])</span>
+<span class="n">train_X</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">,</span> <span class="s1">&#39;Amount&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">standard_scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">train_X</span><span class="p">[[</span><span class="s1">&#39;Time&#39;</span><span class="p">,</span> <span class="s1">&#39;Amount&#39;</span><span class="p">]])</span>
+<span class="n">test_X</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s1">&#39;Time&#39;</span><span class="p">,</span> <span class="s1">&#39;Amount&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">standard_scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">test_X</span><span class="p">[[</span><span class="s1">&#39;Time&#39;</span><span class="p">,</span> <span class="s1">&#39;Amount&#39;</span><span class="p">]])</span>
+
+<span class="n">minmax_scaler</span> <span class="o">=</span> <span class="n">MinMaxScaler</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_X</span><span class="p">)</span>
+<span class="n">train_X</span> <span class="o">=</span> <span class="n">minmax_scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">train_X</span><span class="p">)</span>
+<span class="n">test_X</span> <span class="o">=</span> <span class="n">minmax_scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">test_X</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="dimensionality-reduction">
+<h3>Dimensionality Reduction<a class="headerlink" href="#dimensionality-reduction" title="Link to this heading"></a></h3>
+<p>Now, we can run <code class="docutils literal notranslate"><span class="pre">ivis</span></code> using default hyperparameters for supervised
+embedding problems:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ivis</span> <span class="o">=</span> <span class="n">Ivis</span><span class="p">(</span><span class="n">embedding_dims</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s1">&#39;maaten&#39;</span><span class="p">,</span>
+            <span class="n">k</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">n_epochs_without_progress</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+            <span class="n">supervision_weight</span><span class="o">=</span><span class="mf">0.80</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">ivis</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_X</span><span class="p">,</span> <span class="n">train_Y</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ivis</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="s1">&#39;ivis-supervised-fraud&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Finally, let’s embed the training set and extrapolate learnt embeddings
+to the testing set.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">train_embeddings</span> <span class="o">=</span> <span class="n">ivis</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">train_X</span><span class="p">)</span>
+<span class="n">test_embeddings</span> <span class="o">=</span> <span class="n">ivis</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">test_X</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="visualisations">
+<h3>Visualisations<a class="headerlink" href="#visualisations" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">17</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">train_embeddings</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">train_embeddings</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">train_Y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;RdYlBu_r&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;ivis 1&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;ivis 2&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Training Set&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">test_embeddings</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">test_embeddings</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">test_Y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;RdYlBu_r&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;ivis 1&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;ivis 2&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Testing Set&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/metric_learning.png" src="_images/metric_learning.png" />
+<p>With anomalies being shown in red, we can see that <code class="docutils literal notranslate"><span class="pre">ivis</span></code>:</p>
+<ol class="arabic simple">
+<li><p>Effectively learnt embeddings in an unbalanced dataset.</p></li>
+<li><p>Succesfully extrapolated learnt metrics to a testing subset.</p></li>
+</ol>
+</section>
+<section id="linear-classifier">
+<h3>Linear Classifier<a class="headerlink" href="#linear-classifier" title="Link to this heading"></a></h3>
+<p>We can train a simple linear classifier to assess how well <code class="docutils literal notranslate"><span class="pre">ivis</span></code>
+learned the class representations.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">clf</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="s2">&quot;lbfgs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_embeddings</span><span class="p">,</span> <span class="n">train_Y</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">labels</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_embeddings</span><span class="p">)</span>
+<span class="n">proba</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">test_embeddings</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">classification_report</span><span class="p">(</span><span class="n">test_Y</span><span class="p">,</span> <span class="n">labels</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Confusion Matrix&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">confusion_matrix</span><span class="p">(</span><span class="n">test_Y</span><span class="p">,</span> <span class="n">labels</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Average Precision: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">average_precision_score</span><span class="p">(</span><span class="n">test_Y</span><span class="p">,</span> <span class="n">proba</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ROC AUC: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">roc_auc_score</span><span class="p">(</span><span class="n">test_Y</span><span class="p">,</span> <span class="n">labels</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>              <span class="n">precision</span>    <span class="n">recall</span>  <span class="n">f1</span><span class="o">-</span><span class="n">score</span>   <span class="n">support</span>
+
+           <span class="mi">0</span>       <span class="mf">1.00</span>      <span class="mf">1.00</span>      <span class="mf">1.00</span>    <span class="mi">270100</span>
+           <span class="mi">1</span>       <span class="mf">1.00</span>      <span class="mf">0.99</span>      <span class="mf">1.00</span>       <span class="mi">467</span>
+
+    <span class="n">accuracy</span>                           <span class="mf">1.00</span>    <span class="mi">270567</span>
+   <span class="n">macro</span> <span class="n">avg</span>       <span class="mf">1.00</span>      <span class="mf">1.00</span>      <span class="mf">1.00</span>    <span class="mi">270567</span>
+<span class="n">weighted</span> <span class="n">avg</span>       <span class="mf">1.00</span>      <span class="mf">1.00</span>      <span class="mf">1.00</span>    <span class="mi">270567</span>
+
+<span class="n">Confusion</span> <span class="n">Matrix</span>
+<span class="p">[[</span><span class="mi">270100</span>      <span class="mi">0</span><span class="p">]</span>
+<span class="p">[</span>     <span class="mi">3</span>    <span class="mi">464</span><span class="p">]]</span>
+<span class="n">Average</span> <span class="n">Precision</span><span class="p">:</span> <span class="mf">0.9978643591710002</span>
+<span class="n">ROC</span> <span class="n">AUC</span><span class="p">:</span> <span class="mf">0.9967880085653105</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="conclusions">
+<h2>Conclusions<a class="headerlink" href="#conclusions" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">ivis</span></code> effectively learns a distance metric over an unbalanced
+dataset. The resulting feature set can be used with a simple linear
+model classifier to achieve state-of-the-art performance on a
+classification task.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="comparisons.html" class="btn btn-neutral float-left" title="Comparing ivis with other dimensionality reduction algorithms" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="oom_datasets.html" class="btn btn-neutral float-right" title="Training ivis on Out-of-memory Datasets" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Bering Limited.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

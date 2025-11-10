@@ -1,0 +1,336 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Supervised Dimensionality Reduction &mdash; ivis  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/bering.css?v=0437f1d2" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/js/bering.js?v=63551a6c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Semi-supervised Dimensionality Reduction" href="semi_supervised.html" />
+    <link rel="prev" title="Unsupervised Dimensionality Reduction" href="unsupervised.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            ivis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="python_package.html">Python Package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="r_package.html">R Package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using ivis</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="unsupervised.html">Unsupervised Dimensionality Reduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Supervised Dimensionality Reduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#classification">Classification</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#obtaining-classification-probabilities">Obtaining Classification Probabilities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#linear-svm-classifier">Linear-SVM classifier</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#multi-label-classification">Multi-label classification</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#regression">Regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#supervision-weight">Supervision Weight</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="semi_supervised.html">Semi-supervised Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hyperparameters.html">Hyperparameter Selection</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Ivis Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="scanpy_singlecell.html">Visualising Single Cell Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comparisons.html">Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learning.html">Metric Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="oom_datasets.html">Out-of-memory Datasets</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="timings_benchmarks.html">Speed of Execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="embeddings_benchmarks.html">Distance Preservation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Ivis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#neighbour-retrieval">Neighbour Retrieval</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#indexable-datasets">Indexable Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#module-ivis.nn.losses">Losses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#module-ivis.nn.callbacks">Callbacks</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ivis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Supervised Dimensionality Reduction</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/supervised.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="supervised-dimensionality-reduction">
+<span id="supervised"></span><h1>Supervised Dimensionality Reduction<a class="headerlink" href="#supervised-dimensionality-reduction" title="Link to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">ivis</span></code> is able to make use of any provided class labels to perform
+supervised dimensionality reduction. Supervised <code class="docutils literal notranslate"><span class="pre">ivis</span></code> can thus be used in Metric Learning applications, as well as classical supervised classifier/regressor problems. Supervised embeddings can combine the distance-based characteristics of the unsupervised <code class="docutils literal notranslate"><span class="pre">ivis</span></code> algorithm with clear class boundaries between the class categories when trained to classify inputs simulateously to embedding them. The
+resulting embeddings encode relevant class-specific information into
+lower dimensional space, making them useful for enhancing the
+performance of a classifier.</p>
+<p><code class="docutils literal notranslate"><span class="pre">ivis</span></code> supports both classification and regression problems and makes use of the losses included with keras, so long as the labels are provided in the
+correct format.</p>
+<section id="classification">
+<h2>Classification<a class="headerlink" href="#classification" title="Link to this heading"></a></h2>
+<p>To train <code class="docutils literal notranslate"><span class="pre">ivis</span></code> in supervised mode using the default softmax
+classification loss, simply provide the labels to the fit method’s
+<code class="docutils literal notranslate"><span class="pre">Y</span></code> parameter. These labels should be a list of 0-indexed
+integers with each integer corresponding to a class.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tensorflow.keras.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">mnist</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ivis</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ivis</span>
+
+<span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">),</span> <span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">)</span>  <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+
+<span class="c1"># Rescale to [0,1]</span>
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train</span> <span class="o">/</span> <span class="mf">255.</span>
+<span class="n">X_test</span> <span class="o">=</span> <span class="n">X_test</span> <span class="o">/</span> <span class="mf">255.</span>
+
+<span class="c1"># Flatten images to 1D vectors</span>
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X_train</span><span class="p">),</span> <span class="mi">28</span> <span class="o">*</span> <span class="mi">28</span><span class="p">))</span>
+<span class="n">X_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X_test</span><span class="p">),</span> <span class="mi">28</span> <span class="o">*</span> <span class="mi">28</span><span class="p">))</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">Ivis</span><span class="p">(</span><span class="n">n_epochs_without_progress</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Experimental data has shown that <code class="docutils literal notranslate"><span class="pre">ivis</span></code> converges to a solution faster
+in supervised mode. Therefore, our suggestion is to lower the value of
+the <code class="docutils literal notranslate"><span class="pre">n_epochs_without_progress</span></code> parameter from the default to
+around 5. Here are the resulting embeddings:</p>
+<img alt="_images/mnist-embedding-comparison_titled.png" src="_images/mnist-embedding-comparison_titled.png" />
+<section id="obtaining-classification-probabilities">
+<h3>Obtaining Classification Probabilities<a class="headerlink" href="#obtaining-classification-probabilities" title="Link to this heading"></a></h3>
+<p>Since training <code class="docutils literal notranslate"><span class="pre">ivis</span></code> in supervised mode causes the algorithm to optimize
+the supervised objective in conjunction with the triplet loss function, it is
+possible to obtain the outputs of the supervised network using the
+<code class="docutils literal notranslate"><span class="pre">score_samples</span></code> method. These may be useful for assessing the quality of
+the embeddings by examining the performance of the classifier, for example,
+or for predicting the labels for unseen data.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">weight</span> <span class="o">=</span> <span class="mf">0.8</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Ivis</span><span class="p">(</span><span class="n">n_epochs_without_progress</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+             <span class="n">supervision_weight</span><span class="o">=</span><span class="n">weight</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">)</span>
+
+<span class="n">embeddings</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">score_samples</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>As before, we can train several supervised <code class="docutils literal notranslate"><span class="pre">ivis</span></code> models on the MNIST
+dataset, varying the supervision_weight parameter, coloring the plots
+according to the max of the returned softmax probabilities.</p>
+<img alt="_images/classification-weight-softmax-confidence-impact-mnist.png" src="_images/classification-weight-softmax-confidence-impact-mnist.png" />
+<p>Coloring by the max softmax probabilities shows the degree of certainty in
+the supervised network’s predictions - areas that are yellow are predicted with
+a higher degree of confidence while those in blue and green have a lower degree
+of confidence. With low supervision weight, more of the data is classified
+with a low degree of certainty. Additionally, points floating in the centre
+between clusters tend to have lower class predictions associated with them.</p>
+<p>We also checked the accuracy of the ivis classifiers when used to predict
+the test set labels across the different supervision weights. In general,
+increasing the supervision weight improved the classifier’s predictive
+performance on the test set, with maximum performance achieved with a
+weight of 0.9. At this weight the triplet loss continues to have
+a small regularizing effect on the results, which may improve the
+generalizability of the classifier compared to a pure softmax classifier.</p>
+<img alt="_images/accuracy-classification-weight-zoomed.png" src="_images/accuracy-classification-weight-zoomed.png" />
+</section>
+<section id="linear-svm-classifier">
+<h3>Linear-SVM classifier<a class="headerlink" href="#linear-svm-classifier" title="Link to this heading"></a></h3>
+<p>It’s also possible to utilize different supervised metrics to train the
+supervised network by adjusting the <code class="docutils literal notranslate"><span class="pre">supervsed_metric</span></code> parameter.
+By selecting <code class="docutils literal notranslate"><span class="pre">categorical_hinge</span></code> it is possible
+to optimize a linear SVM on the data in conjunction with the triplet loss.</p>
+<p>Below is an example of training <code class="docutils literal notranslate"><span class="pre">ivis</span></code> in supervised mode in tandem with
+a linear SVM on the Fashion MNIST dataset.
+Note that the <code class="docutils literal notranslate"><span class="pre">categorical_hinge</span></code> loss function expects one-hot encoded
+labels. We can achieve this using the <code class="docutils literal notranslate"><span class="pre">to_categorical</span></code> function from
+keras utils.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">tensorflow.keras.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">mnist</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tensorflow.keras.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_categorical</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ivis</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ivis</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">),</span> <span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">)</span> <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+
+<span class="c1"># Flatten images</span>
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X_train</span><span class="p">),</span> <span class="mi">28</span> <span class="o">*</span> <span class="mi">28</span><span class="p">))</span> <span class="o">/</span> <span class="mf">255.</span>
+<span class="n">X_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X_test</span><span class="p">),</span> <span class="mi">28</span> <span class="o">*</span> <span class="mi">28</span><span class="p">))</span> <span class="o">/</span> <span class="mf">255.</span>
+
+<span class="c1"># One-hot encode labels</span>
+<span class="n">Y_train</span> <span class="o">=</span> <span class="n">to_categorical</span><span class="p">(</span><span class="n">Y_train</span><span class="p">)</span>
+<span class="n">Y_test</span> <span class="o">=</span> <span class="n">to_categorical</span><span class="p">(</span><span class="n">Y_test</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">Ivis</span><span class="p">(</span><span class="n">n_epochs_without_progress</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+             <span class="n">supervision_metric</span><span class="o">=</span><span class="s1">&#39;categorical_hinge&#39;</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">)</span>
+
+<span class="n">embeddings</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="n">y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">score_samples</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/SVM-classification-weight-impact-mnist.png" src="_images/SVM-classification-weight-impact-mnist.png" />
+<p>The resulting embeddings show ivis trained with a
+Linear SVM using the <code class="docutils literal notranslate"><span class="pre">categorical_hinge</span></code> metric over a variety of
+supevision_weight values. The maximum achieved accuracy on the test
+set was 98.02% - once again, a supervision weight of 0.9 led to the
+highest classification performance.</p>
+<img alt="_images/SVM-accuracy-classification-weight-zoomed.png" src="_images/SVM-accuracy-classification-weight-zoomed.png" />
+</section>
+<section id="multi-label-classification">
+<h3>Multi-label classification<a class="headerlink" href="#multi-label-classification" title="Link to this heading"></a></h3>
+<p>In cases where a single observation is accompanied by multiple response variables, <code class="docutils literal notranslate"><span class="pre">ivis</span></code> implements support for multi-label classification. Ensuring that <code class="docutils literal notranslate"><span class="pre">y</span></code> is  a multi-dimensional array (N x L), where L is the number of unique labels, multi-label model can be fitted as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ivis</span> <span class="o">=</span> <span class="n">Ivis</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s1">&#39;maaten&#39;</span><span class="p">,</span>
+            <span class="n">supervision_metric</span><span class="o">=</span><span class="s1">&#39;binary_crossentropy&#39;</span><span class="p">)</span>
+<span class="n">ivis</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that the only requirement is that supervision metric is set to <code class="docutils literal notranslate"><span class="pre">binary_crossentropy</span></code>.</p>
+</section>
+</section>
+<section id="regression">
+<h2>Regression<a class="headerlink" href="#regression" title="Link to this heading"></a></h2>
+<p>It is also possible to perform supervised training on continous labels.
+To do this, a regression metric should be provided to <code class="docutils literal notranslate"><span class="pre">supervision_metric</span></code>
+when constructing the Ivis object. Many of these exist in Keras, including
+mean-absolute-error, mean-squared error, and logcosh.</p>
+<p>In the example below, <code class="docutils literal notranslate"><span class="pre">ivis</span></code> is trained on the boston housing dataset using
+the mean-absolute-error supervised metric (mae).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ivis</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ivis</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tensorflow.keras.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">boston_housing</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">),</span> <span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">)</span> <span class="o">=</span> <span class="n">boston_housing</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+
+<span class="n">supervision_metric</span> <span class="o">=</span> <span class="s1">&#39;mae&#39;</span>
+<span class="n">ivis_boston</span> <span class="o">=</span> <span class="n">Ivis</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">supervision_metric</span><span class="o">=</span><span class="n">supervision_metric</span><span class="p">)</span>
+<span class="n">ivis_boston</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">)</span>
+
+<span class="n">train_embeddings</span> <span class="o">=</span> <span class="n">ivis_boston</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">y_pred_train</span> <span class="o">=</span> <span class="n">ivis_boston</span><span class="o">.</span><span class="n">score_samples</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+
+<span class="n">test_embeddings</span> <span class="o">=</span> <span class="n">ivis_boston</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="n">y_pred_test</span> <span class="o">=</span> <span class="n">ivis_boston</span><span class="o">.</span><span class="n">score_samples</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The embeddings on the training set are shown below. On the left
+are the embeddings are colored by the ground truth label;
+the right is colored by predicted values. There is a high degree
+of correlation between the predicted and actual values, with an
+R-squared value of 0.82.</p>
+<img alt="_images/boston_train_regression_mae_pred-true.png" src="_images/boston_train_regression_mae_pred-true.png" />
+<p>The embeddings on the test set are below. Again, the left
+is colored by the ground truth label, while the right is colored
+by predicted values. There is a also a high degree
+of correlation between the predicted and actual values on the test set,
+although it is lower than on the training set - the R-squared value is 0.63.</p>
+<img alt="_images/boston_test_regression_mae_pred-true.png" src="_images/boston_test_regression_mae_pred-true.png" />
+</section>
+<section id="supervision-weight">
+<h2>Supervision Weight<a class="headerlink" href="#supervision-weight" title="Link to this heading"></a></h2>
+<p>It is possible to control the relative importance <code class="docutils literal notranslate"><span class="pre">ivis</span></code> places on the
+labels when training in supervised mode with the
+<code class="docutils literal notranslate"><span class="pre">supervision_weight</span></code> parameter. This variable should be a float
+between 0.0 to 1.0, with higher values resulting in supervision
+affecting the training process more, and smaller values resulting in it
+impacting the training less. By default, the parameter is set to 0.5.
+Increasing it to 0.8 will result in more cleanly separated classes.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">weight</span> <span class="o">=</span> <span class="mf">0.8</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Ivis</span><span class="p">(</span><span class="n">n_epochs_without_progress</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+             <span class="n">supervision_weight</span><span class="o">=</span><span class="n">weight</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>As an illustration of the impact the <code class="docutils literal notranslate"><span class="pre">supervision_weight</span></code> has on
+the resulting embeddings, see the following plot of supervised <code class="docutils literal notranslate"><span class="pre">ivis</span></code>
+applied to MNIST with different weight values:</p>
+<img alt="_images/classification-weight-impact-mnist.jpg" src="_images/classification-weight-impact-mnist.jpg" />
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="unsupervised.html" class="btn btn-neutral float-left" title="Unsupervised Dimensionality Reduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="semi_supervised.html" class="btn btn-neutral float-right" title="Semi-supervised Dimensionality Reduction" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Bering Limited.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

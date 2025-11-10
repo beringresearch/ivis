@@ -1,0 +1,249 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Using ivis for Dimensionality Reduction of Single Cell Experiments &mdash; ivis  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/bering.css?v=0437f1d2" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/js/bering.js?v=63551a6c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Comparing ivis with other dimensionality reduction algorithms" href="comparisons.html" />
+    <link rel="prev" title="Examples" href="examples.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            ivis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="python_package.html">Python Package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="r_package.html">R Package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using ivis</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="unsupervised.html">Unsupervised Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supervised.html">Supervised Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="semi_supervised.html">Semi-supervised Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hyperparameters.html">Hyperparameter Selection</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Ivis Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Visualising Single Cell Experiments</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#reducing-dimensionality-using-ivis">Reducing Dimensionality Using <code class="docutils literal notranslate"><span class="pre">ivis</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="comparisons.html">Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learning.html">Metric Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="oom_datasets.html">Out-of-memory Datasets</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="timings_benchmarks.html">Speed of Execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="embeddings_benchmarks.html">Distance Preservation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Ivis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#neighbour-retrieval">Neighbour Retrieval</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#indexable-datasets">Indexable Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#module-ivis.nn.losses">Losses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#module-ivis.nn.callbacks">Callbacks</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ivis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Using <code class="docutils literal notranslate"><span class="pre">ivis</span></code> for Dimensionality Reduction of Single Cell Experiments</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/scanpy_singlecell.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="using-ivis-for-dimensionality-reduction-of-single-cell-experiments">
+<span id="scanpy-singlecell"></span><h1>Using <code class="docutils literal notranslate"><span class="pre">ivis</span></code> for Dimensionality Reduction of Single Cell Experiments<a class="headerlink" href="#using-ivis-for-dimensionality-reduction-of-single-cell-experiments" title="Link to this heading"></a></h1>
+<p>This example will demonstrate how <code class="docutils literal notranslate"><span class="pre">ivis</span></code> can be used to visualise
+single cell experiments. Data import, preprocessing and normalisation
+are handled by the <a class="reference external" href="https://scanpy.readthedocs.io/">Scanpy module</a>.
+The data that will be used in this example consists of 3,000 PBMCs from a
+healthy donor and is freely available from 10x Genomics. Now, let’s
+download the data and get started.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>data
+wget<span class="w"> </span>http://cf.10xgenomics.com/samples/cell-exp/1.1.0/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz<span class="w"> </span>-O<span class="w"> </span>data/pbmc3k_filtered_gene_bc_matrices.tar.gz
+<span class="nb">cd</span><span class="w"> </span>data<span class="p">;</span><span class="w"> </span>tar<span class="w"> </span>-xzf<span class="w"> </span>pbmc3k_filtered_gene_bc_matrices.tar.gz
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scanpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sc</span>
+
+<span class="n">sc</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">print_versions</span><span class="p">()</span>
+<span class="n">results_file</span> <span class="o">=</span> <span class="s1">&#39;./write/pbmc3k.h5ad&#39;</span>
+
+<span class="n">adata</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">read_10x_mtx</span><span class="p">(</span>
+    <span class="s1">&#39;./data/filtered_gene_bc_matrices/hg19/&#39;</span><span class="p">,</span>  <span class="c1"># the directory with the `.mtx` file</span>
+    <span class="n">var_names</span><span class="o">=</span><span class="s1">&#39;gene_symbols&#39;</span><span class="p">,</span>                  <span class="c1"># use gene symbols for the variable names (variables-axis index)</span>
+    <span class="n">cache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>                                <span class="c1"># write a cache file for faster subsequent reading</span>
+</pre></div>
+</div>
+<p>We can now carry out basic filtering and handling of mitochondrial
+genes:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">adata</span><span class="o">.</span><span class="n">var_names_make_unique</span><span class="p">()</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">filter_cells</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">min_genes</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">filter_genes</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">min_cells</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="n">mito_genes</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">var_names</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;MT-&#39;</span><span class="p">)</span>
+<span class="c1"># for each cell compute fraction of counts in mito genes vs. all genes</span>
+<span class="c1"># the `.A1` is only necessary as X is sparse (to transform to a dense array after summing)</span>
+<span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;percent_mito&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+    <span class="n">adata</span><span class="p">[:,</span> <span class="n">mito_genes</span><span class="p">]</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">A1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">A1</span>
+<span class="c1"># add the total counts per cell as observations-annotation to adata</span>
+<span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;n_counts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">A1</span>
+
+<span class="n">adata</span> <span class="o">=</span> <span class="n">adata</span><span class="p">[</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;n_genes&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">2500</span><span class="p">,</span> <span class="p">:]</span>
+<span class="n">adata</span> <span class="o">=</span> <span class="n">adata</span><span class="p">[</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;percent_mito&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">,</span> <span class="p">:]</span>
+</pre></div>
+</div>
+<p>Let’s normalise the data and apply log-transformation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">normalize_per_cell</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">counts_per_cell_after</span><span class="o">=</span><span class="mf">1e4</span><span class="p">)</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+<span class="n">adata</span><span class="o">.</span><span class="n">raw</span> <span class="o">=</span> <span class="n">adata</span>
+</pre></div>
+</div>
+<p>Identify highly-variable genes and do the filtering:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">highly_variable_genes</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">min_mean</span><span class="o">=</span><span class="mf">0.0125</span><span class="p">,</span> <span class="n">max_mean</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">min_disp</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="n">adata</span> <span class="o">=</span> <span class="n">adata</span><span class="p">[:,</span> <span class="n">adata</span><span class="o">.</span><span class="n">var</span><span class="p">[</span><span class="s1">&#39;highly_variable&#39;</span><span class="p">]]</span>
+
+<span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">regress_out</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;n_counts&#39;</span><span class="p">,</span> <span class="s1">&#39;percent_mito&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>It’s recommended to apply PCA-transformation of normalised data - this
+step tends to denoise the data.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">pca</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">svd_solver</span><span class="o">=</span><span class="s1">&#39;arpack&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="reducing-dimensionality-using-ivis">
+<h2>Reducing Dimensionality Using <code class="docutils literal notranslate"><span class="pre">ivis</span></code><a class="headerlink" href="#reducing-dimensionality-using-ivis" title="Link to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ivis</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ivis</span>
+</pre></div>
+</div>
+<p>For most single cell datasets, the following hyperparameters can be
+used:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">k=15</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">model='maaten'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_epochs_without_progress=5</span></code></p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Keep in mind that this is a very small experiment (&lt;3000 observations) and there are plenty of fast and accurate algorithm designed for these kinds of datasets e.g. UMAP. However, if you have &gt;250,000 cells, <code class="docutils literal notranslate"><span class="pre">ivis</span></code> considerably outperforms state-of-the-art both in speed and accuracy of embeddings. See our <a class="reference internal" href="timings_benchmarks.html#timings-benchmarks"><span class="std std-ref">timings benchmarks</span></a> for more information on this.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">X</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s1">&#39;X_pca&#39;</span><span class="p">]</span>
+
+<span class="n">ivis</span> <span class="o">=</span> <span class="n">Ivis</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s1">&#39;maaten&#39;</span><span class="p">,</span> <span class="n">n_epochs_without_progress</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">ivis</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">embeddings</span> <span class="o">=</span> <span class="n">ivis</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Finally, let’s visualise our embeddings, coloured by the CST3 gene!</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fill</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">X</span><span class="p">[:,</span> <span class="n">adata</span><span class="o">.</span><span class="n">var</span><span class="o">.</span><span class="n">gene_ids</span><span class="o">.</span><span class="n">index</span><span class="o">==</span><span class="s1">&#39;CST3&#39;</span><span class="p">]</span>
+<span class="n">fill</span> <span class="o">=</span> <span class="n">fill</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">))</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+<span class="n">sc</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">embeddings</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">embeddings</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="n">fill</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;ivis 1&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;ivis 2&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;CST3&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/output_24_1.png" src="_images/output_24_1.png" />
+<p><code class="docutils literal notranslate"><span class="pre">ivis</span></code> effectively captured three distinct cellular populations in this small dataset. Note that <code class="docutils literal notranslate"><span class="pre">ivis</span></code> is an “honest” algorithm and distances between observations are meaningful. Our benchmarks show that <code class="docutils literal notranslate"><span class="pre">ivis</span></code> is ~10% better at preserving local and global distances in low-dimensional space than comparable state-of-the-art algorithms. Additionally, <code class="docutils literal notranslate"><span class="pre">ivis</span></code> is robust against noise and outliers, ulike t-SNE, which tends to group random noise into well-defined clusters that can be potentially misleading.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="examples.html" class="btn btn-neutral float-left" title="Examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="comparisons.html" class="btn btn-neutral float-right" title="Comparing ivis with other dimensionality reduction algorithms" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Bering Limited.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

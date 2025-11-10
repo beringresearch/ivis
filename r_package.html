@@ -1,0 +1,215 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>R Package &mdash; ivis  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/bering.css?v=0437f1d2" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/js/bering.js?v=63551a6c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Unsupervised Dimensionality Reduction" href="unsupervised.html" />
+    <link rel="prev" title="Python Package" href="python_package.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            ivis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get Started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="python_package.html">Python Package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">R Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running-install">Running install</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#quickstart">Quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#vignette">Vignette</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using ivis</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="unsupervised.html">Unsupervised Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supervised.html">Supervised Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="semi_supervised.html">Semi-supervised Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hyperparameters.html">Hyperparameter Selection</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Ivis Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="scanpy_singlecell.html">Visualising Single Cell Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comparisons.html">Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learning.html">Metric Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="oom_datasets.html">Out-of-memory Datasets</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="timings_benchmarks.html">Speed of Execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="embeddings_benchmarks.html">Distance Preservation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Ivis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#neighbour-retrieval">Neighbour Retrieval</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#indexable-datasets">Indexable Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#module-ivis.nn.losses">Losses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#module-ivis.nn.callbacks">Callbacks</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ivis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">R Package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/r_package.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="r-package">
+<span id="id1"></span><h1>R Package<a class="headerlink" href="#r-package" title="Link to this heading"></a></h1>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<section id="prerequisites">
+<h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h3>
+<p>R wrapper for <code class="docutils literal notranslate"><span class="pre">ivis</span></code> is provided via the <code class="docutils literal notranslate"><span class="pre">reticulate</span></code> library.
+Prior to installation, ensure that <cite>reticulate</cite> is available on your machine.</p>
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="nf">install.packages</span><span class="p">(</span><span class="s">&quot;reticulate&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Next, install <a class="reference external" href="https://virtualenv.pypa.io/en/latest/installation/">virtualenv</a> as it will be used to safely interface with the <code class="docutils literal notranslate"><span class="pre">ivis</span></code> Python package.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>Windows Installation</strong>.
+Note that virtual environment functions in the <code class="docutils literal notranslate"><span class="pre">reticulate</span></code> library are <a class="reference external" href="https://rstudio.github.io/reticulate/reference/virtualenv-tools.html">not supported on Windows</a>. Instead, <a class="reference external" href="https://docs.conda.io/en/latest/miniconda.html">conda environment</a> is recommended.</p>
+</div>
+<p>Finally, the easiest way to install <code class="docutils literal notranslate"><span class="pre">ivis</span></code> is using the <code class="docutils literal notranslate"><span class="pre">devtools</span></code> package:</p>
+</section>
+<section id="running-install">
+<h3>Running install<a class="headerlink" href="#running-install" title="Link to this heading"></a></h3>
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="n">devtools</span><span class="o">::</span><span class="nf">install_github</span><span class="p">(</span><span class="s">&quot;beringresearch/ivis/R-package&quot;</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">ivis</span><span class="p">)</span>
+<span class="nf">install_ivis</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>After <code class="docutils literal notranslate"><span class="pre">ivis</span></code> is installed, <strong>restart your R session</strong>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Newer versions of Keras use tensorflow as the default backend, however if for some reason this isn’t the case, add the following line to your environment variables:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">KERAS_BACKEND</span><span class="o">=</span>tensorflow
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="quickstart">
+<h2>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading"></a></h2>
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">ivis</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">)</span>
+
+<span class="n">model</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">ivis</span><span class="p">(</span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">3</span><span class="p">)</span>
+
+<span class="n">X</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">data.matrix</span><span class="p">(</span><span class="n">iris</span><span class="p">[,</span><span class="w"> </span><span class="m">1</span><span class="o">:</span><span class="m">4</span><span class="p">])</span>
+<span class="n">X</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">scale</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="n">model</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">model</span><span class="o">$</span><span class="nf">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="n">xy</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">model</span><span class="o">$</span><span class="nf">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+<span class="n">dat</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">data.frame</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">xy</span><span class="p">[,</span><span class="m">1</span><span class="p">],</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="n">xy</span><span class="p">[,</span><span class="m">2</span><span class="p">],</span><span class="w"> </span><span class="n">species</span><span class="o">=</span><span class="n">iris</span><span class="o">$</span><span class="n">Species</span><span class="p">)</span>
+
+<span class="nf">ggplot</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span><span class="w"> </span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nf">geom_point</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">species</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nf">theme_classic</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="vignette">
+<h2>Vignette<a class="headerlink" href="#vignette" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">ivis</span></code> package includes a <a class="reference external" href="https://github.com/beringresearch/ivis/blob/master/R-package/vignettes/ivis_singlecell.Rmd">vignette</a> that demonstrates an example workflow using single-cell RNA-sequencing data.</p>
+<p>To compile and install this vignette on your system, you need to first have a working installation of <code class="docutils literal notranslate"><span class="pre">ivis</span></code>.
+For this, please follow the instructions above.</p>
+<p>Once you have a working installation of <code class="docutils literal notranslate"><span class="pre">ivis</span></code>, you can reinstall the package including the compiled vignette using the following command:</p>
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="n">devtools</span><span class="o">::</span><span class="nf">install_github</span><span class="p">(</span><span class="s">&quot;beringresearch/ivis/R-package&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">build_vignettes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span><span class="w"> </span><span class="n">force</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="python_package.html" class="btn btn-neutral float-left" title="Python Package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="unsupervised.html" class="btn btn-neutral float-right" title="Unsupervised Dimensionality Reduction" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Bering Limited.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

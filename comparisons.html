@@ -1,0 +1,214 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comparing ivis with other dimensionality reduction algorithms &mdash; ivis  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/bering.css?v=0437f1d2" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/js/bering.js?v=63551a6c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Metric Learning with Application to Supervised Anomaly Detection" href="metric_learning.html" />
+    <link rel="prev" title="Using ivis for Dimensionality Reduction of Single Cell Experiments" href="scanpy_singlecell.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            ivis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="python_package.html">Python Package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="r_package.html">R Package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using ivis</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="unsupervised.html">Unsupervised Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supervised.html">Supervised Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="semi_supervised.html">Semi-supervised Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hyperparameters.html">Hyperparameter Selection</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Ivis Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="scanpy_singlecell.html">Visualising Single Cell Experiments</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Dimensionality Reduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#visual-assessment">Visual Assessment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#random-noise">Random Noise</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#structured-datasets">Structured Datasets</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#quantitative-evaluation">Quantitative Evaluation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learning.html">Metric Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="oom_datasets.html">Out-of-memory Datasets</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="timings_benchmarks.html">Speed of Execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="embeddings_benchmarks.html">Distance Preservation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Ivis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#neighbour-retrieval">Neighbour Retrieval</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#indexable-datasets">Indexable Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#module-ivis.nn.losses">Losses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#module-ivis.nn.callbacks">Callbacks</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ivis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Comparing ivis with other dimensionality reduction algorithms</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/comparisons.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="comparing-ivis-with-other-dimensionality-reduction-algorithms">
+<span id="comparisons"></span><h1>Comparing ivis with other dimensionality reduction algorithms<a class="headerlink" href="#comparing-ivis-with-other-dimensionality-reduction-algorithms" title="Link to this heading"></a></h1>
+<p>Ivis aims to reduce data dimensionality whilst preserving both global
+and local structures. There are a number of real-world applications
+where this feature could be useful. For example:</p>
+<ul class="simple">
+<li><p>Anomaly detection</p></li>
+<li><p>Biological interpretation of high-throughput experiments</p></li>
+<li><p>Feature extraction</p></li>
+</ul>
+<p>Several algorithms have been proposed to address the problem of
+dimensionality reduction, including
+<a class="reference external" href="https://umap-learn.readthedocs.io/en/latest/">UMAP</a> and
+<a class="reference external" href="https://lvdmaaten.github.io/tsne/">t-SNE</a>. UMAP in particular, has
+been succesfully applied in machine learning pipelines. Ivis is
+different to these approaches in several ways.</p>
+<p>First, <code class="docutils literal notranslate"><span class="pre">ivis</span></code> does not make any assumptions as to the inherent structure
+of the dataset. Second, <code class="docutils literal notranslate"><span class="pre">ivis</span></code> is designed
+to handle both small and extremely large datasets. Ivis performs well on
+toy datasets such as the <em>iris</em> dataset, and scales linearly to datasets
+with millions of observations. Indeed, we see that the main usecase for <code class="docutils literal notranslate"><span class="pre">ivis</span></code> are datasets with &gt; 250,000 observations. Finally, <code class="docutils literal notranslate"><span class="pre">ivis</span></code> prioritises interpretation
+over visual apperance - this is accomplished by imposing meaning to
+distances between points in the embedding space. As such, <code class="docutils literal notranslate"><span class="pre">ivis</span></code> does not
+create spurious clusters nor does it artificially pack clusters closer
+together. Embeddings aim to be true to the original structure of the
+data, which can be noisy in a real-world setting.</p>
+<section id="visual-assessment">
+<h2>Visual Assessment<a class="headerlink" href="#visual-assessment" title="Link to this heading"></a></h2>
+<p>We will visually examine how popular dimensionality reduction algorithms
+- UMAP, t-SNE, Isomap, MDS, and PCA - approach two synthetic datasets
+with 5,000 observations in each. Since we are concerned with a
+dimensionality reduction problem, we will artificially add reduntant
+features to the original datasets using polynomial combinations (degree
+≤ 10) of the original features.</p>
+<section id="random-noise">
+<h3>Random Noise<a class="headerlink" href="#random-noise" title="Link to this heading"></a></h3>
+<p>To start, let’s examine how various dimensionality reduction methods behave in the presence of random noise. We generated 5000 uniformly distributed random points in a two-dimensional space and expanded the feature set using polynomial combinations. In all cases default parameters were used to fit multiple models.</p>
+<img alt="_images/random_projections_benchmaks.png" src="_images/random_projections_benchmaks.png" />
+<p>Both <code class="docutils literal notranslate"><span class="pre">ivis</span></code> and PCA reliably recovered the random nature of our dataset. Conversely, Isomap, UMAP, and t-SNE appeared to pack certain points together, creating an impression of clusters within uniform random noise.</p>
+</section>
+<section id="structured-datasets">
+<h3>Structured Datasets<a class="headerlink" href="#structured-datasets" title="Link to this heading"></a></h3>
+<p>Next, we examine how well global features of a dataset, such as relative position of clusters, can be recovered in a low-dimensional space.</p>
+<img alt="_images/comparisons_moons.png" src="_images/comparisons_moons.png" />
+<p>Using default parameters, we can see that <code class="docutils literal notranslate"><span class="pre">ivis</span></code> captures both
+the general structure of each half-moon, as well as their relative
+positions to one another. Both UMAP and t-SNE appear to introduce
+spurious clusters and global relationships between the half-moons appear
+to be disrupted.</p>
+<img alt="_images/comparisons_swiss_roll.png" src="_images/comparisons_swiss_roll.png" />
+<p>Similarly as above, UMAP and t-SNE appear to generate a large number of small clusters along
+the continuous distribution of the dataset. Although the global
+structure is relatively well-preserved. <code class="docutils literal notranslate"><span class="pre">ivis</span></code> maintains both global and
+local structures of the dataset.</p>
+</section>
+</section>
+<section id="quantitative-evaluation">
+<h2>Quantitative Evaluation<a class="headerlink" href="#quantitative-evaluation" title="Link to this heading"></a></h2>
+<p>To measure how well each algorithm preserves global distances, we examined correlation between points in the original dataset and the embedding space. For this analysis, 10,000 observations were chosen from the <a class="reference external" href="https://github.com/lmweber/benchmark-data-Levine-32-dim">Levine dataset</a> (104,184 x 32) using random uniform sampling. Box plots represent distances across pairs of points in the embeddings, binned using 50 equal-width bins over the pairwise distances in the original
+space. Pearson correlation coefficients were also computed over the pairs of distances.</p>
+<blockquote>
+<div><img alt="_images/comparisons_ivis_umap_levine_distances.png" src="_images/comparisons_ivis_umap_levine_distances.png" />
+<p><code class="docutils literal notranslate"><span class="pre">ivis</span></code> appeared to preserve both a small-, mid-, and large-scale  L1 and L2 distances, whilst UMAP and t-SNE seemed to ignore mid- to large-scale distances. Interestingly, <code class="docutils literal notranslate"><span class="pre">ivis</span></code> was particularly good at preserving L2 distances in low-dimensional space.</p>
+</div></blockquote>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="scanpy_singlecell.html" class="btn btn-neutral float-left" title="Using ivis for Dimensionality Reduction of Single Cell Experiments" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="metric_learning.html" class="btn btn-neutral float-right" title="Metric Learning with Application to Supervised Anomaly Detection" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Bering Limited.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

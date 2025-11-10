@@ -1,0 +1,1010 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ivis &mdash; ivis  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/bering.css?v=0437f1d2" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/js/bering.js?v=63551a6c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Distance Preservation Benchmarks" href="embeddings_benchmarks.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            ivis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="python_package.html">Python Package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="r_package.html">R Package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using ivis</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="unsupervised.html">Unsupervised Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supervised.html">Supervised Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="semi_supervised.html">Semi-supervised Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hyperparameters.html">Hyperparameter Selection</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Ivis Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="scanpy_singlecell.html">Visualising Single Cell Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comparisons.html">Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learning.html">Metric Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="oom_datasets.html">Out-of-memory Datasets</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="timings_benchmarks.html">Speed of Execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="embeddings_benchmarks.html">Distance Preservation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Ivis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.Ivis"><code class="docutils literal notranslate"><span class="pre">Ivis</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.Ivis.fit"><code class="docutils literal notranslate"><span class="pre">Ivis.fit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.Ivis.fit_transform"><code class="docutils literal notranslate"><span class="pre">Ivis.fit_transform()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.Ivis.load_model"><code class="docutils literal notranslate"><span class="pre">Ivis.load_model()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.Ivis.save_model"><code class="docutils literal notranslate"><span class="pre">Ivis.save_model()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.Ivis.score_samples"><code class="docutils literal notranslate"><span class="pre">Ivis.score_samples()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.Ivis.transform"><code class="docutils literal notranslate"><span class="pre">Ivis.transform()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#neighbour-retrieval">Neighbour Retrieval</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.data.neighbour_retrieval.NeighbourMatrix"><code class="docutils literal notranslate"><span class="pre">NeighbourMatrix</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.neighbour_retrieval.NeighbourMatrix.get_batch"><code class="docutils literal notranslate"><span class="pre">NeighbourMatrix.get_batch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.neighbour_retrieval.NeighbourMatrix.k"><code class="docutils literal notranslate"><span class="pre">NeighbourMatrix.k</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix"><code class="docutils literal notranslate"><span class="pre">AnnoyKnnMatrix</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.__getitem__"><code class="docutils literal notranslate"><span class="pre">AnnoyKnnMatrix.__getitem__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.__getstate__"><code class="docutils literal notranslate"><span class="pre">AnnoyKnnMatrix.__getstate__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.__init__"><code class="docutils literal notranslate"><span class="pre">AnnoyKnnMatrix.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.__len__"><code class="docutils literal notranslate"><span class="pre">AnnoyKnnMatrix.__len__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.build"><code class="docutils literal notranslate"><span class="pre">AnnoyKnnMatrix.build()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.delete_index"><code class="docutils literal notranslate"><span class="pre">AnnoyKnnMatrix.delete_index()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.get_batch"><code class="docutils literal notranslate"><span class="pre">AnnoyKnnMatrix.get_batch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.get_neighbour_indices"><code class="docutils literal notranslate"><span class="pre">AnnoyKnnMatrix.get_neighbour_indices()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.k"><code class="docutils literal notranslate"><span class="pre">AnnoyKnnMatrix.k</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.load"><code class="docutils literal notranslate"><span class="pre">AnnoyKnnMatrix.load()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.save"><code class="docutils literal notranslate"><span class="pre">AnnoyKnnMatrix.save()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.unload"><code class="docutils literal notranslate"><span class="pre">AnnoyKnnMatrix.unload()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.data.neighbour_retrieval.LabeledNeighbourMap"><code class="docutils literal notranslate"><span class="pre">LabeledNeighbourMap</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.neighbour_retrieval.LabeledNeighbourMap.__getitem__"><code class="docutils literal notranslate"><span class="pre">LabeledNeighbourMap.__getitem__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.neighbour_retrieval.LabeledNeighbourMap.__init__"><code class="docutils literal notranslate"><span class="pre">LabeledNeighbourMap.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.neighbour_retrieval.LabeledNeighbourMap.__len__"><code class="docutils literal notranslate"><span class="pre">LabeledNeighbourMap.__len__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.data.neighbour_retrieval.knn.build_annoy_index"><code class="docutils literal notranslate"><span class="pre">build_annoy_index()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#indexable-datasets">Indexable Datasets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.data.sequence.IndexableDataset"><code class="docutils literal notranslate"><span class="pre">IndexableDataset</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.sequence.IndexableDataset.get_batch"><code class="docutils literal notranslate"><span class="pre">IndexableDataset.get_batch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.sequence.IndexableDataset.shape"><code class="docutils literal notranslate"><span class="pre">IndexableDataset.shape()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.data.sequence.ImageDataset"><code class="docutils literal notranslate"><span class="pre">ImageDataset</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.sequence.ImageDataset.__init__"><code class="docutils literal notranslate"><span class="pre">ImageDataset.__init__()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.sequence.ImageDataset.get_batch"><code class="docutils literal notranslate"><span class="pre">ImageDataset.get_batch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.sequence.ImageDataset.read_image"><code class="docutils literal notranslate"><span class="pre">ImageDataset.read_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.sequence.ImageDataset.resize_image"><code class="docutils literal notranslate"><span class="pre">ImageDataset.resize_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.sequence.ImageDataset.shape"><code class="docutils literal notranslate"><span class="pre">ImageDataset.shape</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.data.sequence.FlattenedImageDataset"><code class="docutils literal notranslate"><span class="pre">FlattenedImageDataset</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ivis.data.sequence.FlattenedImageDataset.__init__"><code class="docutils literal notranslate"><span class="pre">FlattenedImageDataset.__init__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#module-ivis.nn.losses">Losses</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.nn.losses.ChebyshevPnLoss"><code class="docutils literal notranslate"><span class="pre">ChebyshevPnLoss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.nn.losses.ChebyshevTripletLoss"><code class="docutils literal notranslate"><span class="pre">ChebyshevTripletLoss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.nn.losses.CosinePnLoss"><code class="docutils literal notranslate"><span class="pre">CosinePnLoss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.nn.losses.CosineTripletLoss"><code class="docutils literal notranslate"><span class="pre">CosineTripletLoss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.nn.losses.EuclideanPnLoss"><code class="docutils literal notranslate"><span class="pre">EuclideanPnLoss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.nn.losses.EuclideanSoftmaxRatioLoss"><code class="docutils literal notranslate"><span class="pre">EuclideanSoftmaxRatioLoss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.nn.losses.EuclideanSoftmaxRatioPnLoss"><code class="docutils literal notranslate"><span class="pre">EuclideanSoftmaxRatioPnLoss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.nn.losses.EuclideanTripletLoss"><code class="docutils literal notranslate"><span class="pre">EuclideanTripletLoss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.nn.losses.ManhattanPnLoss"><code class="docutils literal notranslate"><span class="pre">ManhattanPnLoss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.nn.losses.ManhattanTripletLoss"><code class="docutils literal notranslate"><span class="pre">ManhattanTripletLoss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.nn.losses.register_loss"><code class="docutils literal notranslate"><span class="pre">register_loss()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.nn.losses.semi_supervised_loss"><code class="docutils literal notranslate"><span class="pre">semi_supervised_loss()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.nn.losses.triplet_loss"><code class="docutils literal notranslate"><span class="pre">triplet_loss()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#module-ivis.nn.callbacks">Callbacks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.nn.callbacks.EmbeddingsImage"><code class="docutils literal notranslate"><span class="pre">EmbeddingsImage</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.nn.callbacks.EmbeddingsLogging"><code class="docutils literal notranslate"><span class="pre">EmbeddingsLogging</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.nn.callbacks.ModelCheckpoint"><code class="docutils literal notranslate"><span class="pre">ModelCheckpoint</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ivis.nn.callbacks.TensorBoardEmbeddingsImage"><code class="docutils literal notranslate"><span class="pre">TensorBoardEmbeddingsImage</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">ivis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Ivis</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ivis">
+<span id="api"></span><h1>Ivis<a class="headerlink" href="#ivis" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="ivis.Ivis">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ivis.</span></span><span class="sig-name descname"><span class="pre">Ivis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embedding_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pn'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_epochs_without_progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_trees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ntrees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">knn_distance_metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'angular'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precompute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'szubert'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">supervision_metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sparse_categorical_crossentropy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">supervision_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annoy_index_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">build_index_on_disk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neighbour_matrix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.Ivis" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Ivis is a technique that uses an artificial neural network for
+dimensionality reduction, often useful for the purposes of visualization.
+The network trains on triplets of data-points at a time and pulls positive
+points together, while pushing more distant points away from each other.
+Triplets are sampled from the original data using KNN approximation using
+the Annoy library.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>embedding_dims</strong> (<em>int</em>) – Number of dimensions in the embedding space</p></li>
+<li><p><strong>k</strong> (<em>int</em>) – The number of neighbours to retrieve for each point.
+Must be less than one minus the number of rows in the dataset.</p></li>
+<li><p><strong>distance</strong> (<em>Union</em><em>[</em><em>str</em><em>,</em><em>Callable</em><em>]</em>) – <p>The loss function used to train
+the neural network.</p>
+<ul>
+<li><p>If string: a registered loss function name. Predefined losses are:
+“pn”, “euclidean”, “manhattan_pn”, “manhattan”, “chebyshev”,
+“chebyshev_pn”, “softmax_ratio_pn”, “softmax_ratio”, “cosine”, “cosine_pn”.</p></li>
+<li><p>If Callable, must have two parameters, (y_true, y_pred).
+y_pred denotes the batch of triplets, and y_true are any corresponding labels.
+y_pred is expected to be of shape: (3, batch_size, embedding_dims).</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>When loading model loaded with a custom loss, provide the loss to the
+constructor of the new Ivis instance before loading the saved model.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – The size of mini-batches used during gradient
+descent while training the neural network. Must be less than the
+num_rows in the dataset.</p></li>
+<li><p><strong>epochs</strong> (<em>int</em>) – The maximum number of epochs to train the model for.
+Each epoch the network will see a triplet based on each data-point
+once.</p></li>
+<li><p><strong>n_epochs_without_progress</strong> (<em>int</em>) – After n number of epochs without an
+improvement to the loss, terminate training early.</p></li>
+<li><p><strong>n_trees</strong> (<em>int</em>) – The number of random projections trees built by Annoy to
+approximate KNN. The more trees the higher the memory usage, but the
+better the accuracy of results.</p></li>
+<li><p><strong>ntrees</strong> (<em>int</em>) – Deprecated. Use <cite>n_trees</cite> instead.</p></li>
+<li><p><strong>knn_distance_metric</strong> (<em>str</em>) – The distance metric used to retrieve nearest
+neighbours. Supports “angular” (default), “euclidean”, “manhattan”,
+“hamming”, or “dot”.</p></li>
+<li><p><strong>search_k</strong> (<em>int</em>) – The maximum number of nodes inspected during a nearest
+neighbour query by Annoy. The higher, the more computation time
+required, but the higher the accuracy. The default is n_trees * k,
+where k is the number of neighbours to retrieve. If this is set too
+low, a variable number of neighbours may be retrieved per data-point.</p></li>
+<li><p><strong>precompute</strong> (<em>bool</em>) – Whether to pre-compute the nearest neighbours.
+Pre-computing is a little faster, but requires more memory. If memory
+is limited, try setting this to False.</p></li>
+<li><p><strong>model</strong> (<em>Union</em><em>[</em><em>str</em><em>,</em><em>tf.keras.models.Model</em><em>]</em>) – <p>The keras model to train using
+triplet loss.</p>
+<ul>
+<li><p>If a model object is provided, an embedding layer of size
+‘embedding_dims’ will be appended to the end of the network.</p></li>
+<li><p>If a string, a pre-defined network by that name will be used. Possible
+options are: ‘szubert’, ‘hinton’, ‘maaten’. By default the ‘szubert’
+network will be created, which is a selu network composed of 3 dense
+layers of 128 neurons each, followed by an embedding layer of size
+‘embedding_dims’.</p></li>
+</ul>
+</p></li>
+<li><p><strong>supervision_metric</strong> (<em>str</em>) – The supervision metric to
+optimize when training keras in supervised mode. Supports all of the
+classification or regression losses included with keras, so long as
+the labels are provided in the correct format. A list of keras’ loss
+functions can be found at <a class="reference external" href="https://keras.io/losses/">https://keras.io/losses/</a> .</p></li>
+<li><p><strong>supervision_weight</strong> (<em>float</em>) – Float between 0 and 1 denoting the
+weighting to give to classification vs triplet loss when training
+in supervised mode. The higher the weight, the more classification
+influences training. Ignored if using Ivis in unsupervised mode.</p></li>
+<li><p><strong>annoy_index_path</strong> (<em>str</em>) – The filepath of a pre-trained annoy index file
+saved on disk. If provided, the annoy index file will be loaded and used.
+Otherwise, a new index will be generated and saved to disk in a temporary directory.</p></li>
+<li><p><strong>callbacks</strong> (<em>[</em><em>keras.callbacks.Callback</em><em>]</em>) – List of keras Callbacks to
+pass model during training, such as the TensorBoard callback. A set of
+ivis-specific callbacks are provided in the ivis.nn.callbacks module.</p></li>
+<li><p><strong>build_index_on_disk</strong> (<em>bool</em>) – Whether to build the annoy index directly
+on disk. Building on disk should allow for bigger datasets to be indexed,
+but may cause issues.</p></li>
+<li><p><strong>neighbour_matrix</strong> (<em>Union</em><em>[</em><em>np.array</em><em>,</em><em>collections.abc.Sequence</em><em>]</em>) – <p>Providing a neighbour matrix will cause Ivis to skip computing the Annoy KNN index
+and instead use the provided neighbour_matrix.</p>
+<ul>
+<li><p>A pre-computed neighbour matrix can be provided as a numpy array. Indexing the array
+should retrieve a list of neighbours for the data point associated with that index.</p></li>
+<li><p>Alternatively, dynamic computation of neighbours can be done by providing a
+class than implements the collections.abc.Sequence class, specifically the
+<cite>__getitem__</cite> and <cite>__len__</cite> methods.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>See the ivis.data.neighbour_retrieval.AnnoyKnnMatrix class for an example.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</p></li>
+<li><p><strong>verbose</strong> (<em>int</em>) – Controls the volume of logging output the model
+produces when training. When set to 0, silences outputs, when above 0
+will print outputs.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.Ivis.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.Ivis.fit" title="Link to this definition"></a></dt>
+<dd><p>Fit an ivis model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.array</em><em>, </em><a class="reference internal" href="#ivis.data.sequence.IndexableDataset" title="ivis.data.sequence.IndexableDataset"><em>ivis.data.sequence.IndexableDataset</em></a><em>, </em><em>tensorflow.keras.utils.HDF5Matrix</em>) – Data to be embedded. Needs to have a <cite>.shape</cite> attribute and a <cite>__getitem__</cite> method.</p></li>
+<li><p><strong>Y</strong> (<em>array</em><em>, </em><em>shape</em><em> (</em><em>n_samples</em><em>)</em>) – Optional array for supervised dimensionality reduction.
+If Y contains -1 labels, and ‘sparse_categorical_crossentropy’
+is the loss function, semi-supervised learning will be used.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>self</strong> – Returns estimator instance.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ivis.Ivis object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.Ivis.fit_transform">
+<span class="sig-name descname"><span class="pre">fit_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.Ivis.fit_transform" title="Link to this definition"></a></dt>
+<dd><p>Fit to data then transform</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.array</em><em>, </em><a class="reference internal" href="#ivis.data.sequence.IndexableDataset" title="ivis.data.sequence.IndexableDataset"><em>ivis.data.sequence.IndexableDataset</em></a><em>, </em><em>tensorflow.keras.utils.HDF5Matrix</em>) – Data to train on and then embedded.
+Needs to have a <cite>.shape</cite> attribute and a <cite>__getitem__</cite> method.</p></li>
+<li><p><strong>Y</strong> (<em>array</em><em>, </em><em>shape</em><em> (</em><em>n_samples</em><em>)</em>) – Optional array for supervised dimensionality reduction.
+If Y contains -1 labels, and ‘sparse_categorical_crossentropy’
+is the loss function, semi-supervised learning will be used.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>X_new</strong> – Embedding of the data in low-dimensional space.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array, shape (n_samples, embedding_dims)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.Ivis.load_model">
+<span class="sig-name descname"><span class="pre">load_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.Ivis.load_model" title="Link to this definition"></a></dt>
+<dd><p>Load ivis model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>folder_path</strong> (<em>string</em>) – Path to serialised model files and metadata</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>self</strong> – Returns estimator instance.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ivis.Ivis object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.Ivis.save_model">
+<span class="sig-name descname"><span class="pre">save_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tf'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.Ivis.save_model" title="Link to this definition"></a></dt>
+<dd><p>Save an ivis model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder_path</strong> (<em>string</em>) – Path to serialised model files and metadata</p></li>
+<li><p><strong>save_format</strong> (<em>string</em>) – Format to save ivis model as. Either “tf” for TensorFlow SavedModel format
+or “h5” for a .h5 file. Default is “tf”.</p></li>
+<li><p><strong>overwrite</strong> (<em>bool</em>) – Whether to overwrite the specified folder path.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.Ivis.score_samples">
+<span class="sig-name descname"><span class="pre">score_samples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.Ivis.score_samples" title="Link to this definition"></a></dt>
+<dd><p>Passes X through classification network to obtain predicted
+supervised values. Only applicable when trained in
+supervised mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>X</strong> (<em>np.array</em><em>, </em><a class="reference internal" href="#ivis.data.sequence.IndexableDataset" title="ivis.data.sequence.IndexableDataset"><em>ivis.data.sequence.IndexableDataset</em></a><em>, </em><em>tensorflow.keras.utils.HDF5Matrix</em>) – Data to be passed through classification network.
+Needs to have a <cite>.shape</cite> attribute and a <cite>__getitem__</cite> method.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>X_new</strong> – Softmax class probabilities of the data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array, shape (n_samples, embedding_dims)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.Ivis.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.Ivis.transform" title="Link to this definition"></a></dt>
+<dd><p>Transform X into the existing embedded space and return that
+transformed output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>X</strong> (<em>np.array</em><em>, </em><a class="reference internal" href="#ivis.data.sequence.IndexableDataset" title="ivis.data.sequence.IndexableDataset"><em>ivis.data.sequence.IndexableDataset</em></a><em>, </em><em>tensorflow.keras.utils.HDF5Matrix</em>) – Data to be transformed. Needs to have a <cite>.shape</cite> attribute and a <cite>__getitem__</cite> method.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>X_new</strong> – Embedding of the data in low-dimensional space.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>array, shape (n_samples, embedding_dims)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="neighbour-retrieval">
+<h1>Neighbour Retrieval<a class="headerlink" href="#neighbour-retrieval" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="ivis.data.neighbour_retrieval.NeighbourMatrix">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ivis.data.neighbour_retrieval.</span></span><span class="sig-name descname"><span class="pre">NeighbourMatrix</span></span><a class="headerlink" href="#ivis.data.neighbour_retrieval.NeighbourMatrix" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></p>
+<p>A matrix A<sub>ij</sub> where i is the row index of the data point and j
+refers to the index of the neigbouring point.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.data.neighbour_retrieval.NeighbourMatrix.get_batch">
+<span class="sig-name descname"><span class="pre">get_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx_seq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.neighbour_retrieval.NeighbourMatrix.get_batch" title="Link to this definition"></a></dt>
+<dd><p>Gets a batch of neighbours corresponding to the provided index sequence.</p>
+<p>Non-optimized version, can be overridden by child classes to be made be efficient</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ivis.data.neighbour_retrieval.NeighbourMatrix.k">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">k</span></span><a class="headerlink" href="#ivis.data.neighbour_retrieval.NeighbourMatrix.k" title="Link to this definition"></a></dt>
+<dd><p>The width of the matrix (number of neighbours retrieved)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ivis.data.neighbour_retrieval.AnnoyKnnMatrix">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ivis.data.neighbour_retrieval.</span></span><span class="sig-name descname"><span class="pre">AnnoyKnnMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'annoy.index'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'angular'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precompute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_distances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ivis.data.neighbour_retrieval.NeighbourMatrix" title="ivis.data.neighbour_retrieval.knn.NeighbourMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">NeighbourMatrix</span></code></a></p>
+<p>A matrix A<sub>ij</sub> where i is the row index of the data point and j
+refers to the index of the neigbouring point.</p>
+<p>Neighbouring points are KNN retrieved using an Annoy Index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> (<em>AnnoyIndex</em>) – AnnoyIndex instance to use when retrieving KNN</p></li>
+<li><p><strong>nrows</strong> (<em>tuple</em>) – Number of rows in data matrix was built on</p></li>
+<li><p><strong>index_path</strong> (<em>string</em>) – Location of the AnnoyIndex file on disk</p></li>
+<li><p><strong>k</strong> (<em>int</em>) – The number of neighbours to retrieve for each point</p></li>
+<li><p><strong>search_k</strong> (<em>int</em>) – Controls the number of nodes searched - higher is more
+expensive but more accurate. Default of -1 defaults to n_trees * k</p></li>
+<li><p><strong>precompute</strong> (<em>boolean</em>) – Whether to precompute the KNN index and store the matrix in memory.
+Much faster when training, but consumes more memory.</p></li>
+<li><p><strong>include_distances</strong> (<em>boolean</em>) – Whether to return the distances along with the indexes of
+the neighbouring points</p></li>
+<li><p><strong>verbose</strong> (<em>boolean</em>) – Controls verbosity of output to console when building index. If
+False, nothing will be printed to the terminal.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.data.neighbour_retrieval.AnnoyKnnMatrix.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.__getitem__" title="Link to this definition"></a></dt>
+<dd><p>Returns neighbours list for the specified index.
+Supports both integer and slice indices.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.data.neighbour_retrieval.AnnoyKnnMatrix.__getstate__">
+<span class="sig-name descname"><span class="pre">__getstate__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.__getstate__" title="Link to this definition"></a></dt>
+<dd><p>Return object serializable variable dict</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.data.neighbour_retrieval.AnnoyKnnMatrix.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrows</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'annoy.index'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'angular'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precompute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_distances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.__init__" title="Link to this definition"></a></dt>
+<dd><p>Constructs an AnnoyKnnMatrix instance from an AnnoyIndex object with given parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.data.neighbour_retrieval.AnnoyKnnMatrix.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.__len__" title="Link to this definition"></a></dt>
+<dd><p>Number of rows in neighbour matrix</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.data.neighbour_retrieval.AnnoyKnnMatrix.build">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'angular'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_distances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ntrees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">build_index_on_disk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precompute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.build" title="Link to this definition"></a></dt>
+<dd><p>Builds a new Annoy Index on input data <em>X</em>, then constructs and returns an
+AnnoyKnnMatrix object using the newly-built index.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.data.neighbour_retrieval.AnnoyKnnMatrix.delete_index">
+<span class="sig-name descname"><span class="pre">delete_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.delete_index" title="Link to this definition"></a></dt>
+<dd><p>Cleans up disk resources used by the index, rendering it unusable.
+First will <cite>unload</cite> the index, then recursively removes the files at index path.
+If parent is True, will recursively remove parent folder.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.data.neighbour_retrieval.AnnoyKnnMatrix.get_batch">
+<span class="sig-name descname"><span class="pre">get_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx_seq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.get_batch" title="Link to this definition"></a></dt>
+<dd><p>Returns a batch of neighbours based on the index sequence provided.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.data.neighbour_retrieval.AnnoyKnnMatrix.get_neighbour_indices">
+<span class="sig-name descname"><span class="pre">get_neighbour_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.get_neighbour_indices" title="Link to this definition"></a></dt>
+<dd><p>Retrieves neighbours for every row in parallel</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ivis.data.neighbour_retrieval.AnnoyKnnMatrix.k">
+<span class="sig-name descname"><span class="pre">k</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.k" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.data.neighbour_retrieval.AnnoyKnnMatrix.load">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'angular'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_distances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precompute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.load" title="Link to this definition"></a></dt>
+<dd><p>Constructs and returns an AnnoyKnnMatrix object from an existing Annoy Index on disk.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.data.neighbour_retrieval.AnnoyKnnMatrix.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.save" title="Link to this definition"></a></dt>
+<dd><p>Saves internal Annoy index to disk at given path.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.data.neighbour_retrieval.AnnoyKnnMatrix.unload">
+<span class="sig-name descname"><span class="pre">unload</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.neighbour_retrieval.AnnoyKnnMatrix.unload" title="Link to this definition"></a></dt>
+<dd><p>Unloads the index from disk, allowing other processes to read/write to the index file.
+After calling this, the index will no longer be usable from this instance.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ivis.data.neighbour_retrieval.LabeledNeighbourMap">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ivis.data.neighbour_retrieval.</span></span><span class="sig-name descname"><span class="pre">LabeledNeighbourMap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.neighbour_retrieval.LabeledNeighbourMap" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></p>
+<p>Retrieves neighbour indices according to class labels provided in constructor.
+Rows with the same label will be regarded as neighbours.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.data.neighbour_retrieval.LabeledNeighbourMap.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.neighbour_retrieval.LabeledNeighbourMap.__getitem__" title="Link to this definition"></a></dt>
+<dd><p>Retrieves the neighbours for the row index provided</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.data.neighbour_retrieval.LabeledNeighbourMap.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.neighbour_retrieval.LabeledNeighbourMap.__init__" title="Link to this definition"></a></dt>
+<dd><p>Constructs a LabeledNeighbourMap instance from a list of labels.
+:param labels list: List of labels for each data-point. One label per data-point.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.data.neighbour_retrieval.LabeledNeighbourMap.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.neighbour_retrieval.LabeledNeighbourMap.__len__" title="Link to this definition"></a></dt>
+<dd><p>Returns the number of rows in the data</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ivis.data.neighbour_retrieval.knn.build_annoy_index">
+<span class="sig-prename descclassname"><span class="pre">ivis.data.neighbour_retrieval.knn.</span></span><span class="sig-name descname"><span class="pre">build_annoy_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'angular'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ntrees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">build_index_on_disk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.neighbour_retrieval.knn.build_annoy_index" title="Link to this definition"></a></dt>
+<dd><p>Build a standalone annoy index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>array</em>) – numpy array with shape (n_samples, n_features)</p></li>
+<li><p><strong>path</strong> (<em>str</em>) – The filepath of a trained annoy index file
+saved on disk.</p></li>
+<li><p><strong>ntrees</strong> (<em>int</em>) – The number of random projections trees built by Annoy to
+approximate KNN. The more trees the higher the memory usage, but the
+better the accuracy of results.</p></li>
+<li><p><strong>build_index_on_disk</strong> (<em>bool</em>) – Whether to build the annoy index directly
+on disk. Building on disk should allow for bigger datasets to be indexed,
+but may cause issues.</p></li>
+<li><p><strong>metric</strong> (<em>str</em>) – Which distance metric Annoy should use when building KNN index.
+Supports “angular”, “euclidean”, “manhattan”, “hamming”, or “dot”.</p></li>
+<li><p><strong>verbose</strong> (<em>int</em>) – Controls the volume of logging output the model
+produces when training. When set to 0, silences outputs, when above 0
+will print outputs.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="indexable-datasets">
+<h1>Indexable Datasets<a class="headerlink" href="#indexable-datasets" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="ivis.data.sequence.IndexableDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ivis.data.sequence.</span></span><span class="sig-name descname"><span class="pre">IndexableDataset</span></span><a class="headerlink" href="#ivis.data.sequence.IndexableDataset" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></p>
+<p>A sequence that also defines a shape attribute. This indexable data structure
+can be provided as input to ivis.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.data.sequence.IndexableDataset.get_batch">
+<span class="sig-name descname"><span class="pre">get_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx_seq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.sequence.IndexableDataset.get_batch" title="Link to this definition"></a></dt>
+<dd><p>Returns a batch of data points based on the index sequence provided.</p>
+<p>Non-optimized version, can be overridden by child classes to be made be efficient</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.data.sequence.IndexableDataset.shape">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shape</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.sequence.IndexableDataset.shape" title="Link to this definition"></a></dt>
+<dd><p>Returns the shape of the dataset. First dimension corresponds to rows,
+the other dimensions correspond to features.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ivis.data.sequence.ImageDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ivis.data.sequence.</span></span><span class="sig-name descname"><span class="pre">ImageDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rgb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bilinear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_aspect_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tensorflow.uint8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preprocessing_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.sequence.ImageDataset" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ivis.data.sequence.IndexableDataset" title="ivis.data.sequence.sequence.IndexableDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">IndexableDataset</span></code></a></p>
+<p>When indexed, loads images from disk, resizes to consistent size, then returns image.
+Since the returned images will consist of 3 dimensions, the model ivis uses must be capable
+of dealing with this dimensionality of data (for example, a Convolutional Neural Network).
+Such a model can be constructed externally and then passed to ivis as the argument for ‘model’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filepath_list</strong> (<em>list</em>) – All image filepaths in dataset.</p></li>
+<li><p><strong>img_shape</strong> (<em>tuple</em>) – A tuple (height, width) containing desired dimensions to resize the
+images to.</p></li>
+<li><p><strong>str</strong> (<em>resize_method</em>) – Either “rgb”, “rgba” or “grayscale”. Determines how many channels present
+in images that are read in - 3, 4, or 1 respectively.</p></li>
+<li><p><strong>str</strong> – Interpolation method to use when resizing image. Must be one of:
+“area”, “bicubic”, “bilinear”, “gaussian”, “lanczos3”, “lanczos5”, “mitchellcubic”, “nearest”.</p></li>
+<li><p><strong>boolean</strong> (<em>preserve_aspect_ratio</em>) – Whether to preserve the aspect ratio when resizing images.
+If True, will maintain aspect ratio by padding the image.</p></li>
+<li><p><strong>tf.dtypes.DType</strong> (<em>dtype</em>) – The dtype to read the image into. One of tf.uint8 or tf.uint16.</p></li>
+<li><p><strong>Callable</strong> (<em>preprocessing_function</em>) – A function to apply to every image. Will be called
+at the end of the pipeline, after image reading and resizing.
+If None (default), no function will be applied.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.data.sequence.ImageDataset.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rgb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bilinear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_aspect_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tensorflow.uint8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preprocessing_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.sequence.ImageDataset.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.data.sequence.ImageDataset.get_batch">
+<span class="sig-name descname"><span class="pre">get_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx_seq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.sequence.ImageDataset.get_batch" title="Link to this definition"></a></dt>
+<dd><p>Returns a batch of data points based on the index sequence provided.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.data.sequence.ImageDataset.read_image">
+<span class="sig-name descname"><span class="pre">read_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.sequence.ImageDataset.read_image" title="Link to this definition"></a></dt>
+<dd><p>Reads an image from disk into a numpy array</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.data.sequence.ImageDataset.resize_image">
+<span class="sig-name descname"><span class="pre">resize_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.sequence.ImageDataset.resize_image" title="Link to this definition"></a></dt>
+<dd><p>Resizes an numpy array image to desired dimensions</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ivis.data.sequence.ImageDataset.shape">
+<span class="sig-name descname"><span class="pre">shape</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ivis.data.sequence.ImageDataset.shape" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ivis.data.sequence.FlattenedImageDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ivis.data.sequence.</span></span><span class="sig-name descname"><span class="pre">FlattenedImageDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rgb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bilinear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_aspect_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tensorflow.uint8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preprocessing_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.sequence.FlattenedImageDataset" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ivis.data.sequence.ImageDataset" title="ivis.data.sequence.image.ImageDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageDataset</span></code></a></p>
+<p>Returns flattened versions of images read in from disk. This dataset can be
+used with the default neighbour retrieval method used by ivis (Annoy KNN index)
+since it is 2D.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ivis.data.sequence.FlattenedImageDataset.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rgb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bilinear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_aspect_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">tensorflow.uint8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preprocessing_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.data.sequence.FlattenedImageDataset.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ivis.nn.losses">
+<span id="losses"></span><h1>Losses<a class="headerlink" href="#module-ivis.nn.losses" title="Link to this heading"></a></h1>
+<p>Triplet loss functions for training a siamese network with three subnetworks.
+All loss function variants are accessible through the <cite>triplet_loss</cite> function
+by specifying the distance as a string.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ivis.nn.losses.ChebyshevPnLoss">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ivis.nn.losses.</span></span><span class="sig-name descname"><span class="pre">ChebyshevPnLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.nn.losses.ChebyshevPnLoss" title="Link to this definition"></a></dt>
+<dd><p>Calculates the pn loss (a variant of triplet loss) between anchor, positive and negative
+examples in a triplet based on chebyshev distance.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ivis.nn.losses.ChebyshevTripletLoss">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ivis.nn.losses.</span></span><span class="sig-name descname"><span class="pre">ChebyshevTripletLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.nn.losses.ChebyshevTripletLoss" title="Link to this definition"></a></dt>
+<dd><p>Calculates the standard triplet loss between anchor, positive and negative
+examples in a triplet based on chebyshev distance.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ivis.nn.losses.CosinePnLoss">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ivis.nn.losses.</span></span><span class="sig-name descname"><span class="pre">CosinePnLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.nn.losses.CosinePnLoss" title="Link to this definition"></a></dt>
+<dd><p>Calculates the pn loss (a variant of triplet loss) between anchor, positive and negative
+examples in a triplet based on cosine distance.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ivis.nn.losses.CosineTripletLoss">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ivis.nn.losses.</span></span><span class="sig-name descname"><span class="pre">CosineTripletLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.nn.losses.CosineTripletLoss" title="Link to this definition"></a></dt>
+<dd><p>Calculates the standard triplet loss between anchor, positive and negative
+examples in a triplet based on cosine distance.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ivis.nn.losses.EuclideanPnLoss">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ivis.nn.losses.</span></span><span class="sig-name descname"><span class="pre">EuclideanPnLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.nn.losses.EuclideanPnLoss" title="Link to this definition"></a></dt>
+<dd><p>Calculates the pn loss (a variant of triplet loss) between anchor, positive and negative
+examples in a triplet based on euclidean distance.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ivis.nn.losses.EuclideanSoftmaxRatioLoss">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ivis.nn.losses.</span></span><span class="sig-name descname"><span class="pre">EuclideanSoftmaxRatioLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.nn.losses.EuclideanSoftmaxRatioLoss" title="Link to this definition"></a></dt>
+<dd><p>Calculates the standard softmax ratio between anchor, positive and negative
+examples in a triplet based on euclidean distance.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ivis.nn.losses.EuclideanSoftmaxRatioPnLoss">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ivis.nn.losses.</span></span><span class="sig-name descname"><span class="pre">EuclideanSoftmaxRatioPnLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.nn.losses.EuclideanSoftmaxRatioPnLoss" title="Link to this definition"></a></dt>
+<dd><p>Calculates a pn variant of the softmax ratio between anchor, positive
+and negative examples in a triplet based on euclidean distance.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ivis.nn.losses.EuclideanTripletLoss">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ivis.nn.losses.</span></span><span class="sig-name descname"><span class="pre">EuclideanTripletLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.nn.losses.EuclideanTripletLoss" title="Link to this definition"></a></dt>
+<dd><p>Calculates the standard triplet loss between anchor, positive and negative
+examples in a triplet based on euclidean distance.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ivis.nn.losses.ManhattanPnLoss">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ivis.nn.losses.</span></span><span class="sig-name descname"><span class="pre">ManhattanPnLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.nn.losses.ManhattanPnLoss" title="Link to this definition"></a></dt>
+<dd><p>Calculates the pn loss (a variant of triplet loss) between anchor, positive and negative
+examples in a triplet based on manhattan distance.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ivis.nn.losses.ManhattanTripletLoss">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ivis.nn.losses.</span></span><span class="sig-name descname"><span class="pre">ManhattanTripletLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">margin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.nn.losses.ManhattanTripletLoss" title="Link to this definition"></a></dt>
+<dd><p>Calculates the standard triplet loss between anchor, positive and negative
+examples in a triplet based on manhattan distance.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ivis.nn.losses.register_loss">
+<span class="sig-prename descclassname"><span class="pre">ivis.nn.losses.</span></span><span class="sig-name descname"><span class="pre">register_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss_fn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.nn.losses.register_loss" title="Link to this definition"></a></dt>
+<dd><p>Registers a class definition or Callable as an ivis loss function.
+A mapping will be created between the name and the loss function passed.
+If a class definition is provided, an instance will be created, passing the name
+as an argument.</p>
+<p>If no name is provided to this function, the name of the passed function will be used
+as a key.</p>
+<p>The loss function must have two parameters, (y_true, y_pred)
+and calculates the loss for a batch of triplet inputs (y_pred).
+y_pred is expected to be of shape: (3, batch_size, embedding_dims).</p>
+<dl>
+<dt>Usage:</dt><dd><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@register_loss</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">custom_loss</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
+    <span class="k">pass</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Ivis</span><span class="p">(</span><span class="n">distance</span><span class="o">=</span><span class="s1">&#39;custom_loss&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ivis.nn.losses.semi_supervised_loss">
+<span class="sig-prename descclassname"><span class="pre">ivis.nn.losses.</span></span><span class="sig-name descname"><span class="pre">semi_supervised_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss_function</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.nn.losses.semi_supervised_loss" title="Link to this definition"></a></dt>
+<dd><p>Wraps the provided ivis supervised loss function to deal with the partially
+labeled data. Returns a new ‘semi-supervised’ loss function that masks the
+loss on examples where label information is missing.</p>
+<p>Missing labels are assumed to be marked with -1.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ivis.nn.losses.triplet_loss">
+<span class="sig-prename descclassname"><span class="pre">ivis.nn.losses.</span></span><span class="sig-name descname"><span class="pre">triplet_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pn'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.nn.losses.triplet_loss" title="Link to this definition"></a></dt>
+<dd><p>Returns a previously registered triplet loss function associated
+with the string ‘distance’. If passed a callable, just returns it.</p>
+</dd></dl>
+
+</section>
+<section id="module-ivis.nn.callbacks">
+<span id="callbacks"></span><h1>Callbacks<a class="headerlink" href="#module-ivis.nn.callbacks" title="Link to this heading"></a></h1>
+<p>A collection of callbacks that can be passed to ivis to be called during training.
+These provide utilities such as saving checkpoints during training (allowing for
+resuming if interrupted), as well as periodic logging of plots and model embeddings.
+With this information, you may decide to terminate a training session early
+due to a lack of improvements to the visualizations, for example.</p>
+<p>To use a callback during training, simply pass a list of callback objects
+to the Ivis object when creating it using the callbacks keyword argument.
+The ivis.nn.callbacks module contains a set of callbacks provided for use with ivis models,
+but any <cite>tf.keras.callbacks.Callbacks</cite> object can be passed and will be used during training:
+for example, <cite>tf.keras.callbacks.TensorBoard</cite>. This means it’s also possible to write your own
+callbacks for ivis to use.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ivis.nn.callbacks.EmbeddingsImage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ivis.nn.callbacks.</span></span><span class="sig-name descname"><span class="pre">EmbeddingsImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.nn.callbacks.EmbeddingsImage" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Callback</span></code></p>
+<p>Periodically generates and plots 2D embeddings of the data
+provided to <code class="docutils literal notranslate"><span class="pre">data</span></code> using the latest state of the <code class="docutils literal notranslate"><span class="pre">Ivis</span></code> model.
+By default, saves plots of the embeddings every epoch; increasing the
+<code class="docutils literal notranslate"><span class="pre">epoch_interval</span></code> will save the plots less frequently.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>list</em><em>[</em><em>float</em><em>]</em>) – Data to embed and plot with the latest Ivis model</p></li>
+<li><p><strong>labels</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – Labels with which to colour plotted
+embeddings. If <cite>None</cite> all points will have the same color.</p></li>
+<li><p><strong>log_dir</strong> (<em>str</em>) – Folder to save resulting embeddings.</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – Filename to save each file as. <cite>{}</cite> in string
+will be substituted with the epoch number.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ivis.nn.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">EmbeddingsImage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ivis</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ivis</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tensorflow.keras.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">mnsit</span>
+
+<span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">),</span> <span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">)</span>  <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+
+<span class="c1"># Plot embeddings of test set every epoch colored by labels</span>
+<span class="n">embeddings_callback</span> <span class="o">=</span> <span class="n">EmbeddingsImage</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">,</span>
+                                        <span class="n">log_dir</span><span class="o">=</span><span class="s1">&#39;test-embeddings&#39;</span><span class="p">,</span>
+                                        <span class="n">filename</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_test_embeddings.npy&#39;</span><span class="p">,</span>
+                                        <span class="n">epoch_interval</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">Ivis</span><span class="p">(</span><span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">embeddings_callback</span><span class="p">])</span>
+
+<span class="c1"># Train on training set</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ivis.nn.callbacks.EmbeddingsLogging">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ivis.nn.callbacks.</span></span><span class="sig-name descname"><span class="pre">EmbeddingsLogging</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.nn.callbacks.EmbeddingsLogging" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Callback</span></code></p>
+<p>Periodically saves embeddings of the data provided to <code class="docutils literal notranslate"><span class="pre">data</span></code>
+using the latest state of the <code class="docutils literal notranslate"><span class="pre">Ivis</span></code> model.
+By default, saves embeddings every epoch; increasing the
+<code class="docutils literal notranslate"><span class="pre">epoch_interval</span></code> will save the embeddings less frequently.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>list</em><em>[</em><em>float</em><em>]</em>) – Data to embed with the latest Ivis object</p></li>
+<li><p><strong>log_dir</strong> (<em>str</em>) – Folder to save resulting embeddings.</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – Filename to save each file as. <cite>{}</cite> in string
+will be substituted with the epoch number.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ivis.nn.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">EmbeddingsLogging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ivis</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ivis</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tensorflow.keras.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">mnsit</span>
+
+<span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">),</span> <span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">)</span>  <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+
+<span class="c1"># Save embeddings of test set every epoch</span>
+<span class="n">embeddings_callback</span> <span class="o">=</span> <span class="n">EmbeddingsLogging</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span>
+                                        <span class="n">log_dir</span><span class="o">=</span><span class="s1">&#39;test-embeddings&#39;</span><span class="p">,</span>
+                                        <span class="n">filename</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_test_embeddings.npy&#39;</span><span class="p">,</span>
+                                        <span class="n">epoch_interval</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">Ivis</span><span class="p">(</span><span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">embeddings_callback</span><span class="p">])</span>
+
+<span class="c1"># Train on training set</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ivis.nn.callbacks.ModelCheckpoint">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ivis.nn.callbacks.</span></span><span class="sig-name descname"><span class="pre">ModelCheckpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.nn.callbacks.ModelCheckpoint" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Callback</span></code></p>
+<p>Periodically saves the model during training. By default, it saves the
+model every epoch; increasing the <code class="docutils literal notranslate"><span class="pre">epoch_interval</span></code> will make
+checkpointing less frequent.</p>
+<p>If the given filename contains the <code class="docutils literal notranslate"><span class="pre">{}</span></code> string, the epoch number will be
+subtituted in, resulting in multiple checkpoint folders with different
+names. If a filename such as ‘ivis-checkpoint’ is provided, only the
+latest checkpoint will be kept.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>log_dir</strong> (<em>str</em>) – Folder to save resulting embeddings.</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – Filename to save each file as. <cite>{}</cite> in string
+will be substituted with the epoch number.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ivis.nn.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelCheckpoint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ivis</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ivis</span>
+
+<span class="c1"># Save only the latest checkpoint to current directory every 10 epochs</span>
+<span class="n">checkpoint_callback</span> <span class="o">=</span> <span class="n">ModelCheckpoint</span><span class="p">(</span><span class="n">log_dir</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span>
+                                    <span class="n">filename</span><span class="o">=</span><span class="s1">&#39;latest-checkpoint.ivis&#39;</span><span class="p">,</span>
+                                    <span class="n">epoch_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">Ivis</span><span class="p">(</span><span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">checkpoint_callback</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ivis.nn.callbacks.TensorBoardEmbeddingsImage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ivis.nn.callbacks.</span></span><span class="sig-name descname"><span class="pre">TensorBoardEmbeddingsImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ivis.nn.callbacks.TensorBoardEmbeddingsImage" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Callback</span></code></p>
+<p>Periodically generates and plots 2D embeddings of the data
+provided to <code class="docutils literal notranslate"><span class="pre">data</span></code> using the latest state of the <code class="docutils literal notranslate"><span class="pre">Ivis</span></code> model.
+The plots are designed to be viewed in Tensorboard, which will provide
+an image that shows the history of embeddings plots through training.
+By default, saves plots of the embeddings every epoch; increasing the
+<code class="docutils literal notranslate"><span class="pre">epoch_interval</span></code> will save the plots less frequently.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>list</em><em>[</em><em>float</em><em>]</em>) – Data to embed and plot with the latest Ivis</p></li>
+<li><p><strong>labels</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – Labels with which to colour plotted
+embeddings. If <cite>None</cite> all points will have the same color.</p></li>
+<li><p><strong>log_dir</strong> (<em>str</em>) – Folder to save resulting embeddings.</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – Filename to save each file as. <cite>{}</cite> in string
+will be substituted with the epoch number.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ivis.nn.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">TensorBoardEmbeddingsImage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ivis</span><span class="w"> </span><span class="kn">import</span> <span class="n">Ivis</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tensorflow.keras.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">mnsit</span>
+
+<span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">),</span> <span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">)</span>  <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+
+<span class="c1"># Plot embeddings of test set every epoch colored by labels</span>
+<span class="n">embeddings_callback</span> <span class="o">=</span> <span class="n">TensorBoardEmbeddingsImage</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">,</span>
+                                        <span class="n">log_dir</span><span class="o">=</span><span class="s1">&#39;test-embeddings&#39;</span><span class="p">,</span>
+                                        <span class="n">filename</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_test_embeddings.npy&#39;</span><span class="p">,</span>
+                                        <span class="n">epoch_interval</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">Ivis</span><span class="p">(</span><span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">embeddings_callback</span><span class="p">])</span>
+
+<span class="c1"># Train on training set</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<video controls loop="true" autoplay="autoplay" width="560" height="315" src="_static/tensorboard_embeddings_plots.mp4"></video></section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="embeddings_benchmarks.html" class="btn btn-neutral float-left" title="Distance Preservation Benchmarks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Bering Limited.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

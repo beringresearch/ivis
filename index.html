@@ -1,0 +1,302 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ivis dimensionality reduction &mdash; ivis  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/bering.css?v=0437f1d2" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/js/bering.js?v=63551a6c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Python Package" href="python_package.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            ivis
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Get Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="python_package.html">Python Package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="r_package.html">R Package</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Using ivis</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="unsupervised.html">Unsupervised Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supervised.html">Supervised Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="semi_supervised.html">Semi-supervised Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hyperparameters.html">Hyperparameter Selection</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Ivis Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="scanpy_singlecell.html">Visualising Single Cell Experiments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comparisons.html">Dimensionality Reduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learning.html">Metric Learning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="oom_datasets.html">Out-of-memory Datasets</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Benchmarks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="timings_benchmarks.html">Speed of Execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="embeddings_benchmarks.html">Distance Preservation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Ivis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#neighbour-retrieval">Neighbour Retrieval</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#indexable-datasets">Indexable Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#module-ivis.nn.losses">Losses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#module-ivis.nn.callbacks">Callbacks</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">ivis</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">ivis dimensionality reduction</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ivis-dimensionality-reduction">
+<h1>ivis dimensionality reduction<a class="headerlink" href="#ivis-dimensionality-reduction" title="Link to this heading"></a></h1>
+<p><a class="reference internal" href="_images/ivis_aorta_all_markers.png"><img alt="fig1" src="_images/ivis_aorta_all_markers.png" style="width: 49%;" /></a> <a class="reference internal" href="_images/ivis_retinal_bipolar_cells.png"><img alt="fig2" src="_images/ivis_retinal_bipolar_cells.png" style="width: 49%;" /></a></p>
+<p><code class="docutils literal notranslate"><span class="pre">ivis</span></code> is a machine learning library for reducing dimensionality of very large datasets using Siamese Neural Networks. <code class="docutils literal notranslate"><span class="pre">ivis</span></code> preserves global data structures in a low-dimensional space, adds new data points to existing embeddings using a parametric mapping function, and scales linearly to millions of observations. The algorithm is described in detail in <a class="reference external" href="https://www.nature.com/articles/s41598-019-45301-0">Structure-preserving visualisation of high dimensional single-cell datasets</a>.</p>
+<section id="features">
+<h2>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h2>
+<ul>
+<li><p>Unsupervised, semi-supervised, and fully supervised dimensionality reduction</p></li>
+<li><p>Support for arbitrary datasets</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>N-dimensional arrays</p></li>
+<li><p>Image files on disk</p></li>
+<li><p>Custom data connectors</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>In- and out-of-memory data processing</p></li>
+<li><p>Resumable training</p></li>
+<li><p>Arbitrary neural network backbones</p></li>
+<li><p>Customizable neighbour retrieval</p></li>
+<li><p>Callbacks and Tensorboard integration</p></li>
+</ul>
+<p>The latest development version is on <a class="reference external" href="https://github.com/beringresearch/ivis">github</a>.</p>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Get Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="python_package.html">Python Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="python_package.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python_package.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python_package.html#quickstart">Quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python_package.html#bugs">Bugs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="r_package.html">R Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="r_package.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="r_package.html#quickstart">Quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="r_package.html#vignette">Vignette</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Using ivis</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="unsupervised.html">Unsupervised Dimensionality Reduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="unsupervised.html#the-iris-dataset">The <code class="docutils literal notranslate"><span class="pre">iris</span></code> dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="unsupervised.html#reducing-dimensionality-of-n-dimensional-arrays">Reducing dimensionality of n-dimensional arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="unsupervised.html#using-custom-knn-retreaval">Using custom KNN retreaval</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="supervised.html">Supervised Dimensionality Reduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="supervised.html#classification">Classification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="supervised.html#regression">Regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="supervised.html#supervision-weight">Supervision Weight</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="semi_supervised.html">Semi-supervised Dimensionality Reduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="semi_supervised.html#semi-supervised-classification">Semi-supervised Classification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="semi_supervised.html#supervision-weight">Supervision Weight</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="hyperparameters.html">Hyperparameter Selection</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="hyperparameters.html#k"><code class="docutils literal notranslate"><span class="pre">k</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="hyperparameters.html#n-epochs-without-progress"><code class="docutils literal notranslate"><span class="pre">n_epochs_without_progress</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="hyperparameters.html#model"><code class="docutils literal notranslate"><span class="pre">model</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Ivis Notebooks</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="scanpy_singlecell.html">Visualising Single Cell Experiments</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="scanpy_singlecell.html#reducing-dimensionality-using-ivis">Reducing Dimensionality Using <code class="docutils literal notranslate"><span class="pre">ivis</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="comparisons.html">Dimensionality Reduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="comparisons.html#visual-assessment">Visual Assessment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="comparisons.html#quantitative-evaluation">Quantitative Evaluation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="metric_learning.html">Metric Learning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="metric_learning.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metric_learning.html#results">Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metric_learning.html#conclusions">Conclusions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="oom_datasets.html">Out-of-memory Datasets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="oom_datasets.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oom_datasets.html#example">Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oom_datasets.html#conclusions">Conclusions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="oom_datasets.html#advanced-custom-dataset-loaders">Advanced: Custom dataset loaders</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Benchmarks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="timings_benchmarks.html">Speed of Execution</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="timings_benchmarks.html#effects-of-data-size-on-performance">Effects of Data Size on Performance</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="embeddings_benchmarks.html">Distance Preservation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="embeddings_benchmarks.html#datasets-selection">Datasets Selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="embeddings_benchmarks.html#accuracy-of-low-dimensional-embeddings">Accuracy of Low-Dimensional Embeddings</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Ivis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.Ivis"><code class="docutils literal notranslate"><span class="pre">Ivis</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#neighbour-retrieval">Neighbour Retrieval</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.data.neighbour_retrieval.NeighbourMatrix"><code class="docutils literal notranslate"><span class="pre">NeighbourMatrix</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.data.neighbour_retrieval.AnnoyKnnMatrix"><code class="docutils literal notranslate"><span class="pre">AnnoyKnnMatrix</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.data.neighbour_retrieval.LabeledNeighbourMap"><code class="docutils literal notranslate"><span class="pre">LabeledNeighbourMap</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.data.neighbour_retrieval.knn.build_annoy_index"><code class="docutils literal notranslate"><span class="pre">build_annoy_index()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#indexable-datasets">Indexable Datasets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.data.sequence.IndexableDataset"><code class="docutils literal notranslate"><span class="pre">IndexableDataset</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.data.sequence.ImageDataset"><code class="docutils literal notranslate"><span class="pre">ImageDataset</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.data.sequence.FlattenedImageDataset"><code class="docutils literal notranslate"><span class="pre">FlattenedImageDataset</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#module-ivis.nn.losses">Losses</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.nn.losses.ChebyshevPnLoss"><code class="docutils literal notranslate"><span class="pre">ChebyshevPnLoss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.nn.losses.ChebyshevTripletLoss"><code class="docutils literal notranslate"><span class="pre">ChebyshevTripletLoss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.nn.losses.CosinePnLoss"><code class="docutils literal notranslate"><span class="pre">CosinePnLoss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.nn.losses.CosineTripletLoss"><code class="docutils literal notranslate"><span class="pre">CosineTripletLoss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.nn.losses.EuclideanPnLoss"><code class="docutils literal notranslate"><span class="pre">EuclideanPnLoss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.nn.losses.EuclideanSoftmaxRatioLoss"><code class="docutils literal notranslate"><span class="pre">EuclideanSoftmaxRatioLoss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.nn.losses.EuclideanSoftmaxRatioPnLoss"><code class="docutils literal notranslate"><span class="pre">EuclideanSoftmaxRatioPnLoss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.nn.losses.EuclideanTripletLoss"><code class="docutils literal notranslate"><span class="pre">EuclideanTripletLoss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.nn.losses.ManhattanPnLoss"><code class="docutils literal notranslate"><span class="pre">ManhattanPnLoss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.nn.losses.ManhattanTripletLoss"><code class="docutils literal notranslate"><span class="pre">ManhattanTripletLoss</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.nn.losses.register_loss"><code class="docutils literal notranslate"><span class="pre">register_loss()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.nn.losses.semi_supervised_loss"><code class="docutils literal notranslate"><span class="pre">semi_supervised_loss()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.nn.losses.triplet_loss"><code class="docutils literal notranslate"><span class="pre">triplet_loss()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#module-ivis.nn.callbacks">Callbacks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.nn.callbacks.EmbeddingsImage"><code class="docutils literal notranslate"><span class="pre">EmbeddingsImage</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.nn.callbacks.EmbeddingsLogging"><code class="docutils literal notranslate"><span class="pre">EmbeddingsLogging</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.nn.callbacks.ModelCheckpoint"><code class="docutils literal notranslate"><span class="pre">ModelCheckpoint</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#ivis.nn.callbacks.TensorBoardEmbeddingsImage"><code class="docutils literal notranslate"><span class="pre">TensorBoardEmbeddingsImage</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="python_package.html" class="btn btn-neutral float-right" title="Python Package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Bering Limited.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
